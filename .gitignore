@@ -1,0 +1,7 @@
+*~
+*.elc
+*~
+\#*\#
+.\#*
+auto-save-list
+.DS_Store
