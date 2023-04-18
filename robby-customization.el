@@ -9,7 +9,7 @@
 ;;; general settings
 (defcustom robby-openai-api-key nil
   "OpenAI API key."
-  :type 'string
+  :type '(choice string (const nil))
   :group 'robby)
 
 (defgroup robby nil
@@ -45,7 +45,6 @@ Set to nil to disable spinner."
   :group 'robby)
 
 ;;; completions api options
-
 (defgroup robby-completions-api nil
   "Options to pass to the completions API."
   :group 'robby)
@@ -57,17 +56,17 @@ Set to nil to disable spinner."
 
 (defcustom robby-completions-suffix nil
   "The suffix that comes after a completion of inserted text."
-  :type :string
+  :type '(choice string (const nil))
   :group 'robby-completions-api)
 
 (defcustom robby-completions-max-tokens 300
   "The maximum number of tokens to generate in the completion."
-  :type 'integer
+  :type '(choice integer (const nil))
   :group 'robby-completions-api)
 
 (defcustom robby-completions-temperature nil
   "What sampling temperature to use.  Defaults to 1."
-  :type 'number
+  :type '(choice number (const nil))
   :group 'robby-completions-api)
 
 (defcustom robby-completions-top-p nil
@@ -75,40 +74,40 @@ Set to nil to disable spinner."
 sampling, where the model considers the results of the tokens
 with top_p probability mass. So 0.1 means only the tokens
 comprising the top 10% probability mass are considered."
-  :type 'number
+  :type '(choice number (const nil))
   :group 'robby-completions-api)
 
 (defcustom robby-completions-n nil
   "How many completions to generate for each prompt. Defaults to 1."
-  :type 'number
+  :type '(choice integer (const nil))
   :group 'robby-completions-api)
 
 (defcustom robby-completions-presence-penalty nil
   "Number between -2.0 and 2.0. Positive values penalize new tokens
 based on whether they appear in the text so far, increasing the
 model's likelihood to talk about new topics."
-  :type 'number
+  :type '(choice number (const nil))
   :group 'robby-completions-api)
 
 (defcustom robby-completions-frequency-penalty nil
   "Number between -2.0 and 2.0. Positive values penalize new tokens
 based on their existing frequency in the text so far, decreasing
 the model's likelihood to repeat the same line verbatim."
-  :type 'number
+  :type '(choice number (const nil))
   :group 'robby-completions-api)
 
 (defcustom robby-completions-best-of nil
   "Generates best_of completions server-side and returns the
 \"best\" (the one with the highest log probability per
 token). Results cannot be streamed."
-  :type 'integer
+  :type '(choice integer (const nil))
   :group 'robby-completions-api)
 
 (defcustom robby-completions-logit-bias nil
   "Generates best_of completions server-side and returns the
 \"best\" (the one with the highest log probability per
 token). Results cannot be streamed."
-  :type 'number
+  :type '(choice integer (const nil))
   :group 'robby-completions-api)
 
 ;;; chat api options
@@ -123,17 +122,17 @@ token). Results cannot be streamed."
 
 (defcustom robby-chat-suffix nil
   "The suffix that comes after a completion of inserted text."
-  :type :string
+  :type '(choice string (const nil))
   :group 'robby-chat-api)
 
 (defcustom robby-chat-max-tokens 300
   "The maximum number of tokens to generate in the completion."
-  :type 'integer
+  :type '(choice integer (const nil))
   :group 'robby-chat-api)
 
 (defcustom robby-chat-temperature nil
   "What sampling temperature to use. Defaults to 1."
-  :type 'number
+  :type '(choice number (const nil))
   :group 'robby-chat-api)
 
 (defcustom robby-chat-top-p nil
@@ -141,12 +140,12 @@ token). Results cannot be streamed."
 sampling, where the model considers the results of the tokens
 with top_p probability mass. So 0.1 means only the tokens
 comprising the top 10% probability mass are considered."
-  :type 'number
+  :type '(choice number (const nil))
   :group 'robby-chat-api)
 
 (defcustom robby-chat-n nil
   "How many completions to generate for each prompt. Defaults to 1."
-  :type 'number
+  :type '(choice number (const nil))
   :group 'robby-chat-api)
 
 (defcustom robby-chat-logprobs nil
@@ -155,40 +154,40 @@ as well the chosen tokens. For example, if logprobs is 5, the API
 will return a list of the 5 most likely tokens. The API will
 always return the logprob of the sampled token, so there may be
 up to logprobs+1 elements in the response."
-  :type 'integer
+  :type '(choice integer (const nil))
   :group 'robby-completions-api)
 
 (defcustom robby-chat-stop nil
   "Up to 4 sequences where the API will stop generating further
 tokens. The returned text will not contain the stop sequence."
-  :type 'string                         ;; todo handle arrays of strings
+  :type '(choice string (const nil)) ;; todo handle arrays of strings
   :group 'robby-chat-api)
 
 (defcustom robby-chat-presence-penalty nil
   "Number between -2.0 and 2.0. Positive values penalize new tokens
 based on whether they appear in the text so far, increasing the
 model's likelihood to talk about new topics."
-  :type 'number
+  :type '(choice number (const nil))
   :group 'robby-chat-api)
 
 (defcustom robby-chat-frequency-penalty nil
   "Number between -2.0 and 2.0. Positive values penalize new tokens
 based on their existing frequency in the text so far, decreasing
 the model's likelihood to repeat the same line verbatim."
-  :type 'number
+  :type '(choice number (const nil))
   :group 'robby-chat-api)
 
 (defcustom robby-chat-best-of nil
   "Generates best_of completions server-side and returns the
 \"best\" (the one with the highest log probability per
 token). Results cannot be streamed."
-  :type 'number
+  :type '(choice number (const nil))
   :group 'robby-chat-api)
 
 (defcustom robby-chat-user nil
   "A unique identifier representing your end-user, which can help
 OpenAI to monitor and detect abuse."
-  :type 'string
+  :type '(choice string (const nil))
   :group 'robby-chat-api)
 
 ;; TODO logit-bias
