@@ -13,35 +13,39 @@
 (defvar robby--buffer "*robby*" "Robby help buffer name, for displaying OpenAI responses.")
 
 ;;;###autoload
-(defun robby--respond-with-message (text _beg _end)
+(defun robby--respond-with-message (text _beg _end _output-buffer)
   "Show TEXT in minibuffer message."
   (message (robby--format-message-text text)))
 
 ;;;###autoload
-(defun robby--show-response-in-help-window (text _beg _end)
+(defun robby--show-response-in-help-window (text _beg _end _output-buffer)
   "Show TEXT in help window."
   (with-help-window (get-buffer-create robby--buffer)
     (princ text)))
 
 ;;;###autoload
-(defun robby--prepend-response-to-region (text beg _end)
+(defun robby--prepend-response-to-region (text beg _end output-buffer)
   "Insert TEXT at position BEG."
-  (goto-char beg)
-  (insert (format "%s\n" text)))
+  (with-current-buffer (or output-buffer (current-buffer))
+    (goto-char beg)
+    (insert (format "%s\n" text))))
 
 ;;;###autoload
-(defun robby--append-response-after-region (text _beg end)
+(defun robby--append-response-after-region (text _beg end output-buffer)
   "Insert TEXT at position END."
-  (goto-char end)
-  (insert (format "\n%s" text)))
+  (with-current-buffer (or output-buffer (current-buffer))
+    (goto-char end)
+    (insert (format "\n%s" text))))
 
 ;;;###autoload
-(defun robby--replace-region-with-response (text beg end)
+(defun robby--replace-region-with-response (text beg end output-buffer)
   "Replace region between BEG and END with TEXT."
-  (delete-region beg end)
-  (goto-char beg)
-  (insert text))
+  (with-current-buffer (or output-buffer (current-buffer))
+    (delete-region beg end)
+    (goto-char beg)
+    (insert text)))
 
 (provide 'robby-actions)
 
 ;;; robby-actions.el ends here
+

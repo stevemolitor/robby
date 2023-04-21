@@ -32,7 +32,7 @@ prefix with PROMPT."
            (prompt-with-prefix (format "%s\n%s" prompt region-text)))
       `(,prompt-with-prefix . ,prompt))))
 
-(cl-defun robby--run-command (&key arg historyp prompt action options)
+(cl-defun robby--run-command (&key arg historyp prompt action options output-buffer)
   "Make OpenAI API request.  Get PROMPT via `robby--get-prompt'.
 
 Save current buffer positions, pass to ACTION when request is
@@ -47,7 +47,10 @@ If HISTORYP is t pass the `robby-history' conversation history
 to the OpenAI request.
 
 OPTIONS is property list list of options to pass to the OpenAI
-API."
+API.
+
+OUTPUT-BUFFER is the output buffer to put response in for buffer
+commands. Defaults to current buffer."
   (let* ((prompt-and-prompt-prefix (robby--get-prompt prompt arg))
          (basic-prompt (car prompt-and-prompt-prefix))
          (prompt-prefix (cdr prompt-and-prompt-prefix))
@@ -70,7 +73,7 @@ API."
            (message nil)
            (if (robby--preview-p arg)
                (robby--show-response-in-help-window text beg end)
-             (funcall action text beg end))
+             (funcall action text beg end output-buffer))
            (run-hooks 'robby-command-complete-hook)))))))
 
 ;;;###autoload (autoload 'robby-define-command "robby" "Define a custom robby command." nil t)
@@ -80,7 +83,8 @@ API."
                                    historyp
                                    prompt
                                    action
-                                   options)
+                                   options
+                                   output-buffer)
   "Define a new Robby command.
 
 NAME is the command name, a symbol.
@@ -99,10 +103,13 @@ ACTION - function to invoke when request is complete.  The
 function is passed the response text and the selected region, and
 must be of the form `(TEXT BEG END)'.
 
-OPTIONS - properlist of options to pass to the OpenAI API. These
+OPTIONS - property list of options to pass to the OpenAI API. These
 options are merged in with the customization options specified in
 the api customization group, either `robby-chat-api' or
-`robby-completions-api'."
+`robby-completions-api'.
+
+OUTPUT-BUFFER is the output buffer to put response in for buffer
+commands. Defaults to current buffer."
   `(defun ,name (arg)
      ,docstring
      (interactive "P")
@@ -111,7 +118,8 @@ the api customization group, either `robby-chat-api' or
       :historyp ,historyp
       :prompt ',prompt
       :action #',action
-      :options ,options)))
+      :options ,options
+      :output-buffer ,output-buffer)))
 
 (provide 'robby-define-command)
 
