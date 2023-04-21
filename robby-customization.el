@@ -93,7 +93,7 @@ model's likelihood to talk about new topics."
   "Number between -2.0 and 2.0. Positive values penalize new tokens
 based on their existing frequency in the text so far, decreasing
 the model's likelihood to repeat the same line verbatim."
-  :type '(choice number (const nil))
+  :type  '(choice integer (const nil))
   :group 'robby-completions-api)
 
 (defcustom robby-completions-best-of nil
@@ -155,7 +155,7 @@ will return a list of the 5 most likely tokens. The API will
 always return the logprob of the sampled token, so there may be
 up to logprobs+1 elements in the response."
   :type '(choice integer (const nil))
-  :group 'robby-completions-api)
+  :group 'robby-chat-api)
 
 (defcustom robby-chat-stop nil
   "Up to 4 sequences where the API will stop generating further
