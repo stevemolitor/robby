@@ -20,10 +20,22 @@ For example, \"robby-chat-temperature\" becomes \"temperature\""
   (let ((regexp (format "^robby-%s-" api)))
     (replace-regexp-in-string regexp "" string)))
 
-(defun robby--kebab-to-snake-case (string)
-  "Transform STRING from kebab to snake case.
-Ie \"a-b-c\" becomes a_b_c."
-  (replace-regexp-in-string "-" "_" string))
+(defun robby--options-from-group (api)
+  "Get list of options from a Robby customization group.
+
+API specifies the customization group, for example `\"chat\"' or
+`\"completions\"'.  Returns an association list of options."
+  (seq-map
+   (lambda (sym)
+     (cons
+      (robby--kebab-to-snake-case (robby--remove-api-prefix api (symbol-name sym)))
+      (symbol-value sym)))
+   (seq-map
+    #'car
+    (seq-filter
+     (lambda (elem)
+       (eq (nth 1 elem) 'custom-variable))
+     (custom-group-members (intern (format "robby-%s-api" api)) nil)))))
 
 (defun robby--options (options)
   "Get a list of options to pass to the OpenAI API.
@@ -39,16 +51,7 @@ customization options."
     'alist
     (seq-filter
      (lambda (elem) (not (null (cdr elem))))
-     (seq-map
-      (lambda (sym)
-        (cons
-         (robby--kebab-to-snake-case (robby--remove-api-prefix robby-api (symbol-name sym)))
-         (symbol-value sym)))
-      (seq-map
-       #'car
-       (seq-filter
-        (lambda (elem) (eq (nth 1 elem) 'custom-variable))
-        (custom-group-members (intern (format "robby-%s-api" robby-api)) nil)))))
+     (robby--options-from-group robby-api))
     (seq-map
      (lambda (assoc) (cons (robby--kebab-to-snake-case (replace-regexp-in-string "^:" "" (symbol-name (car assoc)))) (cdr assoc)))
      (robby--plist-to-alist options)))))

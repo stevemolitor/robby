@@ -11,6 +11,12 @@
   (should (equal (robby--plist-to-alist '(:a 1 :b 2))
                  '((:a . 1) (:b . 2)))))
 
+(ert-deftest robby--kebab-to-snake-case ()
+  (should (equal (robby--kebab-to-snake-case "a-b-c") "a_b_c")))
+
+(ert-deftest robby--snake-to-space-case ()
+  (should (equal (robby--snake-to-space-case "a_b_c") "a b c")))
+
 (provide 'robby-utils-test)
 
 ;;; robby-utils-test.el ends here
