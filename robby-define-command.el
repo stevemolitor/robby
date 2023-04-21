@@ -41,7 +41,7 @@ buffer set to the original buffer when command was invoked.
 
 If PROMPT is a function, call it with ARG and return result.
 Else grab prompt from region, or entire buffer if no region, and
-prefix with PROMPT.
+prefix with PROMPT string.
 
 If HISTORYP is t pass the `robby-history' conversation history
 to the OpenAI request.

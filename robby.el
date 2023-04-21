@@ -26,6 +26,7 @@
 (require 'robby-commands)
 (require 'robby-history)
 (require 'robby-mode)
+(require 'robby-transient)
 
 (provide 'robby)
 

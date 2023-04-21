@@ -13,8 +13,9 @@
     (define-key map "a" 'robby-append-region)
     (define-key map "r" 'robby-replace-region)
     (define-key map "h" 'robby-help-window)
-    (define-key map "c" 'robby-clear-history)
+    (define-key map "l" 'robby-clear-history)
     (define-key map "k" 'robby-kill-last-request)
+    (define-key map "c" 'robby-chat)
     map)
   "Robby command map.")
 
