@@ -56,7 +56,6 @@
   (interactive)
   (read-buffer "Select buffer: "))
 
-;; TODO - autoload not working?
 ;;;###autoload (autoload 'robby-chat "robby" "Robby chat transient command" t)
 (transient-define-prefix robby-chat ()
   "Select Chat API Options"
