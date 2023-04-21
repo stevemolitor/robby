@@ -56,29 +56,24 @@
   (interactive)
   (read-buffer "Select buffer: "))
 
-;; Define a transient command for demonstration purposes.
-(transient-define-prefix my-transient-command ()
-  "Demo command."
-  [("b" "Select buffer" my-buffer-argument)])
-
 ;; TODO - autoload not working?
 ;;;###autoload (autoload 'robby-chat "robby" "Robby chat transient command" t)
 (transient-define-prefix robby-chat ()
   "Select Chat API Options"
   
   ["Prompt Sources"
-   ("-p" "prompt" "prompt=" :prompt "OpenAI prompt or prompt prefix: ")
-   ("-r" "prompt from region or buffer" "prompt-from-region-p")
-   ("-b" "select buffer for response" "buffer=" :reader robby--buffer-reader)]
+   ("-p" "prompt" "prompt=" :prompt "prompt or prompt prefix: ")
+   ("-r" "get prompt from region or buffer" "prompt-from-region-p")
+   ("-b" "output buffer" "buffer=" :prompt "Select output buffer" :reader robby--buffer-reader)]
   ["Options"
    ("-m" "model" "model=" :choices ("gpt-4" "gpt-3.5-turbo"))
    ("-t" "max tokens" "max-tokens=" :reader transient-read-number-N+)]
   ["Actions"
    ("m" "respond with message" robby--message-suffix)
    ("h" "show response in help window" robby--help-window-suffix)
-   ("p" "prepend response to region" robby--prepend-to-region-suffix)
-   ("a" "append response after region" robby--append-after-region-suffix)
-   ("r" "replace region with response" robby--replace-region-suffix)])
+   ("p" "prepend response to region or beginning of buffer" robby--prepend-to-region-suffix)
+   ("a" "append response after region or end of buffer" robby--append-after-region-suffix)
+   ("r" "replace region or buffer with response" robby--replace-region-suffix)])
 
 (provide 'robby-transient)
 

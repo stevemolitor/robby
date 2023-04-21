@@ -17,13 +17,14 @@ If ARG is t also clear robby history."
   (let ((prompt (read-string "Request for AI overlords: ")))
     `(,prompt . ,prompt)))
 
-(defun robby--get-region-or-buffer-text ()
+(defun robby--get-region-or-buffer-text (&optional buffer)
   "Get text in selected region.
 
 If no region return all text in buffer."
-  (if (use-region-p)
-      (buffer-substring-no-properties (region-beginning) (region-end))
-    (buffer-substring-no-properties (point-min) (point-max))))
+  (with-current-buffer (or buffer (current-buffer))
+      (if (use-region-p)
+          (buffer-substring-no-properties (region-beginning) (region-end))
+        (buffer-substring-no-properties (point-min) (point-max)))))
 
 (defun robby--get-prompt-from-region (arg)
   "Get prompt from region, or entire buffer if no selected
