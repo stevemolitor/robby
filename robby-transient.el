@@ -73,6 +73,10 @@
   (interactive)
   (read-buffer "Select buffer: "))
 
+(defun robby--decimal-reader (prompt initial-input history)
+  (interactive)
+  (format "%s" (read-number prompt)))
+
 ;;;###autoload (autoload 'robby-chat "robby" "Robby chat transient command" t)
 (transient-define-prefix robby-chat ()
   "Select Chat API Options"
@@ -83,7 +87,11 @@
    ("-b" "output buffer" "buffer=" :prompt "Select output buffer" :reader robby--buffer-reader)]
   ["Options"
    ("-m" "model" "model=" :choices ("gpt-4" "gpt-3.5-turbo"))
-   ("-t" "max tokens" "max-tokens=" :reader transient-read-number-N+)]
+   ("-e" "temperature" "temperature=" :reader robby--decimal-reader)
+   ("-t" "max tokens" "max-tokens=" :reader robby--decimal-reader)
+   ("-p" "top p" "top-p=")
+   ("-f" "frequency penalty" "frequency-penalty=" :reader robby--decimal-reader)
+   ("-r" "presence penalty" "presence-penalty=" :reader robby--decimal-reader)]
   ["Actions"
    ("m" "respond with message" robby--chat-message-suffix)
    ("h" "show response in help window" robby--chat-help-window-suffix)
@@ -111,8 +119,14 @@
    ("-r" "get prompt from region or buffer" "prompt-from-region-p")
    ("-b" "output buffer" "buffer=" :prompt "Select output buffer" :reader robby--buffer-reader)]
   ["Options"
-   ;; ("-m" "model" "model=" :choices ("gpt-4" "gpt-3.5-turbo"))
-   ("-t" "max tokens" "max-tokens=" :reader transient-read-number-N+)]
+   ("-m" "model" "model=" :choices ("text-davinci-003" "text-curie-001" "text-babbage-001" "text-ada-001"))
+   ("-e" "temperature" "temperature=" :reader robby--decimal-reader)
+   ("-t" "max tokens" "max-tokens=" :reader transient-read-number-N+)
+   ;; TODO stop sequences
+   ("-p" "top p" "top-p=" :reader robby--decimal-reader)
+   ("-f" "frequency penalty" "frequency-penalty=" :reader robby--decimal-reader)
+   ("-r" "presence penalty" "presence-penalty=" :reader robby--decimal-reader)
+   ("-b" "best of" "best-of=" :reader transient-read-number-N+)]
   ["Actions"
    ("m" "respond with message" robby--completions-message-suffix)
    ("h" "show response in help window" robby--completions-help-window-suffix)
