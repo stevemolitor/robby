@@ -32,12 +32,15 @@ prefix with PROMPT."
            (prompt-with-prefix (format "%s\n%s" prompt region-text)))
       `(,prompt-with-prefix . ,prompt))))
 
-(cl-defun robby--run-command (&key arg historyp prompt action options output-buffer)
+(cl-defun robby--run-command (&key arg historyp prompt action api options output-buffer)
   "Make OpenAI API request.  Get PROMPT via `robby--get-prompt'.
 
 Save current buffer positions, pass to ACTION when request is
 complete.  ACTION is invoked asynchronously with the current
 buffer set to the original buffer when command was invoked.
+
+Invoke API, or if nil the current value of the `robby-api'
+customization variable.
 
 If PROMPT is a function, call it with ARG and return result.
 Else grab prompt from region, or entire buffer if no region, and
@@ -54,7 +57,8 @@ commands. Defaults to current buffer."
   (let* ((prompt-and-prompt-prefix (robby--get-prompt prompt arg))
          (basic-prompt (car prompt-and-prompt-prefix))
          (prompt-prefix (cdr prompt-and-prompt-prefix))
-         (complete-prompt (robby--request-input (intern robby-api) basic-prompt historyp)))
+         (complete-prompt (robby--request-input (intern robby-api) basic-prompt historyp))
+         (api (or api (intern robby-api))))
     (message "Awaiting AI overlords…")
     (setq robby--last-command-options
           `(:historyp ,historyp :prompt ,prompt-prefix :action ,action))
@@ -65,6 +69,7 @@ commands. Defaults to current buffer."
        complete-prompt
        basic-prompt
        historyp
+       api
        options
        beg
        end

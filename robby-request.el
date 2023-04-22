@@ -37,7 +37,7 @@ Do nothing if no request is currently running."
   (if (robby--request-running-p)
       (request-abort robby--last-request)))
 
-(defun robby--request (prompt basic-prompt historyp options beg end callback)
+(defun robby--request (prompt basic-prompt historyp api options beg end callback)
   "Make HTTP request to OpenAI API.
 
 PROMPT is the complete prompt possibly including conversation history.
@@ -45,6 +45,9 @@ PROMPT is the complete prompt possibly including conversation history.
 BASIC-PROMPT is the prompt string, without any conversation
 history.  If HISTORYP is t record complete PROMPT and TEXT
 response in history when HTTP request completes.
+
+API is the symbol of the api to use, for example `'chat' or
+`'completions'.
 
 OPTIONS is a property list of options to pass to the OpenAI
 API. It is merged in with the customization options for the API.
@@ -55,8 +58,7 @@ and BEG and END are the bounds of the selected region if any when
 the command was invoked."
   (cl-assert robby-openai-api-key t "Please set robby-openai-api-key customization variable to your OpenAI API Key.")
 
-  (let* ((api (intern robby-api))
-         (input-obj (append prompt (robby--options options)))
+  (let* ((input-obj (append prompt (robby--options options)))
          (input-json (json-encode input-obj))
          (buf (current-buffer)))
     (if (bound-and-true-p robby-mode)
