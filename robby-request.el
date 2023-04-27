@@ -37,7 +37,7 @@ Do nothing if no request is currently running."
   (if (robby--request-running-p)
       (request-abort robby--last-request)))
 
-(defun robby--request (prompt basic-prompt historyp api options beg end callback)
+(cl-defun robby--request (&key prompt basic-prompt historyp api options beg end callback)
   "Make HTTP request to OpenAI API.
 
 PROMPT is the complete prompt possibly including conversation history.

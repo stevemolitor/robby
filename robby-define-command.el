@@ -66,20 +66,20 @@ commands. Defaults to current buffer."
           (beg (if (use-region-p) (region-beginning) (point-min)))
           (end (if (use-region-p) (region-end) (point-max))))
       (robby--request
-       complete-prompt
-       basic-prompt
-       historyp
-       api
-       options
-       beg
-       end
-       (lambda (text beg end)
-         (with-current-buffer buffer
-           (message nil)
-           (if (robby--preview-p arg)
-               (robby--show-response-in-help-window text beg end)
-             (funcall action text beg end output-buffer))
-           (run-hooks 'robby-command-complete-hook)))))))
+       :prompt complete-prompt
+       :basic-prompt basic-prompt
+       :historyp historyp
+       :api api
+       :options options
+       :beg beg
+       :end end
+       :callback (lambda (text beg end)
+                   (with-current-buffer buffer
+                     (message nil)
+                     (if (robby--preview-p arg)
+                         (robby--show-response-in-help-window text beg end)
+                       (funcall action text beg end output-buffer))
+                     (run-hooks 'robby-command-complete-hook)))))))
 
 ;;;###autoload (autoload 'robby-define-command "robby" "Define a custom robby command." nil t)
 (cl-defmacro robby-define-command (name
