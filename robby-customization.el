@@ -130,9 +130,15 @@ token). Results cannot be streamed."
   :type '(choice integer (const nil))
   :group 'robby-chat-api)
 
+(defun robby--validate-temperature (widget)
+  (let ((temp (widget-value widget)))
+    (unless (and (>= temp 0) (<= temp 1))
+      (widget-put widget :error (format "Invalid temperature %d, must be between 0 and 1 inclusive" temp))
+      widget)))
+
 (defcustom robby-chat-temperature nil
   "What sampling temperature to use. Defaults to 1."
-  :type '(choice number (const nil))
+  :type '(choice (number :validate robby--validate-temperature) (const nil))
   :group 'robby-chat-api)
 
 (defcustom robby-chat-top-p nil
