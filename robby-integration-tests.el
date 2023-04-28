@@ -12,11 +12,6 @@
 
 ;;; Code:
 
-(cl-letf (((symbol-function 'completing-read)
-               (lambda (&rest _) "american")))
-      (call-interactively #'set-default-cheese)
-      (should (eq 'american default-cheese)))
-
 (defmacro robby-async-region-test (before re done)
   "Test async robby region command.
 

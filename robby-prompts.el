@@ -32,7 +32,7 @@ If no region return all text in buffer."
 Ask the user for a prompt prefix to prepend to the region that is
 sent as the OpenAI prompt."
   (let* ((prompt-from-region (robby--get-region-or-buffer-text))
-         (prompt-prefix (read-string "hey Request for AI overlords: "))
+         (prompt-prefix (read-string "Request for AI overlords: "))
          (prompt (format "%s\n%s" prompt-prefix prompt-from-region)))
     `(,prompt . ,prompt-prefix)))
 
