@@ -31,13 +31,10 @@ If no region return all text in buffer."
  region.
 
 Prompt for extra context if `ARG'."
-  (let ((prompt-from-region
-         (robby--get-region-or-buffer-text)))
-    (if (robby--prompt-for-extra-context-or-clear-history-p arg)
-        (let* ((prompt-prefix (read-string "Request for AI overlords: "))
-               (prompt (format "%s\n%s" prompt-prefix prompt-from-region)))
-          `(,prompt . ,prompt-prefix))
-      `(,prompt-from-region . ,prompt-from-region))))
+  (let* ((prompt-from-region (robby--get-region-or-buffer-text)
+         (prompt-prefix (read-string "Request for AI overlords: "))
+         (prompt (format "%s\n%s" prompt-prefix prompt-from-region))))
+    `(,prompt . ,prompt-prefix)))
 
 (provide 'robby-prompts)
 
