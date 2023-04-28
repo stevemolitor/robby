@@ -1,5 +1,6 @@
 ;;; robby-integration-test.el  --- integration test for robby commands  -*- lexical-binding:t -*-
 
+(require 'cl)
 (require 'ert-async)
 (require 'seq)
 
@@ -7,8 +8,14 @@
 (require 'robby-define-command)
 (require 'robby-history)
 (require 'robby-customization)
+(require 'robby-prompts)
 
 ;;; Code:
+
+(cl-letf (((symbol-function 'completing-read)
+               (lambda (&rest _) "american")))
+      (call-interactively #'set-default-cheese)
+      (should (eq 'american default-cheese)))
 
 (defmacro robby-async-region-test (before re done)
   "Test async robby region command.
@@ -25,7 +32,6 @@ DONE is the `ert-deftest-async' callback indicating that the test
 is complete."
   `(let ((buffer (generate-new-buffer "*robby-commands-test*"))
          (cb (lambda ()
-               (message "buffer contents %s" (buffer-substring-no-properties (point-min) (point-max)))
                (goto-char (point-min))
                (should (not (null (re-search-forward ,re))))
                (kill-buffer (current-buffer))
@@ -37,8 +43,9 @@ is complete."
      (robby-clear-history)
      (with-current-buffer buffer
        (add-hook 'robby-command-complete-hook cb nil t)
-       ,before)))
-
+       (cl-letf (((symbol-function 'read-string)
+                  (lambda (&rest _) "")))
+         ,before))))
 
 ;;; prepend-region tests
 (defun robby--test-prepend-region (done)
@@ -74,7 +81,6 @@ is complete."
 (ert-deftest-async robby-integration-test--append-region--chat-api (done)
   (let ((robby-api "chat"))
     (robby--test-append-region done)))
-
 
 ;;; replace region tests
 (defun robby--test-replace-region (done)

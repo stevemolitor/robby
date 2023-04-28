@@ -25,7 +25,7 @@
 Else grab prompt from region, or entire buffer if no region, and
 prefix with PROMPT."
   (if (functionp prompt)
-      (funcall prompt arg)
+      (funcall prompt)
     ;; String prompts come from custom commands. Force them to use
     ;; region, and prefix with supplied prompt:
     (let* ((region-text (robby--get-region-or-buffer-text))
@@ -59,9 +59,11 @@ commands. Defaults to current buffer."
          (prompt-prefix (cdr prompt-and-prompt-prefix))
          (complete-prompt (robby--request-input (intern robby-api) basic-prompt historyp))
          (api (or api (intern robby-api))))
-    (message "Awaiting AI overlords…")
+    (if (robby--clear-history-p arg)
+      (robby-clear-history))
     (setq robby--last-command-options
           `(:historyp ,historyp :prompt ,prompt-prefix :action ,action))
+    (message "Awaiting AI overlords…")
     (let ((buffer (current-buffer))
           (beg (if (use-region-p) (region-beginning) (point-min)))
           (end (if (use-region-p) (region-end) (point-max))))
@@ -77,7 +79,7 @@ commands. Defaults to current buffer."
                    (with-current-buffer buffer
                      (message nil)
                      (if (robby--preview-p arg)
-                         (robby--show-response-in-help-window text beg end)
+                         (robby--show-response-in-help-window text nil nil nil)
                        (funcall action text beg end output-buffer))
                      (run-hooks 'robby-command-complete-hook)))))))
 

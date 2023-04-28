@@ -12,8 +12,6 @@
   "Get prompt from minibuffer.
 
 If ARG is t also clear robby history."
-  (if (robby--prompt-for-extra-context-or-clear-history-p arg)
-      (robby-clear-history))
   (let ((prompt (read-string "Request for AI overlords: ")))
     `(,prompt . ,prompt)))
 
@@ -26,14 +24,16 @@ If no region return all text in buffer."
           (buffer-substring-no-properties (region-beginning) (region-end))
         (buffer-substring-no-properties (point-min) (point-max)))))
 
-(defun robby--get-prompt-from-region (arg)
+;; TODO don't prompt with custom commands
+(defun robby--get-prompt-from-region ()
   "Get prompt from region, or entire buffer if no selected
  region.
 
-Prompt for extra context if `ARG'."
-  (let* ((prompt-from-region (robby--get-region-or-buffer-text)
-         (prompt-prefix (read-string "Request for AI overlords: "))
-         (prompt (format "%s\n%s" prompt-prefix prompt-from-region))))
+Ask the user for a prompt prefix to prepend to the region that is
+sent as the OpenAI prompt."
+  (let* ((prompt-from-region (robby--get-region-or-buffer-text))
+         (prompt-prefix (read-string "hey Request for AI overlords: "))
+         (prompt (format "%s\n%s" prompt-prefix prompt-from-region)))
     `(,prompt . ,prompt-prefix)))
 
 (provide 'robby-prompts)

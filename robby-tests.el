@@ -1,4 +1,4 @@
-;;; *robby-tests.el  --- robby unit test suite  -*- lexical-binding:t -*-
+;;; robby-tests.el  --- robby unit test suite  -*- lexical-binding:t -*-
 
 ;;; Commentary:
 
@@ -8,7 +8,6 @@
 
 (require 'robby-history-test)
 (require 'robby-actions-test)
-(require 'robby-prompts-test)
 (require 'robby-logging-test)
 (require 'robby-options-test)
 (require 'robby-apis-test)

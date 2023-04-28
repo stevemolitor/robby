@@ -7,22 +7,22 @@
 
 ;;; Code:
 
-(defun robby--prompt-for-extra-context-or-clear-history-p (arg)
-  "Prompt for extra context or clear history based on ARG.
+(defun robby--clear-history-p (arg)
+  "Clear history based on ARG.
 
-The action performed depends the command.  Returns true when ARG
-is \\[universal-argument], or \\[universal-argument]
+Returns true when ARG is \\[universal-argument]
+\\[universal-argument] or \\[universal-argument]
 \\[universal-argument] \\[universal-argument]."
   (let ((n (prefix-numeric-value arg)))
-    (or (eq n 4) (eq n 64))))
+    (or (eq n 16) (eq n 64))))
 
 (defun robby--preview-p (arg)
   "Preview in help buffer based on ARG.
 
-Return true when arg is \\[universal-argument]
-\\[universal-argument], or \\[universal-argument]
-\\[universal-argument] \\[universal-argument]."
-  (or (eq (prefix-numeric-value arg) 16)
+Return true when arg is \\[universal-argument] or
+\\[universal-argument] \\[universal-argument]
+\\[universal-argument]."
+  (or (eq (prefix-numeric-value arg) 4)
       (eq (prefix-numeric-value arg) 64)))
 
 (provide 'robby-prefix-args)
