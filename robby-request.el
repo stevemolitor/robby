@@ -37,6 +37,24 @@ Do nothing if no request is currently running."
   (if (robby--request-running-p)
       (request-abort robby--last-request)))
 
+(cl-defun robby--request-handle-success (&key
+                                         api
+                                         basic-prompt
+                                         callback
+                                         data
+                                         response-buffer-beg
+                                         response-buffer-end
+                                         spinner-buffer)
+  (robby--spinner-stop spinner-buffer)
+  (robby--log (format "# Raw response:\n%S\n" data))
+  (let ((text (robby--parse-response api data)))
+    (robby--history-push basic-prompt text)
+    (funcall callback text response-buffer-beg response-buffer-end)))
+
+(cl-defun robby--request-handle-error (&rest args &key error-thrown &key data &key symbol-status &allow-other-keys)
+  (unless (robby--request-running-p)
+    (robby--spinner-stop buf)))
+
 (cl-defun robby--request (&key prompt basic-prompt historyp api options beg end callback)
   "Make HTTP request to OpenAI API.
 
@@ -71,30 +89,13 @@ the command was invoked."
             :type "POST"
             :headers `(("Content-Type" . "application/json")
                        ("Authorization" . ,(format "Bearer %s" robby-openai-api-key)))
-            ;; TODO change robby-api to be a symbol
             :data input-json
             :parser 'json-read
             :success
             (cl-function
              (lambda (&key data &allow-other-keys)
-               (robby--spinner-stop buf)
-               (robby--log (format "# Raw response:\n%S\n" data))
-               (let ((text (robby--parse-response api data)))
-                 (robby--history-push basic-prompt text)
-                 (funcall callback text beg end))))
-            :error
-            (cl-function
-             (lambda (&rest args &key error-thrown &key data &key symbol-status &allow-other-keys)
-               (unless (robby--request-running-p)
-                 (robby--spinner-stop buf))
-               (robby--log (format "# Error thrown:\n%S\n# Raw error response data:\n%S\n# symbol-status: %S" error-thrown data symbol-status))
-               (cond
-                ((robby--request-running-p)
-                 (message "Making another request to our AI overlords…"))
-                ((eq symbol-status 'abort)
-                 (message "Robby request aborted"))
-                (t
-                 (message (robby--parse-error-response data))))))))))
+               (robby--request-handle-success :buf buf :data data :api api :basic-prompt basic-prompt :callback callback :beg beg :end end)))
+            :error #'robby--request-handle-error))))
 
 (provide 'robby-request)
 
