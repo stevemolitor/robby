@@ -28,6 +28,15 @@ For example \"a-b-c\" becomes a_b_c."
 For example \"a_b_c\" becomes \"a b c\""
   (replace-regexp-in-string "_" " " string))
 
+(defun robby--get-region (&optional buffer)
+  "Get selected region or bounds of entire buffer if no selected region in BUFFER.
+
+Returns a cons cell - `(beg . end)'"
+  (with-current-buffer (or buffer (current-buffer))
+    (if (use-region-p)
+        (cons (region-beginning) (region-end))
+      (cons (point-min) (point-max)))))
+
 (provide 'robby-utils)
 
 ;;; robby-utils.el ends here

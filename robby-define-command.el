@@ -32,66 +32,17 @@ prefix with PROMPT."
            (prompt-with-prefix (format "%s\n%s" prompt region-text)))
       `(,prompt-with-prefix . ,prompt))))
 
-(cl-defun robby--run-command (&key arg historyp prompt action api options output-buffer)
-  "Make OpenAI API request.  Get PROMPT via `robby--get-prompt'.
-
-Save current buffer positions, pass to ACTION when request is
-complete.  ACTION is invoked asynchronously with the current
-buffer set to the original buffer when command was invoked.
-
-Invoke API, or if nil the current value of the `robby-api'
-customization variable.
-
-If PROMPT is a function, call it with ARG and return result.
-Else grab prompt from region, or entire buffer if no region, and
-prefix with PROMPT string.
-
-If HISTORYP is t pass the `robby-history' conversation history
-to the OpenAI request.
-
-OPTIONS is property list list of options to pass to the OpenAI
-API.
-
-OUTPUT-BUFFER is the output buffer to put response in for buffer
-commands. Defaults to current buffer."
-  (let* ((prompt-and-prompt-prefix (robby--get-prompt prompt arg))
-         (basic-prompt (car prompt-and-prompt-prefix))
-         (prompt-prefix (cdr prompt-and-prompt-prefix))
-         (complete-prompt (robby--request-input (intern robby-api) basic-prompt historyp))
-         (api (or api (intern robby-api))))
-    (if (robby--clear-history-p arg)
-      (robby-clear-history))
-    (setq robby--last-command-options
-          `(:historyp ,historyp :prompt ,prompt-prefix :action ,action))
-    (message "Awaiting AI overlords…")
-    (let ((buffer (current-buffer))
-          (beg (if (use-region-p) (region-beginning) (point-min)))
-          (end (if (use-region-p) (region-end) (point-max))))
-      (robby--request
-       :prompt complete-prompt
-       :basic-prompt basic-prompt
-       :historyp historyp
-       :api api
-       :options options
-       :beg beg
-       :end end
-       :callback (lambda (text beg end)
-                   (with-current-buffer buffer
-                     (message nil)
-                     (if (robby--preview-p arg)
-                         (robby--show-response-in-help-window text nil nil nil)
-                       (funcall action text beg end output-buffer))
-                     (run-hooks 'robby-command-complete-hook)))))))
-
 ;;;###autoload (autoload 'robby-define-command "robby" "Define a custom robby command." nil t)
 (cl-defmacro robby-define-command (name
                                    docstring
                                    &key
                                    historyp
                                    prompt
+                                   prompt-args
                                    action
-                                   options
-                                   output-buffer)
+                                   action-args
+                                   api
+                                   api-options)
   "Define a new Robby command.
 
 NAME is the command name, a symbol.
@@ -110,23 +61,21 @@ ACTION - function to invoke when request is complete.  The
 function is passed the response text and the selected region, and
 must be of the form `(TEXT BEG END)'.
 
-OPTIONS - property list of options to pass to the OpenAI API. These
-options are merged in with the customization options specified in
-the api customization group, either `robby-chat-api' or
-`robby-completions-api'.
-
-OUTPUT-BUFFER is the output buffer to put response in for buffer
-commands. Defaults to current buffer."
+API-OPTIONS - property list of options to pass to the OpenAI
+API. These options are merged in with the customization options
+specified in the api customization group, either `robby-chat-api'
+or `robby-completions-api'."
   `(defun ,name (arg)
      ,docstring
      (interactive "P")
-     (robby--run-command
-      :arg arg
+     (robby-run-command
+      ;; :arg arg ;; TODO add back arg?
+      :prompt ,prompt
+      :prompt-args ,prompt-args
+      :action ,action
       :historyp ,historyp
-      :prompt ',prompt
-      :action #',action
-      :options ,options
-      :output-buffer ,output-buffer)))
+      :api ,api
+      :api-options ,api-options)))
 
 (provide 'robby-define-command)
 

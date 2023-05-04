@@ -38,50 +38,74 @@ Do nothing if no request is currently running."
       (request-abort robby--last-request)))
 
 (cl-defun robby--request-handle-success (&key
+                                         action
+                                         action-args
                                          api
                                          basic-prompt
-                                         callback
                                          data
-                                         response-buffer-beg
-                                         response-buffer-end
+                                         (response-region nil)
                                          spinner-buffer)
   (robby--spinner-stop spinner-buffer)
   (robby--log (format "# Raw response:\n%S\n" data))
-  (let ((text (robby--parse-response api data)))
+  (let ((text (robby--parse-response api data))
+        (beg (car response-region))
+        (end (cdr response-region)))
     (robby--history-push basic-prompt text)
-    (funcall callback text response-buffer-beg response-buffer-end)))
+    (apply action (map-merge 'plist action-args `(:text ,text :beg ,beg :end ,end)))))
 
-(cl-defun robby--request-handle-error (&rest args &key error-thrown &key data &key symbol-status &allow-other-keys)
+(cl-defun robby--request-handle-error (&key error-thrown data symbol-status originating-buffer)
   (unless (robby--request-running-p)
-    (robby--spinner-stop buf)))
+                 (robby--spinner-stop originating-buffer))
+               (robby--log (format "# Error thrown:\n%S\n# Raw error response data:\n%S\n# symbol-status: %S" error-thrown data symbol-status))
+               (cond
+                ((robby--request-running-p)
+                 (message "Making another request to our AI overlords…"))
+                ((eq symbol-status 'abort)
+                 (message "Robby request aborted"))
+                (t
+                 (message (robby--parse-error-response data)))))               
 
-(cl-defun robby--request (&key prompt basic-prompt historyp api options beg end callback)
+(cl-defun robby--request (&key action
+                               action-args
+                               basic-prompt
+                               complete-prompt
+                               historyp
+                               api
+                               api-options
+                               originating-buffer
+                               response-region)
   "Make HTTP request to OpenAI API.
 
-PROMPT is the complete prompt possibly including conversation history.
-
 BASIC-PROMPT is the prompt string, without any conversation
-history.  If HISTORYP is t record complete PROMPT and TEXT
-response in history when HTTP request completes.
+history.
+
+COMPLETE-PROMPT is the complete prompt possibly including conversation history.
+
+If HISTORYP is t record COMPLETE-PROMPT and text response in
+history when HTTP request completes.
 
 API is the symbol of the api to use, for example `'chat' or
 `'completions'.
 
-OPTIONS is a property list of options to pass to the OpenAI
+API-OPTIONS is a property list of options to pass to the OpenAI
 API. It is merged in with the customization options for the API.
 
-Call CALLBACK with result.  CALLBACK function must be of the
-form `(TEXT BEG END), where TEXT is the value returned by OpenAI,
-and BEG and END are the bounds of the selected region if any when
-the command was invoked."
+ORIGINATING-BUFFER is the current buffer active when the command
+was initiated. The spinner is local to this buffer. You can
+multiple robby commands running at once in different buffers.
+
+Call ACTION with result. ACTION is called with the ACTION-ARGS
+property list, and a property list with the keys `':text', (the
+response text), `:beg' and `:end' (from `response-region') and
+their values merged in."
   (cl-assert robby-openai-api-key t "Please set robby-openai-api-key customization variable to your OpenAI API Key.")
 
-  (let* ((input-obj (append prompt (robby--options options)))
+  (let* ((input-obj (append complete-prompt (robby--options api-options)))
          (input-json (json-encode input-obj))
          (buf (current-buffer)))
     (if (bound-and-true-p robby-mode)
         (robby--spinner-start))
-    (robby--log (format "# Prompt:\n%S\n# Request body:\n%s\n" prompt input-json))
+    (robby--log (format "# Prompt:\n%S\n# Request body:\n%s\n" complete-prompt input-json))
     (robby-kill-last-request)
     (setq robby--last-request
           (request
@@ -94,8 +118,25 @@ the command was invoked."
             :success
             (cl-function
              (lambda (&key data &allow-other-keys)
-               (robby--request-handle-success :buf buf :data data :api api :basic-prompt basic-prompt :callback callback :beg beg :end end)))
-            :error #'robby--request-handle-error))))
+               (robby--request-handle-success
+                :action action
+                :action-args action-args
+                
+                :api api
+                :basic-prompt basic-prompt
+                ;; :callback callback
+                :data data
+                :response-region response-region
+                :spinner-buffer buf)))
+            :error
+            (cl-function
+             (lambda (&rest args &key error-thrown &key data &key symbol-status &allow-other-keys)
+               (message "EEEEEE error")
+               (robby--request-handle-error
+                :error-thrown error-thrown
+                :data data
+                :symbol-status symbol-status
+                :originating-buffer originating-buffer)))))))
 
 (provide 'robby-request)
 

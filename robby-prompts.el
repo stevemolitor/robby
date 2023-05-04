@@ -8,33 +8,46 @@
 
 ;;; Code:
 
-(defun robby--get-prompt-from-minibuffer (arg)
-  "Get prompt from minibuffer.
+;;;###autoload (autoload 'robby-get-prompt-from-minibuffer "robby" "Get Robby prompt from minibuffer" t)
+(defun robby-get-prompt-from-minibuffer ()
+  "Get Robby prompt from minibuffer."
+  (read-string "Request for AI overlords: "))
 
-If ARG is t also clear robby history."
-  (let ((prompt (read-string "Request for AI overlords: ")))
-    `(,prompt . ,prompt)))
-
-(defun robby--get-region-or-buffer-text (&optional buffer)
-  "Get text in selected region.
+;;;###autoload (autoload 'robby-get-region-or-buffer-text "robby" "Get Robby prompt from buffer region" t)
+(cl-defun robby--get-region-or-buffer-text (&optional buffer)
+  "Get Robby prompt from buffer region.
 
 If no region return all text in buffer."
   (with-current-buffer (or buffer (current-buffer))
-      (if (use-region-p)
-          (buffer-substring-no-properties (region-beginning) (region-end))
-        (buffer-substring-no-properties (point-min) (point-max)))))
+    (if (use-region-p)
+        (buffer-substring-no-properties (region-beginning) (region-end))
+      (buffer-substring-no-properties (point-min) (point-max)))))
 
-;; TODO don't prompt with custom commands
-(defun robby--get-prompt-from-region ()
+;; TODO maybe - add optional flag to turn off prompting for prefix no matter what.
+;; Could be useful in special cases, where you want to read the prompt verbatim from a buffer.
+(cl-defun robby-get-prompt-from-region (&key buffer prompt-prefix prompt-suffix never-ask-p &allow-other-keys)
   "Get prompt from region, or entire buffer if no selected
  region.
 
-Ask the user for a prompt prefix to prepend to the region that is
-sent as the OpenAI prompt."
-  (let* ((prompt-from-region (robby--get-region-or-buffer-text))
-         (prompt-prefix (read-string "Request for AI overlords: "))
-         (prompt (format "%s\n%s" prompt-prefix prompt-from-region)))
-    `(,prompt . ,prompt-prefix)))
+If supplied PROMPT-PREFIX and/or PROMPT-PREFIX are prepended or
+appended to the buffer or region text to make the complete
+prompt.
+
+If there both PROMPT-PREFIX and PROMPT-SUFFIX are nil or not
+specified, prompt the user for a prompt prefix in the minibuffer.
+
+If NEVER-ASK-P is t, do not prompt the user for a prompt prefix
+no matter what."
+  (let* ((prompt-from-region (robby--get-region-or-buffer-text (or buffer (current-buffer))))
+         (prefix (cond
+                  (prompt-prefix prompt-prefix)
+                  (prompt-suffix nil)
+                  ((not never-ask-p) (read-string "Request for AI overlords: "))
+                  (t nil))))
+    (format "%s%s%s"
+            (if prefix (concat prefix "\n") "") ; prefix
+            prompt-from-region          ; region or buffer text
+            (if prompt-suffix (concat "\n" prompt-suffix)))))
 
 (provide 'robby-prompts)
 
