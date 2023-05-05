@@ -24,10 +24,9 @@
   (seq-reduce
    (lambda (plist arg)
      (let* ((scope (oref transient-current-prefix scope))
-            (api (plist-get 'scope :api))
+            (api (plist-get scope :api))
             (parts (split-string arg "="))
-            (key-str (car parts))
-            (key-sym (intern (format ":%s" key-str)))
+            (key-str (car parts)) (key-sym (intern (format ":%s" key-str)))
             (raw-value (cadr parts))
             (custom-var (intern (format "robby-%s-%s" api key-str)))
             (custom-type (robby--custom-type custom-var))
@@ -92,23 +91,58 @@ customization values."
 ;;; Suffixes
 (transient-define-suffix robby--respond-with-message-suffix ()
   (interactive)
-  (message "current scope %S" (oref transient-current-prefix scope)))
+  (let* ((scope (or (oref transient-current-prefix scope) '()))
+         (api (or (plist-get scope :api) robby-api))
+         (api-options (plist-get scope :api-options))) ;; TODO rename :options to :api-options in scope
+    (robby-run-command
+     :prompt (transient-arg-value "prompt=" (transient-args transient-current-command))
+     :action #'robby-respond-with-message
+     :api api
+     :api-options api-options)))
 
 (transient-define-suffix robby--respond-in-help-window-suffix ()
   (interactive)
-  (message "respond in help window args: %S" (transient-args transient-current-command)))
+  (let* ((scope (or (oref transient-current-prefix scope) '()))
+         (api (or (plist-get scope :api) robby-api))
+         (api-options (plist-get scope :api-options))) ;; TODO rename :options to :api-options in scope
+    (robby-run-command
+     :prompt (transient-arg-value "prompt=" (transient-args transient-current-command))
+     :action #'robby-respond-in-help-window
+     :api api
+     :api-options api-options)))
 
 (transient-define-suffix robby--prefix-region-with-response-suffix ()
   (interactive)
-  (message "prefix region args: %S" (transient-args transient-current-command)))
+  (let* ((scope (or (oref transient-current-prefix scope) '()))
+         (api (or (plist-get scope :api) robby-api))
+         (api-options (plist-get scope :api-options))) ;; TODO rename :options to :api-options in scope
+    (robby-run-command
+     :prompt #'robby-get-prompt-from-region
+     :action #'robby-prepend-response-to-region
+     :api api
+     :api-options api-options)))
 
 (transient-define-suffix robby--append-response-to-region-suffix ()
   (interactive)
-  (message "append response arg: %S" (transient-args transient-current-command)))
+  (let* ((scope (or (oref transient-current-prefix scope) '()))
+         (api (or (plist-get scope :api) robby-api))
+         (api-options (plist-get scope :api-options))) ;; TODO rename :options to :api-options in scope
+    (robby-run-command
+     :prompt #'robby-get-prompt-from-region
+     :action #'robby-append-response-to-region
+     :api api
+     :api-options api-options)))
 
 (transient-define-suffix robby--replace-region-with-response-suffix ()
   (interactive)
-  (message "replace region args: %S" (transient-args transient-current-command)))
+(let* ((scope (or (oref transient-current-prefix scope) '()))
+         (api (or (plist-get scope :api) robby-api))
+         (api-options (plist-get scope :api-options))) ;; TODO rename :options to :api-options in scope
+    (robby-run-command
+     :prompt #'robby-get-prompt-from-region
+     :action #'robby-replace-region-with-response
+     :api api
+     :api-options api-options)))
 
 (transient-define-suffix robby--select-completions-suffix ()
   "Select the Completions API."
@@ -127,30 +161,30 @@ customization values."
   (interactive)
   (let* ((scope (oref transient-current-prefix scope))
          (args (transient-args transient-current-command))
-         (options (robby--transient-args-to-options args))
+         (api-options (robby--transient-args-to-options args))
          (robby-value (plist-get scope :robby-value)))
     (transient-setup 'robby nil nil
-                     :scope `(:api "chat" :options ,options)
+                     :scope `(:api "chat" :api-options ,api-options)
                      :value robby-value)))
 
 (transient-define-suffix robby--setup-advanced-options ()
   "Call appropriate advanced options prefix for API in scope."
   (interactive)
   (let* ((scope (oref transient-current-prefix scope))
-         (options (plist-get scope :options))
+         (api-options (plist-get scope :api-options))
          (selected-api (robby--transient-selected-api scope))
-         (value (or (and options (robby--plist-to-transient-args options))
+         (value (or (and api-options (robby--plist-to-transient-args api-options))
                     (robby--advanced-options-defaults selected-api)))
          (transient-name (format "robby--advanced-%s-options" selected-api)))
     (transient-setup (intern transient-name) nil nil
-                     :scope `(:api api :robby-value ,(transient-args 'robby))
+                     :scope `(:api ,selected-api :robby-value ,(transient-args 'robby))
                      :value value)))
 
 ;;; API Options Suffixes
 (transient-define-prefix robby--advanced-chat-options ()
   "Advanced OpenAI API options."
   ["Advanced chat API Options"
-   ("m" "model" "model="  :always-read t :choices '("gpt-3.5-turbo" "gpt-4"))
+   ("m" "model" "model="  :always-read t :choices ("gpt-3.5-turbo" "gpt-4"))
    ("s" "suffix" "suffix=" :always-read t)
    ("t" "max tokens" "max-tokens=" :reader transient-read-number-N+ :always-read t)
    ("e" "temperature" "temperature=" :reader robby--read-decimal :always-read t)
@@ -194,8 +228,8 @@ customization values."
            :description (lambda () (robby--transient-api-description "completions")))
           ("A" "advanced API options" robby--setup-advanced-options :transient transient--do-replace)]
   ["Prompt"
-   ("s" "simple prompt" "simple-prompt=" :always-read t)
-   ("r" "from region" "from-region")]
+   ("s" "simple prompt" "prompt=" :always-read t)
+   ("r" "from region" "from-region=")]
   [["Prompt From Region Options"
     ("pp" "prompt prefix" "prompt-prefix=" :always-read t)
     ("ps" "prompt suffix" "prompt-suffix=" :always-read t)
