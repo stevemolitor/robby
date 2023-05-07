@@ -210,7 +210,7 @@ customization values."
    ("f" "frequency penalty" "frequency-penalty=" :reader robby--read-decimal :always-read t)
    ("l" "logit bias" "logit-bias=" :reader robby--read-decimal :always-read t)
    ""
-   ("a" "apply options" robby--apply-completions-options)])
+   ("a" "apply options" robby--apply-advanced-options)])
 
 ;;; Transient Commands
 (transient-define-prefix robby ()
