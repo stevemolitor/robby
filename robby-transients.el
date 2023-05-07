@@ -226,22 +226,19 @@ customization values."
           ("o" "Completions" robby--select-completions-suffix
            :description (lambda () (robby--transient-api-description "completions")))
           ("A" "advanced API options" robby--setup-advanced-options :transient transient--do-replace)]
-  ["Prompt"
-   ("s" "simple prompt" "prompt=" :always-read t)
-   ("f" "from region" "-from-region")]
-  [["Prompt From Region Options"
-    ("pp" "prompt prefix" "prompt-prefix=" :always-read t)
-    ("ps" "prompt suffix" "prompt-suffix=" :always-read t)
-    ("pb" "prompt buffer" "prompt-buffer=" :always-read t :reader robby--read-buffer)]]
-  ["Action"
-   ("h" "respond in help window" robby--respond-in-help-window-suffix)
-   ("m" "respond with message" robby--respond-with-message-suffix)
-   ""
-   ("x" "prefix region with response" robby--prefix-region-with-response-suffix)
-   ("a" "append response to region" robby--append-response-to-region-suffix)
-   ("r" "replace region with response" robby--replace-region-with-response-suffix)]
-  [["Region Action Options"
-    ("gb" "response buffer" "to-buffer=" :always-read t :reader robby--read-buffer)]])
+  [["Prompt"
+    ("p" "prompt prefix" "prompt-prefix=" :always-read t)
+    ("s" "prompt suffix" "prompt-suffix=" :always-read t)
+    ("b" "prompt buffer" "prompt-buffer=" :reader robby--read-buffer)]]
+  [["Action"
+    ("x" "prefix region with response" robby--prefix-region-with-response-suffix)
+    ("a" "append response to region" robby--append-response-to-region-suffix)
+    ("r" "replace region with response" robby--replace-region-with-response-suffix)
+    ""
+    ("h" "respond in help window" robby--respond-in-help-window-suffix)
+    ("m" "respond with message" robby--respond-with-message-suffix)]
+   [""
+    ("f" "response buffer" "to-buffer=" :always-read t :reader robby--read-buffer)]])
 
 (provide 'robby-transients)
 
