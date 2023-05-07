@@ -8,6 +8,8 @@
 (require 'seq)
 (require 'transient)
 
+(require 'robby-actions)
+(require 'robby-prompts)
 (require 'robby-customization)
 (require 'robby-utils)
 
@@ -77,6 +79,25 @@ customization values."
                      :scope `(:api "chat" :options options)
                      :value robby-value)))
 
+(defun robby--get-transient-prompt ()
+  (let* ((args (transient-args transient-current-command))
+         (from-region-p (transient-arg-value "-fromregion" args))
+         (prompt (transient-arg-value "prompt=" args)))
+    (if from-region-p
+        #'robby-get-prompt-fromregion
+      prompt)))
+
+(defun robby--run-transient-command (action)
+  (let* ((scope (or (oref transient-current-prefix scope) '()))
+         (api (or (plist-get scope :api) robby-api))
+         (api-options (plist-get scope :api-options)))
+    (robby-run-command
+     :prompt (robby--get-transient-prompt)
+     :prompt-args '(:never-ask-p t)
+     :action action
+     :api api
+     :api-options api-options)))
+
 ;;; Readers
 (defun robby--read-buffer (prompt initial-input history)
   "Select a buffer."
@@ -88,75 +109,49 @@ customization values."
   (interactive)
   (format "%s" (read-number prompt)))
 
-;;; Suffixes
-(transient-define-suffix robby--respond-with-message-suffix ()
+;;; Action Suffixes
+(transient-define-suffix
+  robby--respond-with-message-suffix ()
   (interactive)
-  (let* ((scope (or (oref transient-current-prefix scope) '()))
-         (api (or (plist-get scope :api) robby-api))
-         (api-options (plist-get scope :api-options))) ;; TODO rename :options to :api-options in scope
-    (robby-run-command
-     :prompt (transient-arg-value "prompt=" (transient-args transient-current-command))
-     :action #'robby-respond-with-message
-     :api api
-     :api-options api-options)))
+  (robby--run-transient-command #'robby-respond-with-message))
 
-(transient-define-suffix robby--respond-in-help-window-suffix ()
+(transient-define-suffix
+  robby--respond-in-help-window-suffix ()
   (interactive)
-  (let* ((scope (or (oref transient-current-prefix scope) '()))
-         (api (or (plist-get scope :api) robby-api))
-         (api-options (plist-get scope :api-options))) ;; TODO rename :options to :api-options in scope
-    (robby-run-command
-     :prompt (transient-arg-value "prompt=" (transient-args transient-current-command))
-     :action #'robby-respond-in-help-window
-     :api api
-     :api-options api-options)))
+  (robby--run-transient-command #'robby-respond-in-help-window))
 
-(transient-define-suffix robby--prefix-region-with-response-suffix ()
+(transient-define-suffix
+  robby--prefix-region-with-response-suffix ()
   (interactive)
-  (let* ((scope (or (oref transient-current-prefix scope) '()))
-         (api (or (plist-get scope :api) robby-api))
-         (api-options (plist-get scope :api-options))) ;; TODO rename :options to :api-options in scope
-    (robby-run-command
-     :prompt #'robby-get-prompt-from-region
-     :action #'robby-prepend-response-to-region
-     :api api
-     :api-options api-options)))
+  (robby--run-transient-command #'robby-prepend-response-to-region))
 
-(transient-define-suffix robby--append-response-to-region-suffix ()
+(transient-define-suffix
+  robby--append-response-to-region-suffix ()
   (interactive)
-  (let* ((scope (or (oref transient-current-prefix scope) '()))
-         (api (or (plist-get scope :api) robby-api))
-         (api-options (plist-get scope :api-options))) ;; TODO rename :options to :api-options in scope
-    (robby-run-command
-     :prompt #'robby-get-prompt-from-region
-     :action #'robby-append-response-to-region
-     :api api
-     :api-options api-options)))
+  (robby--run-transient-command #'robby-append-response-to-region))
 
-(transient-define-suffix robby--replace-region-with-response-suffix ()
+(transient-define-suffix
+  robby--replace-region-with-response-suffix ()
   (interactive)
-(let* ((scope (or (oref transient-current-prefix scope) '()))
-         (api (or (plist-get scope :api) robby-api))
-         (api-options (plist-get scope :api-options))) ;; TODO rename :options to :api-options in scope
-    (robby-run-command
-     :prompt #'robby-get-prompt-from-region
-     :action #'robby-replace-region-with-response
-     :api api
-     :api-options api-options)))
+  (robby--run-transient-command #'robby-replace-region-with-response))
 
-(transient-define-suffix robby--select-completions-suffix ()
+;;; Select API Suffixes
+(transient-define-suffix
+  robby--select-completions-suffix ()
   "Select the Completions API."
   :transient 'transient--do-exit
   (interactive)
   (robby--select-api "completions"))
 
-(transient-define-suffix robby--select-chat-suffix ()
+(transient-define-suffix
+  robby--select-chat-suffix ()
   "Select the Chat API."
   :transient 'transient--do-exit
   (interactive)
   (robby--select-api "chat"))
 
-(transient-define-suffix robby--apply-advanced-options ()
+(transient-define-suffix
+  robby--apply-advanced-options ()
   :transient 'transient--do-exit
   (interactive)
   (let* ((scope (oref transient-current-prefix scope))
@@ -167,7 +162,8 @@ customization values."
                      :scope `(:api "chat" :api-options ,api-options)
                      :value robby-value)))
 
-(transient-define-suffix robby--setup-advanced-options ()
+(transient-define-suffix
+  robby--setup-advanced-options ()
   "Call appropriate advanced options prefix for API in scope."
   (interactive)
   (let* ((scope (oref transient-current-prefix scope))
@@ -181,7 +177,8 @@ customization values."
                      :value value)))
 
 ;;; API Options Suffixes
-(transient-define-prefix robby--advanced-chat-options ()
+(transient-define-prefix
+  robby--advanced-chat-options ()
   "Advanced OpenAI API options."
   ["Advanced chat API Options"
    ("m" "model" "model="  :always-read t :choices ("gpt-3.5-turbo" "gpt-4"))
@@ -199,7 +196,8 @@ customization values."
    ""
    ("a" "apply options" robby--apply-advanced-options)])
 
-(transient-define-prefix robby--advanced-completions-options ()
+(transient-define-prefix
+  robby--advanced-completions-options ()
   "Advanced OpenAI API options."
   ["Advanced completions API Options"
    ("m" "model" "model="  :always-read t)
@@ -217,10 +215,11 @@ customization values."
 ;;; Transient Commands
 (transient-define-prefix robby ()
   "Invoke OpenAI Chat API."
-  :incompatible '(("simple-prompt=" "from-region")
-                  ("simple-prompt=" "prompt-buffer=")
-                  ("simple-prompt=" "prompt-prefix=")
-                  ("simple-prompt=" "prompt-suffix="))
+  :incompatible '(("prompt=" "-fromregion")
+                  ;; ("prompt=" "prompt-buffer=")
+                  ;; ("prompt=" "prompt-prefix=")
+                  ;; ("prompt=" "prompt-suffix=")
+                  )
   [:class transient-row "API"
           ("c" "Chat" robby--select-chat-suffix
            :description (lambda () (robby--transient-api-description "chat")))
@@ -229,7 +228,7 @@ customization values."
           ("A" "advanced API options" robby--setup-advanced-options :transient transient--do-replace)]
   ["Prompt"
    ("s" "simple prompt" "prompt=" :always-read t)
-   ("r" "from region" "from-region=")]
+   ("f" "from region" "-from-region")]
   [["Prompt From Region Options"
     ("pp" "prompt prefix" "prompt-prefix=" :always-read t)
     ("ps" "prompt suffix" "prompt-suffix=" :always-read t)
