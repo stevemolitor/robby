@@ -57,9 +57,9 @@
         (propertize api-name 'face 'transient-enabled-suffix)
       api-name)))
 
-(defun robby--advanced-options-defaults (api)
-  "Get default advanced options values for API from current
-customization values."
+(defun robby--api-options-defaults (api)
+  "Get default api options values for API from current customization
+values."
   (let ((custom-variables
          (seq-filter
           (lambda (var) (not (null (symbol-value var))))
@@ -151,7 +151,7 @@ customization values."
   (robby--select-api "chat"))
 
 (transient-define-suffix
-  robby--apply-advanced-options ()
+  robby--apply-api-options ()
   :transient 'transient--do-exit
   (interactive)
   (let* ((scope (oref transient-current-prefix scope))
@@ -163,24 +163,24 @@ customization values."
                      :value robby-value)))
 
 (transient-define-suffix
-  robby--setup-advanced-options ()
-  "Call appropriate advanced options prefix for API in scope."
+  robby--setup-api-options ()
+  "Call appropriate options prefix for API in scope."
   (interactive)
   (let* ((scope (oref transient-current-prefix scope))
          (api-options (plist-get scope :api-options))
          (selected-api (robby--transient-selected-api scope))
          (value (or (and api-options (robby--plist-to-transient-args api-options))
-                    (robby--advanced-options-defaults selected-api)))
-         (transient-name (format "robby--advanced-%s-options" selected-api)))
+                    (robby--api-options-defaults selected-api)))
+         (transient-name (format "robby--%s-api-options" selected-api)))
     (transient-setup (intern transient-name) nil nil
                      :scope `(:api ,selected-api :robby-value ,(transient-args 'robby))
                      :value value)))
 
-;;; API Options Suffixes
+;;; API Options Prefixes
 (transient-define-prefix
-  robby--advanced-chat-options ()
-  "Advanced OpenAI API options."
-  ["Advanced chat API Options"
+  robby--chat-api-options ()
+  "Chat API options."
+  ["Chat API Options"
    ("m" "model" "model="  :always-read t :choices ("gpt-3.5-turbo" "gpt-4"))
    ("s" "suffix" "suffix=" :always-read t)
    ("t" "max tokens" "max-tokens=" :reader transient-read-number-N+ :always-read t)
@@ -194,12 +194,12 @@ customization values."
    ("b" "best of" "best-of=" :reader transient-read-number-N+ :always-read t)
    ("u" "user" "user=" :always-read t)
    ""
-   ("a" "apply options" robby--apply-advanced-options)])
+   ("a" "apply options" robby--apply-api-options)])
 
 (transient-define-prefix
-  robby--advanced-completions-options ()
-  "Advanced OpenAI API options."
-  ["Advanced completions API Options"
+  robby--completions-api-options ()
+  "Completions API options."
+  ["Completions API Options"
    ("m" "model" "model="  :always-read t)
    ("s" "suffix" "suffix=" :always-read t)
    ("t" "max tokens" "max-tokens=" :reader transient-read-number-N+ :always-read t)
@@ -210,22 +210,17 @@ customization values."
    ("f" "frequency penalty" "frequency-penalty=" :reader robby--read-decimal :always-read t)
    ("l" "logit bias" "logit-bias=" :reader robby--read-decimal :always-read t)
    ""
-   ("a" "apply options" robby--apply-advanced-options)])
+   ("a" "apply options" robby--apply-api-options)])
 
-;;; Transient Commands
+;;; Robby transient
 (transient-define-prefix robby ()
   "Invoke OpenAI Chat API."
-  :incompatible '(("prompt=" "-fromregion")
-                  ;; ("prompt=" "prompt-buffer=")
-                  ;; ("prompt=" "prompt-prefix=")
-                  ;; ("prompt=" "prompt-suffix=")
-                  )
   [:class transient-row "API"
           ("c" "Chat" robby--select-chat-suffix
            :description (lambda () (robby--transient-api-description "chat")))
           ("o" "Completions" robby--select-completions-suffix
            :description (lambda () (robby--transient-api-description "completions")))
-          ("A" "advanced API options" robby--setup-advanced-options :transient transient--do-replace)]
+          ("A" "API options" robby--setup-api-options :transient transient--do-replace)]
   [["Prompt"
     ("p" "prompt prefix" "prompt-prefix=" :always-read t)
     ("s" "prompt suffix" "prompt-suffix=" :always-read t)
