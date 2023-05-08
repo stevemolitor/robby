@@ -24,23 +24,23 @@
     (princ text)))
 
 ;;;###autoload
-(cl-defun robby-prepend-response-to-region (&key text beg output-buffer &allow-other-keys)
+(cl-defun robby-prepend-response-to-region (&key text beg response-buffer &allow-other-keys)
   "Prepend AI response to region, or buffer if no selected region."
-  (with-current-buffer (or output-buffer (current-buffer))
+  (with-current-buffer (or response-buffer (current-buffer))
     (goto-char beg)
     (insert (format "%s\n" text))))
 
 ;;;###autoload
-(cl-defun robby-append-response-to-region (&key text end output-buffer &allow-other-keys)
+(cl-defun robby-append-response-to-region (&key text end response-buffer &allow-other-keys)
   "Append AI response to region, or buffer if no selected region."
-  (with-current-buffer (or output-buffer (current-buffer))
+  (with-current-buffer (or response-buffer (current-buffer))
     (goto-char end)
     (insert (format "\n%s" text))))
 
 ;;;###autoload
-(cl-defun robby-replace-region-with-response (&key text beg end output-buffer)
+(cl-defun robby-replace-region-with-response (&key text beg end response-buffer &allow-other-keys)
   "Append AI response to region, or buffer if no selected region."
-  (with-current-buffer (or output-buffer (current-buffer))
+  (with-current-buffer (or response-buffer (current-buffer))
     (delete-region beg end)
     (goto-char beg)
     (insert text)))

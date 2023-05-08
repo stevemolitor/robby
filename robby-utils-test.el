@@ -17,6 +17,10 @@
 (ert-deftest robby--snake-to-space-case ()
   (should (equal (robby--snake-to-space-case "a_b_c") "a b c")))
 
+(ert-deftest robby--plist-to-transient-args ()
+  (should (equal (robby--plist-to-transient-args '(:a 1 :b "2"))
+                 '("a=1" "b=2"))))
+
 (provide 'robby-utils-test)
 
 ;;; robby-utils-test.el ends here

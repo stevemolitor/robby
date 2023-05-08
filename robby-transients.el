@@ -87,16 +87,48 @@ values."
         #'robby-get-prompt-fromregion
       prompt)))
 
+(defun robby--empty-p (thing)
+  (or (null thing) (string= thing "")))
+
+(defun robby--format-simple-prompt (prompt-prefix prompt-suffix)
+  (if (and (not (robby--empty-p prompt-prefix))
+           (not (robby--empty-p prompt-suffix)))
+      (format "%s\n%s" prompt-prefix prompt-suffix)
+    (or prompt-prefix prompt-suffix (read-string "Prompt: "))))
+
 (defun robby--run-transient-command (action)
   (let* ((scope (or (oref transient-current-prefix scope) '()))
          (api (or (plist-get scope :api) robby-api))
-         (api-options (plist-get scope :api-options)))
+         (api-options (plist-get scope :api-options))
+         (args (transient-args transient-current-command))
+         (prompt-prefix (transient-arg-value "prompt-prefix=" args))
+         (prompt-suffix (transient-arg-value "prompt-suffix=" args))
+         (prompt-buffer (transient-arg-value "prompt-buffer=" args))
+         (simple-prompt-p (robby--empty-p prompt-buffer))
+         (prompt (if simple-prompt-p
+                     (robby--format-simple-prompt prompt-prefix prompt-suffix)
+                   #'robby-get-prompt-from-region))
+         (prompt-args (if simple-prompt-p
+                          '()
+                        `(:prompt-prefix ,prompt-prefix :prompt-suffix ,prompt-suffix :buffer ,prompt-buffer :never-ask-p t)))
+         (response-buffer (transient-arg-value "response-buffer=" args))
+         (action-args `(:response-buffer ,response-buffer)))
     (robby-run-command
-     :prompt (robby--get-transient-prompt)
-     :prompt-args '(:never-ask-p t)
+     :prompt prompt
+     :prompt-args prompt-args
      :action action
+     :action-args action-args
      :api api
      :api-options api-options)))
+
+(defun robby--apply-api-options (api)
+  (let* ((scope (oref transient-current-prefix scope))
+         (args (transient-args transient-current-command))
+         (api-options (robby--transient-args-to-options args))
+         (robby-value (plist-get scope :robby-value)))
+    (transient-setup 'robby nil nil
+                     :scope `(:api ,api :api-options ,api-options)
+                     :value robby-value)))
 
 ;;; Readers
 (defun robby--read-buffer (prompt initial-input history)
@@ -151,16 +183,16 @@ values."
   (robby--select-api "chat"))
 
 (transient-define-suffix
-  robby--apply-api-options ()
+  robby--apply-chat-api-options ()
   :transient 'transient--do-exit
   (interactive)
-  (let* ((scope (oref transient-current-prefix scope))
-         (args (transient-args transient-current-command))
-         (api-options (robby--transient-args-to-options args))
-         (robby-value (plist-get scope :robby-value)))
-    (transient-setup 'robby nil nil
-                     :scope `(:api "chat" :api-options ,api-options)
-                     :value robby-value)))
+  (robby--apply-api-options "chat"))
+
+(transient-define-suffix
+  robby--apply-completions-api-options ()
+  :transient 'transient--do-exit
+  (interactive)
+  (robby--apply-api-options "completions"))
 
 (transient-define-suffix
   robby--setup-api-options ()
@@ -194,7 +226,7 @@ values."
    ("b" "best of" "best-of=" :reader transient-read-number-N+ :always-read t)
    ("u" "user" "user=" :always-read t)
    ""
-   ("a" "apply options" robby--apply-api-options)])
+   ("a" "apply options" robby--apply-chat-api-options)])
 
 (transient-define-prefix
   robby--completions-api-options ()
@@ -210,11 +242,16 @@ values."
    ("f" "frequency penalty" "frequency-penalty=" :reader robby--read-decimal :always-read t)
    ("l" "logit bias" "logit-bias=" :reader robby--read-decimal :always-read t)
    ""
-   ("a" "apply options" robby--apply-api-options)])
+   ("a" "apply options" robby--apply-completions-api-options)])
 
 ;;; Robby transient
+(defun robby--prefix-init (obj)
+  (oset obj value `(,(concat "prompt-buffer=" (buffer-name)))))
+
 (transient-define-prefix robby ()
   "Invoke OpenAI Chat API."
+  :init-value (lambda (obj) (oset obj value `(,(concat "prompt-buffer=" (buffer-name))
+                                         ,(concat "response-buffer=" (buffer-name)))))
   [:class transient-row "API"
           ("c" "Chat" robby--select-chat-suffix
            :description (lambda () (robby--transient-api-description "chat")))
@@ -233,7 +270,7 @@ values."
     ("h" "respond in help window" robby--respond-in-help-window-suffix)
     ("m" "respond with message" robby--respond-with-message-suffix)]
    [""
-    ("f" "response buffer" "to-buffer=" :always-read t :reader robby--read-buffer)]])
+    ("f" "response buffer" "response-buffer=" :always-read t :reader robby--read-buffer)]])
 
 (provide 'robby-transients)
 

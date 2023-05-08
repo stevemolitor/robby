@@ -53,9 +53,9 @@ Do nothing if no request is currently running."
     (robby--history-push basic-prompt text)
     (apply action (map-merge 'plist action-args `(:text ,text :beg ,beg :end ,end)))))
 
-(cl-defun robby--request-handle-error (&key error-thrown data symbol-status originating-buffer)
+(cl-defun robby--request-handle-error (&key error-thrown data symbol-status spinner-buffer)
   (unless (robby--request-running-p)
-                 (robby--spinner-stop originating-buffer))
+                 (robby--spinner-stop spinner-buffer))
                (robby--log (format "# Error thrown:\n%S\n# Raw error response data:\n%S\n# symbol-status: %S" error-thrown data symbol-status))
                (cond
                 ((robby--request-running-p)
@@ -72,7 +72,7 @@ Do nothing if no request is currently running."
                                historyp
                                api
                                api-options
-                               originating-buffer
+                               spinner-buffer
                                response-region)
   "Make HTTP request to OpenAI API.
 
@@ -90,9 +90,9 @@ API is the symbol of the api to use, for example `'chat' or
 API-OPTIONS is a property list of options to pass to the OpenAI
 API. It is merged in with the customization options for the API.
 
-ORIGINATING-BUFFER is the current buffer active when the command
-was initiated. The spinner is local to this buffer. You can
-multiple robby commands running at once in different buffers.
+SPINNER-BUFFER is buffer with the buffer local spinner value. You
+can have different Robby commands running in different buffers,
+each with their own spinner.
 
 Call ACTION with result. ACTION is called with the ACTION-ARGS
 property list, and a property list with the keys `':text', (the
@@ -136,7 +136,7 @@ their values merged in."
                 :error-thrown error-thrown
                 :data data
                 :symbol-status symbol-status
-                :originating-buffer originating-buffer)))))))
+                :spinner-buffer spinner-buffer)))))))
 
 (provide 'robby-request)
 

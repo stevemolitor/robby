@@ -59,7 +59,7 @@ values in the customization options specified in for example
      :historyp historyp
      :api request-api
      :api-options (or api-options '())
-     :originating-buffer (current-buffer)
+     :spinner-buffer (or (plist-get action-args :response-buffer) (current-buffer))
      :response-region (robby--get-region)
      :action action
      :action-args action-args)))

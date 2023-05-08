@@ -37,6 +37,16 @@ Returns a cons cell - `(beg . end)'"
         (cons (region-beginning) (region-end))
       (cons (point-min) (point-max)))))
 
+(defun robby--plist-to-transient-args (plist)
+  "Convert PLIST to transient args list."
+  (let ((alist (robby--plist-to-alist plist)))
+    (seq-map
+     (lambda (assoc)
+       (let ((key (replace-regexp-in-string "^:" "" (symbol-name (car assoc)) 1))
+             (value (cdr assoc)))
+         (format "%s=%s" key value)))
+     alist)))
+
 (provide 'robby-utils)
 
 ;;; robby-utils.el ends here
