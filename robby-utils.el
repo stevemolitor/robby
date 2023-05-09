@@ -47,6 +47,15 @@ Returns a cons cell - `(beg . end)'"
          (format "%s=%s" key value)))
      alist)))
 
+(defun robby--string-to-sym (string)
+  (intern (format ":%s" string)))
+
+(defun robby--sym-to-string (sym)
+  (replace-regexp-in-string "^:" "" (symbol-name sym)))
+
+(defun robby--empty-p (thing)
+  (or (null thing) (string= thing "")))
+
 (provide 'robby-utils)
 
 ;;; robby-utils.el ends here

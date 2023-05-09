@@ -19,6 +19,4 @@
 
 (provide 'robby-mode)
 
-(provide 'robby-mode)
-
 ;;; robby-mode.el ends here

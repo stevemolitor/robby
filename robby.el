@@ -17,16 +17,14 @@
 (require 'request)
 
 (require 'robby-customization)
-(require 'robby-logging)
-(require 'robby-request)
 (require 'robby-prompts)
 (require 'robby-actions)
+(require 'robby-run-command)
 (require 'robby-define-command)
 (require 'robby-keymap)
 (require 'robby-commands)
-(require 'robby-history)
 (require 'robby-mode)
-(require 'robby-transient)
+(require 'robby-transients)
 
 (provide 'robby)
 

@@ -9,11 +9,47 @@
 (require 'transient)
 
 (require 'robby-actions)
-(require 'robby-prompts)
 (require 'robby-customization)
+(require 'robby-prompts)
+(require 'robby-run-command)
 (require 'robby-utils)
 
 ;;; Code:
+
+;;; Scope struct
+(cl-defstruct
+    (robby--scope
+     (:constructor robby--scope-default)
+     (:constructor robby--scope-set-selected-api
+                   (&key
+                    scope api
+                    &aux
+                    (selected-api api)
+                    (api-options (robby--scope-api-options scope))
+                    (robby-value (robby--scope-robby-value scope))))
+     (:constructor robby--scope-set-api-options
+                   (&key
+                    scope selected-api-options
+                    &aux
+                    (selected-api (robby--scope-selected-api scope))
+                    (api-options
+                     (map-merge 'plist
+                                (robby--scope-api-options scope)
+                                `(,(robby--scope-selected-api scope) ,selected-api-options)))
+                    (robby-value (robby--scope-robby-value scope))))
+     (:constructor robby--scope-set-robby-value
+                   (&key
+                    scope value
+                    &aux
+                    (selected-api (robby--scope-selected-api scope))
+                    (api-options (robby--scope-api-options scope))
+                    (robby-value value))))
+  (selected-api (robby--string-to-sym robby-api) :read-only t)
+  (api-options nil :read-only t)
+  (robby-value nil :read-only t))
+
+(cl-defmethod robby--scope-selected-api-options (scope)
+  (plist-get (robby--scope-api-options scope) (robby--scope-selected-api scope)))
 
 ;;; Util Functions
 (defun robby--custom-type (symbol)
@@ -26,11 +62,12 @@
   (seq-reduce
    (lambda (plist arg)
      (let* ((scope (oref transient-current-prefix scope))
-            (api (plist-get scope :api))
+            (api (robby--scope-selected-api scope))
+            (api-str (robby--sym-to-string api))
             (parts (split-string arg "="))
             (key-str (car parts)) (key-sym (intern (format ":%s" key-str)))
             (raw-value (cadr parts))
-            (custom-var (intern (format "robby-%s-%s" api key-str)))
+            (custom-var (intern (format "robby-%s-%s" api-str key-str)))
             (custom-type (robby--custom-type custom-var))
             (value (if (or (eq custom-type 'integer) (eq custom-type 'number)) (string-to-number raw-value) raw-value)))
        (plist-put plist key-sym value)))
@@ -39,45 +76,36 @@
 
 (defun robby--select-api (api)
   "Helper function to select an API in robby transient."
-  (let* ((scope (oref transient-current-prefix scope))
-         (prev-api (plist-get 'scope :api))
-         (options (if (equal prev-api api) (plist-get scope :options) '()))
+  (let* ((scope (or (oref transient-current-prefix scope) (robby--scope-default)))
+         (new-scope (robby--scope-set-selected-api :scope scope :api api))
          (robby-value (transient-args 'robby)))
     (transient-setup transient-current-command nil nil
-                     :scope `(:api ,api (:options ,options))
+                     :scope new-scope
                      :value robby-value)))
-
-(defun robby--transient-selected-api (scope)
-  (or (plist-get scope ':api) robby-api))
 
 (defun robby--transient-api-description (api)
   (let* ((scope (oref transient--prefix scope))
-         (api-name (capitalize api)))
-    (if (equal (robby--transient-selected-api scope) api)
+         (api-name (capitalize (robby--sym-to-string api)))
+         (robby-api-sym (robby--string-to-sym robby-api))
+         (selected-api (or (and scope (robby--scope-selected-api scope)) robby-api-sym)))
+    (if (eq selected-api api)
         (propertize api-name 'face 'transient-enabled-suffix)
       api-name)))
 
 (defun robby--api-options-defaults (api)
   "Get default api options values for API from current customization
 values."
-  (let ((custom-variables
-         (seq-filter
-          (lambda (var) (not (null (symbol-value var))))
-          (seq-map #'car (custom-group-members (intern-soft (format "robby-%s-api" api)) nil))))
-        (regexp (format "^robby-%s-" api)))
+  (let* ((api-name (robby--sym-to-string api))
+         (custom-variables
+          (seq-filter
+           (lambda (var) (not (null (symbol-value var))))
+           (seq-map #'car (custom-group-members (intern-soft (format "robby-%s-api" api-name)) nil))))
+         (regexp (format "^robby-%s-" api-name)))
     (seq-map
      (lambda (var)
        (let ((key (replace-regexp-in-string regexp "" (symbol-name var))))
          (format "%s=%s" key (symbol-value var))))
      custom-variables)))
-
-(defun robby--return-to-parent-transient ()
-  (let* ((scope (oref transient-current-prefix scope))
-         (options (plist-get scope :options))
-         (robby-value (plist-get scope :robby-value)))
-    (transient-setup 'robby nil nil
-                     :scope `(:api "chat" :options options)
-                     :value robby-value)))
 
 (defun robby--get-transient-prompt ()
   (let* ((args (transient-args transient-current-command))
@@ -87,9 +115,6 @@ values."
         #'robby-get-prompt-fromregion
       prompt)))
 
-(defun robby--empty-p (thing)
-  (or (null thing) (string= thing "")))
-
 (defun robby--format-simple-prompt (prompt-prefix prompt-suffix)
   (if (and (not (robby--empty-p prompt-prefix))
            (not (robby--empty-p prompt-suffix)))
@@ -98,8 +123,9 @@ values."
 
 (defun robby--run-transient-command (action)
   (let* ((scope (or (oref transient-current-prefix scope) '()))
-         (api (or (plist-get scope :api) robby-api))
-         (api-options (plist-get scope :api-options))
+         (api (robby--scope-selected-api scope))
+         (api-str (robby--sym-to-string api))
+         (api-options (robby--scope-selected-api-options scope))
          (args (transient-args transient-current-command))
          (prompt-prefix (transient-arg-value "prompt-prefix=" args))
          (prompt-suffix (transient-arg-value "prompt-suffix=" args))
@@ -118,17 +144,8 @@ values."
      :prompt-args prompt-args
      :action action
      :action-args action-args
-     :api api
+     :api api-str
      :api-options api-options)))
-
-(defun robby--apply-api-options (api)
-  (let* ((scope (oref transient-current-prefix scope))
-         (args (transient-args transient-current-command))
-         (api-options (robby--transient-args-to-options args))
-         (robby-value (plist-get scope :robby-value)))
-    (transient-setup 'robby nil nil
-                     :scope `(:api ,api :api-options ,api-options)
-                     :value robby-value)))
 
 ;;; Readers
 (defun robby--read-buffer (prompt initial-input history)
@@ -167,46 +184,49 @@ values."
   (interactive)
   (robby--run-transient-command #'robby-replace-region-with-response))
 
-;;; Select API Suffixes
-(transient-define-suffix
-  robby--select-completions-suffix ()
-  "Select the Completions API."
-  :transient 'transient--do-exit
-  (interactive)
-  (robby--select-api "completions"))
-
+;;; API Related Suffixes
 (transient-define-suffix
   robby--select-chat-suffix ()
   "Select the Chat API."
   :transient 'transient--do-exit
   (interactive)
-  (robby--select-api "chat"))
+  (robby--select-api :chat))
 
 (transient-define-suffix
-  robby--apply-chat-api-options ()
+  robby--select-completions-suffix ()
+  "Select the Completions API."
   :transient 'transient--do-exit
   (interactive)
-  (robby--apply-api-options "chat"))
+  (robby--select-api :completions))
 
 (transient-define-suffix
-  robby--apply-completions-api-options ()
+  robby--apply-api-options ()
   :transient 'transient--do-exit
   (interactive)
-  (robby--apply-api-options "completions"))
+  (let* ((scope (oref transient-current-prefix scope))
+         (robby-value (robby--scope-robby-value scope))
+         (args (transient-args transient-current-command))
+         (api-options (robby--transient-args-to-options args))
+         (new-scope (robby--scope-set-api-options :scope scope :selected-api-options api-options)))
+    (transient-setup 'robby nil nil
+                     :scope new-scope
+                     :value robby-value)))
 
 (transient-define-suffix
   robby--setup-api-options ()
-  "Call appropriate options prefix for API in scope."
+  "Call appropriate API options prefix for API in scope.
+
+The initial transient value comes from either any previously
+edited options for the API, or default API options from
+customization values."
   (interactive)
-  (let* ((scope (oref transient-current-prefix scope))
-         (api-options (plist-get scope :api-options))
-         (selected-api (robby--transient-selected-api scope))
+  (let* ((scope (or (oref transient-current-prefix scope) (robby--scope-default)))
+         (selected-api (robby--scope-selected-api scope))
+         (api-options (robby--scope-selected-api-options scope))
          (value (or (and api-options (robby--plist-to-transient-args api-options))
                     (robby--api-options-defaults selected-api)))
-         (transient-name (format "robby--%s-api-options" selected-api)))
-    (transient-setup (intern transient-name) nil nil
-                     :scope `(:api ,selected-api :robby-value ,(transient-args 'robby))
-                     :value value)))
+         (transient-name (format "robby--%s-api-options" (robby--sym-to-string selected-api))))
+    (transient-setup (intern transient-name) nil nil :scope scope :value value)))
 
 ;;; API Options Prefixes
 (transient-define-prefix
@@ -226,7 +246,7 @@ values."
    ("b" "best of" "best-of=" :reader transient-read-number-N+ :always-read t)
    ("u" "user" "user=" :always-read t)
    ""
-   ("a" "apply options" robby--apply-chat-api-options)])
+   ("a" "apply options" robby--apply-api-options)])
 
 (transient-define-prefix
   robby--completions-api-options ()
@@ -242,7 +262,7 @@ values."
    ("f" "frequency penalty" "frequency-penalty=" :reader robby--read-decimal :always-read t)
    ("l" "logit bias" "logit-bias=" :reader robby--read-decimal :always-read t)
    ""
-   ("a" "apply options" robby--apply-completions-api-options)])
+   ("a" "apply options" robby--apply-api-options)])
 
 ;;; Robby transient
 (defun robby--prefix-init (obj)
@@ -254,9 +274,9 @@ values."
                                          ,(concat "response-buffer=" (buffer-name)))))
   [:class transient-row "API"
           ("c" "Chat" robby--select-chat-suffix
-           :description (lambda () (robby--transient-api-description "chat")))
+           :description (lambda () (robby--transient-api-description :chat)))
           ("o" "Completions" robby--select-completions-suffix
-           :description (lambda () (robby--transient-api-description "completions")))
+           :description (lambda () (robby--transient-api-description :completions)))
           ("A" "API options" robby--setup-api-options :transient transient--do-replace)]
   [["Prompt"
     ("p" "prompt prefix" "prompt-prefix=" :always-read t)

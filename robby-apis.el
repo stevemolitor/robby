@@ -4,6 +4,8 @@
 
 ;; Polymorphic API helper methods that dispatch on OpenAI API.
 
+(require 'cl-generic)
+
 (require 'robby-history)
 
 ;;; Code:

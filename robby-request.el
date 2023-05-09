@@ -121,17 +121,14 @@ their values merged in."
                (robby--request-handle-success
                 :action action
                 :action-args action-args
-                
                 :api api
                 :basic-prompt basic-prompt
-                ;; :callback callback
                 :data data
                 :response-region response-region
                 :spinner-buffer buf)))
             :error
             (cl-function
              (lambda (&rest args &key error-thrown &key data &key symbol-status &allow-other-keys)
-               (message "EEEEEE error")
                (robby--request-handle-error
                 :error-thrown error-thrown
                 :data data
