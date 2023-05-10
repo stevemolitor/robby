@@ -8,12 +8,12 @@
 
 ;;; Code:
 
-;;;###autoload (autoload 'robby-get-prompt-from-minibuffer "robby" "Get Robby prompt from minibuffer" t)
+;;;###autoload
 (defun robby-get-prompt-from-minibuffer ()
   "Get Robby prompt from minibuffer."
   (read-string "Request for AI overlords: "))
 
-;;;###autoload (autoload 'robby-get-region-or-buffer-text "robby" "Get Robby prompt from buffer region" t)
+;;;###autoload
 (cl-defun robby--get-region-or-buffer-text (&optional buffer)
   "Get Robby prompt from buffer region.
 

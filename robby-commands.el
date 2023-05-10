@@ -35,7 +35,7 @@ prepend results to region or buffer."
  "Query AI from region or entire buffer if no selected region,
 append results to region or buffer."
   :prompt #'robby-get-prompt-from-region
- :action #'robby-append-response-to-region)
+  :action #'robby-append-response-to-region)
 
 (robby-define-command
  robby-replace-region

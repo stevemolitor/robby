@@ -15,7 +15,6 @@
     (define-key map "h" 'robby-help-window)
     (define-key map "l" 'robby-clear-history)
     (define-key map "k" 'robby-kill-last-request)
-    (define-key map "c" 'robby-chat)
     map)
   "Robby command map.")
 

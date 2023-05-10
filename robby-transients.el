@@ -119,10 +119,10 @@ values."
   (if (and (not (robby--empty-p prompt-prefix))
            (not (robby--empty-p prompt-suffix)))
       (format "%s\n%s" prompt-prefix prompt-suffix)
-    (or prompt-prefix prompt-suffix (read-string "Prompt: "))))
+    (or prompt-prefix prompt-suffix (read-string "Request for AI overlords: "))))
 
 (defun robby--run-transient-command (action)
-  (let* ((scope (or (oref transient-current-prefix scope) '()))
+  (let* ((scope (or (oref transient-current-prefix scope) (robby--scope-default)))
          (api (robby--scope-selected-api scope))
          (api-str (robby--sym-to-string api))
          (api-options (robby--scope-selected-api-options scope))
@@ -290,7 +290,7 @@ customization values."
     ("h" "respond in help window" robby--respond-in-help-window-suffix)
     ("m" "respond with message" robby--respond-with-message-suffix)]
    [""
-    ("f" "response buffer" "response-buffer=" :always-read t :reader robby--read-buffer)]])
+    ("f" "response buffer" "response-buffer=" :reader robby--read-buffer)]])
 
 (provide 'robby-transients)
 

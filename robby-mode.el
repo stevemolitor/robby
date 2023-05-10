@@ -15,7 +15,10 @@
   "Minor mode for robby commands."
   :global t
   :lighter robby--lighter
-  :keymap robby-mode-map)
+  :keymap robby-mode-map
+  ;; autoload built in command, robby transient when entering robby-mode
+  (require 'robby-commands)
+  (require 'robby-transients))
 
 (provide 'robby-mode)
 

@@ -12,9 +12,16 @@
 ;; interactive AI commands, and to save the last executed command as a
 ;; reusable custom AI command. See the README for more details.
 
-(require 'cl-lib)
-(require 'json)
-(require 'request)
+(eval-when-compile
+  (require 'cl-generic)
+  (require 'cl-lib)
+  (require 'cl-macs)
+  (require 'cus-edit)
+  (require 'json)
+  (require 'map)
+  (require 'request)
+  (require 'seq)
+  (require 'transient))
 
 (require 'robby-customization)
 (require 'robby-prompts)
