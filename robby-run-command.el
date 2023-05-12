@@ -20,7 +20,7 @@
 (defun robby--run-command-callback (text beg end)
   (message "callback, %s text, beg %S end %S" text beg end))
 
-(cl-defun robby-run-command (&key prompt prompt-args action (action-args '()) historyp api api-options)
+(cl-defun robby-run-command (&key prompt prompt-args action action-args historyp api api-options)
   "Run a command using OpenAI.
 
 PROMPT is a string or a function. If a string it used as is as
@@ -58,7 +58,7 @@ values in the customization options specified in for example
      :complete-prompt complete-prompt
      :historyp historyp
      :api request-api
-     :api-options (or api-options '())
+     :api-options api-options
      :spinner-buffer (or (plist-get action-args :response-buffer) (current-buffer))
      :response-region (robby--get-region)
      :action action

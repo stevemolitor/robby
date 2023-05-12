@@ -7,6 +7,7 @@
 ;; `robby-define-command'.
 
 (require 'cl-lib)
+(require 'map)
 
 (require 'robby-request)
 (require 'robby-save-commands)
@@ -16,23 +17,15 @@
 
 ;;; Code:
 
-(defvar robby-command-complete-hook nil
-  "Hook called when a robby OpenAI command completes successfully.")
+(defun robby--handle-prefix-args (arg prompt-args)
+  "Mix in appropriate values into PROMPT-ARGS based on prefix ARG.
 
-(defun robby--get-prompt (prompt arg)
-  "If PROMPT is a function, call it with ARG and return result.
+If there is prefix arg, never prompt for input in a command."
+  (if arg
+      (map-merge 'plist prompt-args '(:never-ask-p t))
+    prompt-args))
 
-Else grab prompt from region, or entire buffer if no region, and
-prefix with PROMPT."
-  (if (functionp prompt)
-      (funcall prompt)
-    ;; String prompts come from custom commands. Force them to use
-    ;; region, and prefix with supplied prompt:
-    (let* ((region-text (robby--get-region-or-buffer-text))
-           (prompt-with-prefix (format "%s\n%s" prompt region-text)))
-      `(,prompt-with-prefix . ,prompt))))
-
-;;;###autoload (autoload 'robby-define-command "robby" "Define a custom robby command." nil t)
+;;;###autoload (autoload 'robby-define-command "robby-define-command" "Define a custom robby command." nil t)
 (cl-defmacro robby-define-command (name
                                    docstring
                                    &key
@@ -69,9 +62,8 @@ or `robby-completions-api'."
      ,docstring
      (interactive "P")
      (robby-run-command
-      ;; :arg arg ;; TODO add back arg?
       :prompt ,prompt
-      :prompt-args ,prompt-args
+      :prompt-args (robby--handle-prefix-args arg ,prompt-args)
       :action ,action
       :historyp ,historyp
       :api ,api

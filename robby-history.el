@@ -18,8 +18,6 @@
 
 (defun robby--history-push (prompt response)
   "Push PROMPT and RESPONSE onto `robby--history'."
-  (if (null robby--history)
-      (setq robby--history '()))
   (let ((start-pos (max 0 (- (length robby--history) robby-max-history))))
     (setq robby--history (append (seq-subseq robby--history start-pos) `(,(cons prompt response))))))
 

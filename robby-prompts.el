@@ -23,8 +23,6 @@ If no region return all text in buffer."
         (buffer-substring-no-properties (region-beginning) (region-end))
       (buffer-substring-no-properties (point-min) (point-max)))))
 
-;; TODO maybe - add optional flag to turn off prompting for prefix no matter what.
-;; Could be useful in special cases, where you want to read the prompt verbatim from a buffer.
 (cl-defun robby-get-prompt-from-region (&key buffer prompt-prefix prompt-suffix never-ask-p &allow-other-keys)
   "Get prompt from region, or entire buffer if no selected
  region.

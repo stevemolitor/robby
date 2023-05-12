@@ -19,7 +19,7 @@
   "Return OpenAI completions API input data including PROMPT.
 Also include prompt history if HISTORYP is true."
   (let* ((all-messages (if historyp
-                           (append (or robby--history '()) `(,prompt))
+                           (append robby-history `(,prompt))
                          `(,prompt)))
          (prompt-with-history
           (string-join (flatten-list all-messages) "\n")))
