@@ -201,7 +201,7 @@ values."
 
 (transient-define-suffix
   robby--apply-api-options ()
-  :transient 'transient--do-exit
+  :transient 'transient--do-exit        ;; TODO try transient--do-return here, and maybe we don't need transient setup anymore
   (interactive)
   (let* ((scope (oref transient-current-prefix scope))
          (robby-value (robby--scope-robby-value scope))
@@ -277,6 +277,7 @@ customization values."
            :description (lambda () (robby--transient-api-description :chat)))
           ("o" "Completions" robby--select-completions-suffix
            :description (lambda () (robby--transient-api-description :completions)))
+          ;; TODO try using transient--do-recurse here, and then transient--do-return when returning in robby--apply-api-options
           ("A" "API options" robby--setup-api-options :transient transient--do-replace)]
   [["Prompt"
     ("p" "prompt prefix" "prompt-prefix=" :always-read t)
