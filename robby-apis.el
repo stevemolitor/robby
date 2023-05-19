@@ -19,7 +19,7 @@
   "Return OpenAI completions API input data including PROMPT.
 Also include prompt history if HISTORYP is true."
   (let* ((all-messages (if historyp
-                           (append robby-history `(,prompt))
+                           (append robby--history `(,prompt))
                          `(,prompt)))
          (prompt-with-history
           (string-join (flatten-list all-messages) "\n")))
@@ -57,7 +57,6 @@ Also include prompt history if HISTORYP is true."
 (cl-defmethod robby--parse-response ((api (eql 'chat)) data)
   "Parse OpenAI chat API from response DATA."
   (string-trim (or (assoc-default 'content (assoc-default 'message (seq-first (assoc-default 'choices data)))) "")))
-
 
 (provide 'robby-apis)
 
