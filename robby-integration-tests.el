@@ -29,7 +29,6 @@ DONE is the `ert-deftest-async' callback indicating that the test
 is complete."
   `(let ((buffer (generate-new-buffer "*robby-commands-test*"))
          (cb (lambda ()
-               (message "in CB, buffer contents %S" (buffer-string))
                (goto-char (point-min))
                (should (not (null (re-search-forward ,re))))
                (kill-buffer (current-buffer))
@@ -40,7 +39,6 @@ is complete."
            (setq robby-openai-api-key sm-openai-key)))
      (robby-clear-history)
      (with-current-buffer buffer
-       (message "adding hook %S" cb)
        (add-hook 'robby-command-complete-hook cb)
        ;; TODO cl-left still needed?
        (cl-letf (((symbol-function 'read-string)

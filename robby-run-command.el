@@ -17,9 +17,6 @@
           (cons (region-beginning) (region-end))
         (cons (point-min) (point-max))))))
 
-(defun robby--run-command-callback (text beg end)
-  (message "callback, %s text, beg %S end %S" text beg end))
-
 (cl-defun robby-run-command (&key prompt prompt-args action action-args historyp api api-options)
   "Run a command using OpenAI.
 
