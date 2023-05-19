@@ -38,6 +38,7 @@
 
 Do nothing if no request is currently running."
   (interactive)
+  (robby--spinner-stop (current-buffer)) ;; TODO rethink buffer local requests, spinners. Get's confusing when output buffer is different from input buf.
   (if (robby--request-running-p)
       (request-abort robby--last-request)))
 
@@ -108,10 +109,10 @@ their values merged in."
   (let* ((input-obj (append complete-prompt (robby--options api-options)))
          (input-json (json-encode input-obj))
          (buf (current-buffer)))
-    (if (bound-and-true-p robby-mode)
-        (robby--spinner-start))
     (robby--log (format "# Prompt:\n%S\n# Request body:\n%s\n" complete-prompt input-json))
     (robby-kill-last-request)
+    (if (bound-and-true-p robby-mode)
+        (robby--spinner-start))
     (setq robby--last-request
           (request
             (robby--request-url api)
