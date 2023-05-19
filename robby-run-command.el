@@ -60,7 +60,7 @@ values in the customization options specified in for example
      :api request-api
      :api-options api-options
      :spinner-buffer (or (plist-get action-args :response-buffer) (current-buffer))
-     :response-region (robby--get-region)
+     :response-region response-region
      :action action
      :action-args action-args)))
 
