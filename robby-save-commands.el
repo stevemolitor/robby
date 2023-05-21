@@ -10,6 +10,23 @@
 (defvar robby--last-command-options nil
   "Last robby command.")
 
+(cl-defun robby--save-last-command-options (&key prompt prompt-args action action-args historyp api api-options)
+  (setq robby--last-command-options
+        `(:prompt
+          ,(if (functionp prompt) `#',prompt ,prompt)
+          :prompt-args
+          ',prompt-args
+          :action
+          ,`#',action
+          :action-args
+          ',action-args
+          :historyp
+          ,historyp
+          :api
+          ,api
+          :api-options
+          ',api-options)))
+
 (defun robby-insert-last-command (name)
   "Insert a definition for the last command invoked into current
 buffer.

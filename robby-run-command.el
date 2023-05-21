@@ -40,26 +40,25 @@ keys. For example `'max-tokens' becomes \"max_tokens\". The
 values in API-OPTIONS are merged with and overwrite equivalent
 values in the customization options specified in for example
 `'robby-chat-options' or `'robby-completion-options'."
-  
+
   ;; save command history
-  (setq
-   robby--last-command-options
-   `(:prompt prompt :prompt-args prompt-args :action action :action-args action-args :historyp historyp :api api :api-options api-options))
-  
+  (robby--save-last-command-options
+   :prompt prompt :prompt-args prompt-args :action action :action-args action-args :historyp historyp :api api :api-options api-options)
+
   (let* ((basic-prompt (if (functionp prompt) (apply prompt prompt-args) (format "%s" prompt)))
          (request-api (intern (or api robby-api)))
          (complete-prompt (robby--request-input request-api basic-prompt historyp))
          (response-region (robby--get-response-region action-args)))
     (robby--request
      :basic-prompt basic-prompt
-     :complete-prompt complete-prompt
-     :historyp historyp
-     :api request-api
-     :api-options api-options
-     :spinner-buffer (or (plist-get action-args :response-buffer) (current-buffer))
-     :response-region response-region
-     :action action
-     :action-args action-args)))
+      :complete-prompt complete-prompt
+      :historyp historyp
+      :api request-api
+      :api-options api-options
+      :spinner-buffer (or (plist-get action-args :response-buffer) (current-buffer))
+      :response-region response-region
+      :action action
+      :action-args action-args)))
 
 (provide 'robby-run-command)
 
