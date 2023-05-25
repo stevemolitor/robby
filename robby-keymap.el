@@ -8,10 +8,11 @@
 
 (defvar robby-command-map
   (let ((map (make-sparse-keymap)))
+    (define-key map "r" 'robby)
     (define-key map "m" 'robby-message)
     (define-key map "p" 'robby-prepend-region)
     (define-key map "a" 'robby-append-region)
-    (define-key map "r" 'robby-replace-region)
+    (define-key map "g" 'robby-replace-region)
     (define-key map "h" 'robby-help-window)
     (define-key map "l" 'robby-clear-history)
     (define-key map "k" 'robby-kill-last-request)
