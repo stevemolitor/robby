@@ -282,9 +282,7 @@ customization values."
     ("f" "response buffer" "response-buffer=" :reader robby--read-buffer :level 5)]
    [""
     ("h" "respond in help window" robby--respond-in-help-window-suffix)
-    ("m" "respond with message" robby--respond-with-message-suffix)
-    
-    ]])
+    ("m" "respond with message" robby--respond-with-message-suffix)]])
 
 (provide 'robby-transients)
 
