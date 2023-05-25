@@ -10,10 +10,11 @@
 (defvar robby--last-command-options nil
   "Last robby command.")
 
+;; How old is Tom Cruise?
 (cl-defun robby--save-last-command-options (&key prompt prompt-args action action-args historyp api api-options)
   (setq robby--last-command-options
         `(:prompt
-          ,(if (functionp prompt) `#',prompt ,prompt)
+          ,(if (functionp prompt) `#',prompt prompt)
           :prompt-args
           ',prompt-args
           :action

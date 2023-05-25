@@ -115,26 +115,18 @@ values."
         #'robby-get-prompt-fromregion
       prompt)))
 
-(defun robby--format-simple-prompt (prompt-prefix prompt-suffix)
-  (if (and (not (robby--empty-p prompt-prefix))
-           (not (robby--empty-p prompt-suffix)))
-      (format "%s\n%s" prompt-prefix prompt-suffix)
-    (or prompt-prefix prompt-suffix (read-string "Request for AI overlords: "))))
-
 (defun robby--run-transient-command (action)
   (let* ((scope (or (oref transient-current-prefix scope) (robby--scope-default)))
          (api (robby--scope-selected-api scope))
          (api-str (robby--sym-to-string api))
          (api-options (robby--scope-selected-api-options scope))
          (args (transient-args transient-current-command))
+         (simple-prompt (transient-arg-value "prompt=" args))
          (prompt-prefix (transient-arg-value "prompt-prefix=" args))
          (prompt-suffix (transient-arg-value "prompt-suffix=" args))
          (prompt-buffer (transient-arg-value "prompt-buffer=" args))
-         (simple-prompt-p (robby--empty-p prompt-buffer))
-         (prompt (if simple-prompt-p
-                     (robby--format-simple-prompt prompt-prefix prompt-suffix)
-                   #'robby-get-prompt-from-region))
-         (prompt-args (if simple-prompt-p
+         (prompt (or simple-prompt #'robby-get-prompt-from-region))
+         (prompt-args (if simple-prompt
                           '()
                         `(:prompt-prefix ,prompt-prefix :prompt-suffix ,prompt-suffix :buffer ,prompt-buffer :never-ask-p t)))
          (response-buffer (transient-arg-value "response-buffer=" args))
@@ -265,13 +257,12 @@ customization values."
    ("a" "apply options" robby--apply-api-options)])
 
 ;;; Robby transient
-(defun robby--prefix-init (obj)
-  (oset obj value `(,(concat "prompt-buffer=" (buffer-name)))))
-
 (transient-define-prefix robby ()
   "Invoke OpenAI Chat API."
-  :init-value (lambda (obj) (oset obj value `(,(concat "prompt-buffer=" (buffer-name))
-                                         ,(concat "response-buffer=" (buffer-name)))))
+  :incompatible '(("prompt=" "prompt-prefix=")
+                  ("prompt=" "prompt-suffix=")
+                  ("prompt=" "prompt-buffer="))
+  
   [:class transient-row "API"
           ("c" "Chat" robby--select-chat-suffix
            :description (lambda () (robby--transient-api-description :chat)))
@@ -280,6 +271,8 @@ customization values."
           ;; TODO try using transient--do-recurse here, and then transient--do-return when returning in robby--apply-api-options
           ("A" "API options" robby--setup-api-options :transient transient--do-replace)]
   [["Prompt"
+    ("S" "simple prompt" "prompt=" :always-read t)
+    ""
     ("p" "prompt prefix" "prompt-prefix=" :always-read t)
     ("s" "prompt suffix" "prompt-suffix=" :always-read t)
     ("b" "prompt buffer" "prompt-buffer=" :reader robby--read-buffer)]]

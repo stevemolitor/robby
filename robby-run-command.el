@@ -51,14 +51,14 @@ values in the customization options specified in for example
          (response-region (robby--get-response-region action-args)))
     (robby--request
      :basic-prompt basic-prompt
-      :complete-prompt complete-prompt
-      :historyp historyp
-      :api request-api
-      :api-options api-options
-      :spinner-buffer (or (plist-get action-args :response-buffer) (current-buffer))
-      :response-region response-region
-      :action action
-      :action-args action-args)))
+     :complete-prompt complete-prompt
+     :historyp historyp
+     :api request-api
+     :api-options api-options
+     :spinner-buffer (or (plist-get action-args :response-buffer) (current-buffer))
+     :response-region response-region
+     :action action
+     :action-args action-args)))
 
 (provide 'robby-run-command)
 
