@@ -45,7 +45,7 @@ no matter what."
     (format "%s%s%s"
             (if prefix (concat prefix "\n") "") ; prefix
             prompt-from-region          ; region or buffer text
-            (if prompt-suffix (concat "\n" prompt-suffix)))))
+            (if prompt-suffix (concat "\n" prompt-suffix) ""))))
 
 (provide 'robby-prompts)
 
