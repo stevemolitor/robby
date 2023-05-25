@@ -263,7 +263,7 @@ customization values."
                   ("prompt=" "prompt-suffix=")
                   ("prompt=" "prompt-buffer="))
   
-  [:class transient-row "API"
+  [:class transient-row "API" 
           ("c" "Chat" robby--select-chat-suffix
            :description (lambda () (robby--transient-api-description :chat)))
           ("o" "Completions" robby--select-completions-suffix
@@ -272,19 +272,19 @@ customization values."
           ("A" "API options" robby--setup-api-options :transient transient--do-replace)]
   [["Prompt"
     ("S" "simple prompt" "prompt=" :always-read t)
-    ""
     ("p" "prompt prefix" "prompt-prefix=" :always-read t)
     ("s" "prompt suffix" "prompt-suffix=" :always-read t)
-    ("b" "prompt buffer" "prompt-buffer=" :reader robby--read-buffer)]]
+    ("b" "prompt buffer" "prompt-buffer=" :reader robby--read-buffer :level 5)]]
   [["Action"
     ("x" "prefix region with response" robby--prefix-region-with-response-suffix)
     ("a" "append response to region" robby--append-response-to-region-suffix)
     ("r" "replace region with response" robby--replace-region-with-response-suffix)
-    ""
-    ("h" "respond in help window" robby--respond-in-help-window-suffix)
-    ("m" "respond with message" robby--respond-with-message-suffix)]
+    ("f" "response buffer" "response-buffer=" :reader robby--read-buffer :level 5)]
    [""
-    ("f" "response buffer" "response-buffer=" :reader robby--read-buffer)]])
+    ("h" "respond in help window" robby--respond-in-help-window-suffix)
+    ("m" "respond with message" robby--respond-with-message-suffix)
+    
+    ]])
 
 (provide 'robby-transients)
 
