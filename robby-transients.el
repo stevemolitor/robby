@@ -200,6 +200,7 @@ values."
          (args (transient-args transient-current-command))
          (api-options (robby--transient-args-to-options args))
          (new-scope (robby--scope-set-api-options :scope scope :selected-api-options api-options)))
+    (transient-set)
     (transient-setup 'robby nil nil
                      :scope new-scope
                      :value robby-value)))
