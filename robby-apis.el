@@ -40,7 +40,6 @@ Also include prompt history if HISTORYP is true."
 Also include prompt history if HISTORYP is true."
   (let ((formatted-messages
          (if historyp
-             ;; TODO simplify this
              (vconcat
               (seq-reduce
                (lambda (vec history-elem)

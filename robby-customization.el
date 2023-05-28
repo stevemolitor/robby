@@ -196,8 +196,6 @@ OpenAI to monitor and detect abuse."
   :type '(choice string (const nil))
   :group 'robby-chat-api)
 
-;; TODO logit-bias
-
 (provide 'robby-customization)
 
 ;;; robby-customization.el ends here

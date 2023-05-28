@@ -23,7 +23,7 @@ If no region return all text in buffer."
         (buffer-substring-no-properties (region-beginning) (region-end))
       (buffer-substring-no-properties (point-min) (point-max)))))
 
-(cl-defun robby-get-prompt-from-region (&key buffer prompt-prefix prompt-suffix never-ask-p &allow-other-keys)
+(cl-defun robby-get-prompt-from-region (&key prompt-buffer prompt-prefix prompt-suffix never-ask-p &allow-other-keys)
   "Get prompt from region, or entire buffer if no selected
  region.
 
@@ -36,7 +36,7 @@ specified, prompt the user for a prompt prefix in the minibuffer.
 
 If NEVER-ASK-P is t, do not prompt the user for a prompt prefix
 no matter what."
-  (let* ((prompt-from-region (robby--get-region-or-buffer-text (or buffer (current-buffer))))
+  (let* ((prompt-from-region (robby--get-region-or-buffer-text (or prompt-buffer (current-buffer))))
          (prefix (cond
                   (prompt-prefix prompt-prefix)
                   (prompt-suffix nil)

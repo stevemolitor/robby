@@ -17,7 +17,6 @@
 
 ;;; Code:
 
-;; TODO move me
 (defvar robby-command-complete-hook nil
   "Hook called when a robby OpenAI command completes successfully.")
 

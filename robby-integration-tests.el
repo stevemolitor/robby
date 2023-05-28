@@ -40,10 +40,7 @@ is complete."
      (robby-clear-history)
      (with-current-buffer buffer
        (add-hook 'robby-command-complete-hook cb)
-       ;; TODO cl-left still needed?
-       (cl-letf (((symbol-function 'read-string)
-                  (lambda (&rest _) "")))
-         ,before))))
+       ,before)))
 
 ;;; prepend-region tests
 (ert-deftest-async robby-integration-test--run-command-get-prompt-from-region (done)
@@ -55,8 +52,6 @@ is complete."
                                (funcall done)))))
         (insert "What year did Abraham Lincoln die?")
         (robby-run-command
-         ;; TODO normalize buffer names between prompt and action buffers i.e. just :buffer for both, or longer name for both
-         ;; TODO figure out why we can default to current buffer
          :prompt #'robby-get-prompt-from-region :prompt-args '(:never-ask-p t)
          :action cb)))))
 
@@ -76,50 +71,8 @@ is complete."
    "1865.*\n*What year did Abraham Lincoln die?"
    done))
 
-;; (ert-deftest-async robby-integration-test--prepend-region--completions-api (done)
-;;   (let ((robby-api "completions"))
-;;     (robby--test-prepend-region done)))
 
-;; (ert-deftest-async robby-integration-test--prepend-region--chat-api (done)
-;;   (let ((robby-api "chat"))
-;;     (robby--test-prepend-region done)))
-
-
-;; ;;; append region tests
-;; (defun robby--test-append-region (done)
-;;   (robby-async-region-test
-;;    (progn
-;;      (insert "What year did Abraham Lincoln die?")
-;;      (robby-append-region nil))
-;;    "What year did Abraham Lincoln die?.*\n*.*1865"
-;;    done))
-
-;; (ert-deftest-async robby-integration-test--append-region--completions-api (done)
-;;   (let ((robby-api "completions"))
-;;     (robby--test-append-region done)))
-
-;; (ert-deftest-async robby-integration-test--append-region--chat-api (done)
-;;   (let ((robby-api "chat"))
-;;     (robby--test-append-region done)))
-
-;; ;;; replace region tests
-;; (defun robby--test-replace-region (done)
-;;   (robby-async-region-test
-;;    (progn
-;;      (insert "What year did Abraham Lincoln die?")
-;;      (robby-replace-region nil))
-;;    "1865"
-;;    done))
-
-;; (ert-deftest-async robby-integration-test--replace-region--completions-api (done)
-;;   (let ((robby-api "completions"))
-;;     (robby--test-replace-region done)))
-
-;; (ert-deftest-async robby-integration-test--replace-region--chat-api (done)
-;;   (let ((robby-api "chat"))
-;;     (robby--test-replace-region done)))
-
-;; ;;; suite
+;;; suite
 (defun robby-run-integration-tests ()
   (interactive)
   (setq ert-async-timeout 20)
