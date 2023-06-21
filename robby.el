@@ -1,7 +1,7 @@
 ;;; robby --- Extensible OpenAI Integration for Emacs  -*- lexical-binding:t -*-
 
 ;; Version: 0.0.1
-;; Package-Requires: ((emacs "28.1") (request "0.3.0") (ert-async "0.1.2") (spinner "1.7.2") (transient "0.4.0")
+;; Package-Requires: ((emacs "28.1") (request "0.3.0") (ert-async "0.1.2") (spinner "1.7.2") (transient "0.4.1")
 ;; Homepage: https://github.com/stevemolitor/robby
 
 ;;; Commentary

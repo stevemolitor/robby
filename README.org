@@ -3,7 +3,13 @@
 [[./images/robby.png]]
 
 Robby provides an extensible Emacs interface to OpenAI. It provides basic commands to use OpenAI with regions, the minibuffer, and help windows. It also provides a mechanism for defining your own interactive AI commands, and to save the last executed command as a reusable custom AI command. 
+* Requirements
+- Emacs 28.1 or higher
+- [[https://github.com/tkf/emacs-request][emacs-request]] version 0.0.1 or higher
+- [[https://github.com/Malabarba/spinner.el][spinner.el]] version 1.7.2 or higher
+- [[https://github.com/magit/transient][transient]] version 0.4.1 or higher.
 
+  Note that the required transient version is more recent that the version included in Emacs 29 (0.4.0 vs 0.4.1). Robby requires a bug fix included in the 0.4.1 version of transient. 
 * Installation
 ** AI Key
 You need an OpenAI API key to use ~robby~. Set the customization variable ~robby-openai-api-key~ like this:
