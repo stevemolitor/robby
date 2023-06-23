@@ -29,17 +29,17 @@
    nil
    (let ((expected-json "{\"messages\":[{\"role\":\"user\",\"content\":\"hello\"}]}")
          (input (robby--request-input 'chat "hello" nil)))
-     (should (equal input '((messages . [((role . "user") (content . "hello"))]))))
-     ;; (should (equal (json-encode input) expected-json))
-     )))
+     (should (equal input `((messages . [((role . "system") (content . ,robby-chat-system-message))
+                                         ((role . "user") (content . "hello"))])))))))
 
 (ert-deftest robby--request-input--with-history--chat-api ()
   (robby--with-history
    '(("Who won the world series in 2020?" . "The Los Angeles Dodgers won the World Series in 2020."))
    (should (equal
             (robby--request-input 'chat "Where was it played?" t)
-            '((messages .
-                        [((role . "user") (content . "Who won the world series in 2020?"))
+            `((messages .
+                        [((role . "system") (content . ,robby-chat-system-message))
+                         ((role . "user") (content . "Who won the world series in 2020?"))
                          ((role . "assistant") (content . "The Los Angeles Dodgers won the World Series in 2020."))
                          ((role . "user") (content . "Where was it played?"))
                          ]))))))

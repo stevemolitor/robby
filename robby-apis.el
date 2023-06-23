@@ -7,6 +7,7 @@
 (require 'cl-generic)
 
 (require 'robby-history)
+(require 'robby-customization)
 
 ;;; Code:
 
@@ -38,19 +39,21 @@ Also include prompt history if HISTORYP is true."
 (cl-defmethod robby--request-input ((api (eql 'chat)) prompt historyp)
   "Return OpenAI chat API input data including PROMPT.
 Also include prompt history if HISTORYP is true."
-  (let ((formatted-messages
-         (if historyp
-             (vconcat
-              (seq-reduce
-               (lambda (vec history-elem)
-                 (vconcat
-                  vec
-                  `(((role . "user") (content . ,(car history-elem)))
-                    ((role . "assistant") (content . ,(cdr history-elem))))))
-               robby--history
-               '[])
-              `(((role . "user") (content . ,prompt))))
-           `[((role . "user") (content . ,prompt))])))
+  (let* ((system-message `((role . "system") (content . ,robby-chat-system-message)))
+         (formatted-messages
+          (if historyp
+              (vconcat
+               `(,system-message)
+               (seq-reduce
+                (lambda (vec history-elem)
+                  (vconcat
+                   vec
+                   `(((role . "user") (content . ,(car history-elem)))
+                     ((role . "assistant") (content . ,(cdr history-elem))))))
+                robby--history
+                '[])
+               `(((role . "user") (content . ,prompt))))
+            `[,system-message ((role . "user") (content . ,prompt))])))
     `((messages . ,formatted-messages))))
 
 (cl-defmethod robby--parse-response ((api (eql 'chat)) data)
