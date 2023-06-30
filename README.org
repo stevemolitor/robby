@@ -2,6 +2,8 @@
 
 [[./images/robby.png]]
 
+
+* Overview
 Robby provides an extensible Emacs interface to OpenAI. It provides basic commands to use OpenAI with regions, the minibuffer, and help windows. It also provides a mechanism for defining your own interactive AI commands, and to save the last executed command as a reusable custom AI command. 
 * Requirements
 - Emacs 28.1 or higher
@@ -11,14 +13,14 @@ Robby provides an extensible Emacs interface to OpenAI. It provides basic comman
 
   Note that the required transient version is more recent that the version included in Emacs 29 (0.4.0 vs 0.4.1). Robby requires a bug fix included in the 0.4.1 version of transient. 
 * Installation
-** AI Key
-You need an OpenAI API key to use ~robby~. Set the customization variable ~robby-openai-api-key~ like this:
+** API Key
+You need an [[https://platform.openai.com/account/api-keys][OpenAI API key]] to use ~robby~.  You can set ~robby-openai-api-key~ to the key, or set it to a function that returns the key. By default ~robby-openai-api-key~ is set to the function ~robby-get-api-key-from-auth-source~ which reads from =~/.authinfo=. You need to add a line to that file that looks like this:
 
-#+begin_src emacs-lisp
-(setq robby-openai-api-key "my-api-key")
+#+begin_src sh
+machine api.openai.com login apikey password OPENAI_API_KEY
 #+end_src
 
-For instructions on using keys securely within Emacs see the "Mastering Emacs" article  [[https://www.masteringemacs.org/article/keeping-secrets-in-emacs-gnupg-auth-sources][Keeping Secrets in Emacs with GnuPG and Auth Sources]].
+For instructions on using keys securely within Emacs using GPG see the "Mastering Emacs" article  [[https://www.masteringemacs.org/article/keeping-secrets-in-emacs-gnupg-auth-sources][Keeping Secrets in Emacs with GnuPG and Auth Sources]]. Robby will alternately decrypt and read the API key from the encrypted =~/.authinfo.gpg= if you have set that up. This is what I do.
 ** Straight.el
 To install using ~straight.el~ add code like this to your Emacs initialization file:
 
@@ -28,24 +30,21 @@ To install using ~straight.el~ add code like this to your Emacs initialization f
   :bind-keymap
   ;; optionally bin a prefix key to the robby-command-map,
   ;; default is "C-c C-r":
-  ("s-r" . robby-command-map)
-  :config
-  ;; set your OpenAI API key:
-  (setq robby-openai-api-key "my-api-key"))
+  ("s-r" . robby-command-map))
 #+end_src
 ** Manual Installation
 *** Prerequisites
 First install these packages via ~package-install~:
-- =request=
+- =emacs-request=
 - =spinner=
+- =transient= version =0.4.1= or higher
 *** Install
 Next, clone the ~robby~ repo and put its root diretory in your load path, set your api key, and optionally custom the keymap prefix key:
 
 #+begin_src emacs-lisp
   (add-to-list 'load-path "~/path-to-robby")
   (require 'robby)
-  (setq robby-openai-api-key "my-api-key")
-  (require 'robby)
+    (require 'robby)
   ;; optional, default is "C-c C-r":
   (global-set-key (kbd "s-r") robby-command-map)
 #+end_src
@@ -66,10 +65,6 @@ If no selected region read prompt from buffer content.
 *** ~robby-help-window~
 Query AI from region, respond in help window.
 If no selected region read prompt from buffer content.
-** Prefix Key Behavior
-- single universal argument =C-u=  :: Preview results in help window, do not modify buffer contents.
-- double universal argument =C-u C-u=  :: Clear the conversation history before running the command.
-- triple universal argument =C-u C-u C-u=  :: Preview result and clear the conversation history.
 ** Defining Custom Commands
 The interactive command ~robby-insert-last-command~ will prompt for a command name and doc string, and then insert Emacs lisp code that defines the command permanently. You can run commands like ~robby-replace-region~ repeatedly, experimenting with different prompts until you get one that works, and then save the results permanently for use as custom command. Here are some examples:
 

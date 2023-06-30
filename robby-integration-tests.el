@@ -9,8 +9,8 @@
 (require 'robby-history)
 (require 'robby-customization)
 (require 'robby-prompts)
-
 (require 'robby-request)
+(require 'robby-api-key)
 
 ;;; Code:
 
@@ -33,10 +33,6 @@ is complete."
                (should (not (null (re-search-forward ,re))))
                (kill-buffer (current-buffer))
                (funcall done))))
-     (if (not robby-openai-api-key)
-         (progn
-           (load-file (concat user-emacs-directory ".secrets.el.gpg"))
-           (setq robby-openai-api-key sm-openai-key)))
      (robby-clear-history)
      (with-current-buffer buffer
        (add-hook 'robby-command-complete-hook cb)

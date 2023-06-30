@@ -7,12 +7,13 @@
 (require 'json)
 (require 'request)
 
-(require 'robby-prompts)
-(require 'robby-history)
+(require 'robby-api-key)
+(require 'robby-apis)
 (require 'robby-customization)
+(require 'robby-history)
 (require 'robby-logging)
 (require 'robby-options)
-(require 'robby-apis)
+(require 'robby-prompts)
 (require 'robby-spinner)
 
 ;;; Code:
@@ -103,8 +104,6 @@ Call ACTION with result. ACTION is called with the ACTION-ARGS
 property list, and a property list with the keys `':text', (the
 response text), `:beg' and `:end' (from `response-region') and
 their values merged in."
-  (cl-assert robby-openai-api-key t "Please set robby-openai-api-key customization variable to your OpenAI API Key.")
-
   (let* ((input-obj (append complete-prompt (robby--options api-options)))
          (input-json (json-encode input-obj))
          (buf (current-buffer)))
@@ -117,7 +116,7 @@ their values merged in."
             (robby--request-url api)
             :type "POST"
             :headers `(("Content-Type" . "application/json")
-                       ("Authorization" . ,(format "Bearer %s" robby-openai-api-key)))
+                       ("Authorization" . ,(format "Bearer %s" (robby--get-api-key))))
             :data input-json
             :parser 'json-read
             :success

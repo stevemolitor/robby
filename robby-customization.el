@@ -7,10 +7,14 @@
 ;;; Code:
 
 ;;; general settings
-(defcustom robby-openai-api-key nil
-  "OpenAI API key."
-  :type '(choice string (const nil))
-  :group 'robby)
+(defcustom robby-openai-api-key #'robby-get-api-key-from-auth-source
+  "OpenAI API key.
+
+A string, or a function that returns the API key."
+  :group 'robby
+  :type '(choice
+          (string :tag "OpenAI API key")
+          (function :tag "Function that returns the OpenAI API key")))
 
 (defgroup robby nil
   "Simple AI Integration for Emacs."
@@ -199,7 +203,7 @@ OpenAI to monitor and detect abuse."
 (defcustom robby-chat-system-message "You are a large language model living in Emacs and a helpful assistant. Respond concisely."
   "System message used with Chat API"
   :type 'string
-  :group 'robby-chat-api)
+  :group 'robby)
 
 (provide 'robby-customization)
 
