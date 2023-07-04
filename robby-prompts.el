@@ -5,6 +5,7 @@
 ;; Functions to get prompts for OpenAI.
 
 (require 'robby-prefix-args)
+(require 'robby-view)
 
 ;;; Code:
 
@@ -12,6 +13,15 @@
 (defun robby-get-prompt-from-minibuffer ()
   "Get Robby prompt from minibuffer."
   (read-string "Request for AI overlords: "))
+
+;;;###autoload
+(defun robby-get-prompt-for-conversation ()
+  "Get Robby prompt from minibuffer, and open window for a conversation."
+  (switch-to-buffer (get-buffer-create robby--view-buffer))
+  (let ((prompt (read-string "Request for AI overlords: ")))
+    (robby--with-robby-view
+     (insert ""))
+    prompt))
 
 ;;;###autoload
 (cl-defun robby--get-region-or-buffer-text (&optional buffer)

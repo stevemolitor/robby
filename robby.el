@@ -18,6 +18,7 @@
   (require 'cl-macs)
   (require 'cus-edit)
   (require 'json)
+  (require 'markdown-mode)
   (require 'map)
   (require 'request)
   (require 'seq)

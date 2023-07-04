@@ -8,20 +8,30 @@
 (require 'robby-define-command)
 (require 'robby-prompts)
 (require 'robby-actions)
+(require 'robby-view)
 
 ;;; Code:
 
 (robby-define-command
- robby-help-window
- "Query AI from minibuffer, respond in help window."
+ robby-view
+ "Query AI from minibuffer, respond in robby-view-mode buffer."
  :prompt #'robby-get-prompt-from-minibuffer
- :action #'robby-respond-in-help-window)
+ :action #'robby-respond-with-robby-view
+ :historyp t)
+
+;; (robby-define-command
+;;  robby-help-window-conversation
+;;  "Query AI from minibuffer, open help window up front for conversation."
+;;  :prompt #'robby-get-prompt-for-help-window-conversation
+;;  :action #'robby-respond-in-help-window-conversation
+;;  :historyp t)
 
 (robby-define-command
  robby-message
  "Query AI from minibuffer, respond with message."
  :prompt #'robby-get-prompt-from-minibuffer
- :action #'robby-respond-with-message)
+ :action #'robby-respond-with-message
+ :historyp t)
 
 (robby-define-command
  robby-prepend-region

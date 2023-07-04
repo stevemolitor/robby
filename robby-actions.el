@@ -18,12 +18,6 @@
   (message (robby--format-message-text text)))
 
 ;;;###autoload
-(cl-defun robby-respond-in-help-window (&key text &allow-other-keys)
-  "Show TEXT in help window."
-  (with-help-window (get-buffer-create robby--buffer)
-    (princ text)))
-
-;;;###autoload
 (cl-defun robby-prepend-response-to-region (&key text beg response-buffer &allow-other-keys)
   "Prepend AI response to region, or buffer if no selected region."
   (with-current-buffer (or response-buffer (current-buffer))

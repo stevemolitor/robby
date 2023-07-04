@@ -8,7 +8,7 @@
 
 ;;; Code:
 
-(defvar-local robby--history nil "AI Conversation history.  Buffer local value.")
+(defvar robby--history nil "AI Conversation history.")
 
 (defun robby-clear-history ()
   "Clear robby conversation history."
@@ -20,8 +20,6 @@
   "Push PROMPT and RESPONSE onto `robby--history'."
   (let ((start-pos (max 0 (- (length robby--history) robby-max-history))))
     (setq robby--history (append (seq-subseq robby--history start-pos) `(,(cons prompt response))))))
-
-(provide 'robby-history)
 
 (provide 'robby-history)
 

@@ -13,6 +13,7 @@
 (require 'robby-prompts)
 (require 'robby-run-command)
 (require 'robby-utils)
+(require 'robby-view)
 
 ;;; Code:
 
@@ -157,9 +158,9 @@ values."
   (robby--run-transient-command #'robby-respond-with-message))
 
 (transient-define-suffix
-  robby--respond-in-help-window-suffix ()
+  robby--respond-with-robby-view-suffix ()
   (interactive)
-  (robby--run-transient-command #'robby-respond-in-help-window))
+  (robby--run-transient-command #'robby-respond-with-robby-view))
 
 (transient-define-suffix
   robby--prefix-region-with-response-suffix ()
@@ -281,8 +282,8 @@ customization values."
     ("r" "replace region with response" robby--replace-region-with-response-suffix)
     ("f" "response buffer" "response-buffer=" :reader robby--read-buffer :level 5)]
    [""
-    ("h" "respond in help window" robby--respond-in-help-window-suffix)
     ("m" "respond with message" robby--respond-with-message-suffix)]])
+    ("v" "respond in robby view buffer" robby--respond-with-robby-view-suffix)
 
 (provide 'robby-transients)
 

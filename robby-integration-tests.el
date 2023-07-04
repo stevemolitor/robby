@@ -67,7 +67,6 @@ is complete."
    "1865.*\n*What year did Abraham Lincoln die?"
    done))
 
-
 ;;; suite
 (defun robby-run-integration-tests ()
   (interactive)

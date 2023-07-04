@@ -13,7 +13,7 @@
     (define-key map "p" 'robby-prepend-region)
     (define-key map "a" 'robby-append-region)
     (define-key map "g" 'robby-replace-region)
-    (define-key map "h" 'robby-help-window)
+    (define-key map "v" 'robby-view)
     (define-key map "l" 'robby-clear-history)
     (define-key map "k" 'robby-kill-last-request)
     map)
