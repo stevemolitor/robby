@@ -38,7 +38,7 @@
 
 Do nothing if no request is currently running."
   (interactive)
-  (robby--spinner-stop (current-buffer)) ;; TODO rethink buffer local requests, spinners. Get's confusing when output buffer is different from input buf.
+  (robby--spinner-stop (current-buffer)) 
   (if (robby--request-running-p)
       (request-abort robby--last-request)))
 
@@ -109,7 +109,7 @@ their values merged in."
          (buf (current-buffer)))
     (robby--log (format "# Prompt:\n%S\n# Request body:\n%s\n" complete-prompt input-json))
     (robby-kill-last-request)
-    (if (bound-and-true-p robby-mode)
+    (if (bound-and-true-p robby-spinner-mode)
         (robby--spinner-start))
     (setq robby--last-request
           (request

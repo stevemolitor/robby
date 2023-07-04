@@ -21,7 +21,7 @@
 
 (defvar robby-keymap-prefix (kbd "C-c C-r"))
 
-(defvar robby-mode-map
+(defvar robby-spinner-mode-map
   (let ((map (make-sparse-keymap)))
     (define-key map robby-keymap-prefix robby-command-map)
     map))
