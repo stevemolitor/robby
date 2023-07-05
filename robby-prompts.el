@@ -14,14 +14,11 @@
   "Get Robby prompt from minibuffer."
   (read-string "Request for AI overlords: "))
 
-;;;###autoload
-(defun robby-get-prompt-for-conversation ()
-  "Get Robby prompt from minibuffer, and open window for a conversation."
-  (switch-to-buffer (get-buffer-create robby--view-buffer))
-  (let ((prompt (read-string "Request for AI overlords: ")))
-    (robby--with-robby-view
-     (insert ""))
-    prompt))
+(defun robby-get-prompt-from-minibuffer-with-stop-message ()
+  "Get Robby prompt from minibuffer, with instructions on how to quit."
+  (interactive)
+  (read-from-minibuffer
+   (concat "Request for AI overloards (" (propertize (substitute-command-keys "\\<global-map>\\[keyboard-quit]" t) 'face '(help-key-binding default)) " to stop): ")))
 
 ;;;###autoload
 (cl-defun robby--get-region-or-buffer-text (&optional buffer)

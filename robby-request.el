@@ -56,7 +56,7 @@ Do nothing if no request is currently running."
         (beg (car response-region))
         (end (cdr response-region)))
     (robby--history-push basic-prompt text)
-    (apply action (map-merge 'plist action-args `(:text ,text :beg ,beg :end ,end)))
+    (apply action (map-merge 'plist action-args `(:text ,text :beg ,beg :end ,end :prompt ,basic-prompt)))
     (run-hooks 'robby-command-complete-hook)))
 
 (cl-defun robby--request-handle-error (&key error-thrown data symbol-status spinner-buffer)

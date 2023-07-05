@@ -163,6 +163,11 @@ values."
   (robby--run-transient-command #'robby-respond-with-robby-view))
 
 (transient-define-suffix
+  robby--respond-in-conversation-suffix ()
+  (interactive)
+  (robby--run-transient-command #'robby-respond-in-conversation))
+
+(transient-define-suffix
   robby--prefix-region-with-response-suffix ()
   (interactive)
   (robby--run-transient-command #'robby-prepend-response-to-region))
@@ -264,8 +269,8 @@ customization values."
   :incompatible '(("prompt=" "prompt-prefix=")
                   ("prompt=" "prompt-suffix=")
                   ("prompt=" "prompt-buffer="))
-  
-  [:class transient-row "API" 
+
+  [:class transient-row "API"
           ("c" "Chat" robby--select-chat-suffix
            :description (lambda () (robby--transient-api-description :chat)))
           ("o" "Completions" robby--select-completions-suffix
@@ -282,8 +287,9 @@ customization values."
     ("r" "replace region with response" robby--replace-region-with-response-suffix)
     ("f" "response buffer" "response-buffer=" :reader robby--read-buffer :level 5)]
    [""
-    ("m" "respond with message" robby--respond-with-message-suffix)]])
     ("v" "respond in robby view buffer" robby--respond-with-robby-view-suffix)
+    ("m" "respond with message" robby--respond-with-message-suffix)
+    ("n" "start a conversation with AI" robby--respond-in-conversation-suffix)]])
 
 (provide 'robby-transients)
 

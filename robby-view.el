@@ -24,9 +24,9 @@
          ,@body)
        (robby-view-mode))))
 
-(defun robby--view-message ()
+(defun robby--quit-message ()
   (interactive)
-  (message "%s" (substitute-command-keys "Type \\<markdown-view-mode-map>\\[kill-this-buffer] to delete robby view")))
+  (message "%s" (substitute-command-keys "Type \\<global-map>\\[keyboard-quit] to delete robby view")))
 
 ;;;###autoload
 (cl-defun robby-respond-with-robby-view (&key text &allow-other-keys)
@@ -34,13 +34,14 @@
   (robby--with-robby-view
    (erase-buffer)
    (insert text))
-  (robby--view-message))
+  (message "%s" (substitute-command-keys "Type \\<markdown-view-mode-map>\\[kill-this-buffer] to delete robby view")))
 
-(cl-defun robby-respond-in-conversation (&key text &allow-other-keys)
+(cl-defun robby-respond-in-conversation (&key text prompt &allow-other-keys)
   "Show TEXT in help window, keep minibuffer open."
   (robby--with-robby-view
    (goto-char (point-max))
-   (insert text))
+   (insert "> " prompt "\n\n")
+   (insert text "\n\n"))
   (setq unread-command-events (listify-key-sequence (kbd "M-x robby-conversation RET"))))
 
 (provide 'robby-view)

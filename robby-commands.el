@@ -19,12 +19,12 @@
  :action #'robby-respond-with-robby-view
  :historyp t)
 
-;; (robby-define-command
-;;  robby-help-window-conversation
-;;  "Query AI from minibuffer, open help window up front for conversation."
-;;  :prompt #'robby-get-prompt-for-help-window-conversation
-;;  :action #'robby-respond-in-help-window-conversation
-;;  :historyp t)
+(robby-define-command
+ robby-conversation
+ "Start AI conversation."
+ :prompt #'robby-get-prompt-from-minibuffer-with-stop-message
+ :action #'robby-respond-in-conversation
+ :historyp t)
 
 (robby-define-command
  robby-message
