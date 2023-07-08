@@ -51,6 +51,7 @@ customization options."
     'alist
     (seq-filter
      (lambda (elem) (not (null (cdr elem))))
+     ;; TODO add API param to this function
      (robby--options-from-group robby-api))
     (seq-map
      (lambda (assoc) (cons (robby--kebab-to-snake-case (replace-regexp-in-string "^:" "" (symbol-name (car assoc)))) (cdr assoc)))
