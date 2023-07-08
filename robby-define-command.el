@@ -54,6 +54,10 @@ ACTION - function to invoke when request is complete.  The
 function is passed the response text and the selected region, and
 must be of the form `(TEXT BEG END)'.
 
+API - the OpenAI API to use, either `chat' or `completions`'.
+Defaults to the value of the `robby-api' customization variable
+if not supplied.
+
 API-OPTIONS - property list of options to pass to the OpenAI
 API. These options are merged in with the customization options
 specified in the api customization group, either `robby-chat-api'
