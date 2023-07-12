@@ -76,19 +76,12 @@ Emacs Lisp, do not print messages if SILENTP is t."
         (apply action (map-merge 'plist action-args `(:text ,text :beg ,beg :end ,end :prompt ,basic-prompt :chars-processed ,chars-processed :completep ,completep))))
     (run-hooks 'robby-command-complete-hook)))
 
-(cl-defun robby--handle-error (&key error-thrown text symbol-status)
+(defun robby--handle-error (err)
+  (let ((msg (format "Error processing robby request: %s" (error-message-string err))))
+    (robby--log msg)
+    (message msg))
   (robby--spinner-stop)
-  (robby--log (format "# robby error: %s" text))
-  ;; (robby--log (format "# Error thrown:\n%S\n# Raw error response data:\n%S\n# symbol-status: %S" error-thrown text symbol-status))
-  ;; (cond
-  ;;   ((robby--request-running-p)
-  ;;    (message "Making another request to our AI overlords…"))
-  ;;   ((eq symbol-status 'abort)
-  ;;    (message "Robby request aborted"))
-  ;;   (t
-  ;;    (message (robby--parse-error-response data))
-  ;;    (message (robby--parse-error-response data))))
-  )
+  (kill-process robby--last-process))
 
 (defun robby--parse-error-response (data)
   "Parse raw error response from DATA and try to return descriptive message."
@@ -143,25 +136,23 @@ values in the customization options specified in for example
              (cl-function
               (lambda (&key text chars completep &allow-other-keys)
                 (if (buffer-live-p response-buffer)
-                    (with-current-buffer response-buffer
-                      (robby--handle-success
-                       :action action
-                       :action-args action-args
-                       :api request-api
-                       :basic-prompt basic-prompt
-                       :chars-processed chars-processed
-                       :completep completep
-                       :response-region response-region
-                       :text text)))
+                    (condition-case err
+                        (with-current-buffer response-buffer
+                          (robby--handle-success
+                           :action action
+                           :action-args action-args
+                           :api request-api
+                           :basic-prompt basic-prompt
+                           :chars-processed chars-processed
+                           :completep completep
+                           :response-region response-region
+                           :text text))
+                      (error (robby--handle-error err))))
                 (setq chars-processed (+ chars-processed (length text)))))
              :on-error
-             (cl-function
-              (lambda (&rest args &key error-thrown ext symbol-status &allow-other-keys)
-                (with-current-buffer response-buffer
-                  (robby--handle-error
-                   :error-thrown error-thrown
-                   :text text
-                   :symbol-status symbol-status)))))))))
+             (lambda (err)
+               (with-current-buffer response-buffer
+                 (robby--handle-error err))))))))
 
 (provide 'robby-run-command)
 

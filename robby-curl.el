@@ -59,7 +59,7 @@ of parsed JSON objects: `(:remaining \"text\" :parsed '())'
                           "curl"
                           "https://api.openai.com/v1/chat/completions"
                           curl-options)
-                 (error (funcall on-error (error-message-string err))))))
+                 (error (funcall on-error err)))))
     (let ((remaining "")
           (text ""))
       (set-process-filter
