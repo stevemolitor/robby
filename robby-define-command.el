@@ -69,6 +69,7 @@ or `robby-completions-api'."
       :prompt ,prompt
       :prompt-args (robby--handle-prefix-args arg ,prompt-args)
       :action ,action
+      :action-args ,action-args
       :historyp ,historyp
       :api ,api
       :api-options ,api-options)))

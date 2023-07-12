@@ -17,24 +17,24 @@
   "Mode for viewing read-only OpenAI robby responses. Press `q` to quit.")
 
 (defmacro robby--with-robby-view (&rest body)
+  ;; TODO handle case when view buffer has no window
   `(let ((buf (get-buffer-create robby--view-buffer)))
      (with-current-buffer buf
-       (display-buffer buf 'display-buffer-reuse-window)
+       (when (eq (point-max) 1)
+         (display-buffer buf 'display-buffer-reuse-window)
+         (robby-view-mode))
        (let ((inhibit-read-only t))
-         ,@body)
-       (robby-view-mode))))
-
-(defun robby--quit-message ()
-  (interactive)
-  (message "%s" (substitute-command-keys "Type \\<global-map>\\[keyboard-quit] to delete robby view")))
+         ,@body))))
 
 ;;;###autoload
-(cl-defun robby-respond-with-robby-view (&key text &allow-other-keys)
+(cl-defun robby-respond-with-robby-view (&key text completep &allow-other-keys)
   "Show TEXT in robby-view-mode buffer."
   (robby--with-robby-view
-   (erase-buffer)
-   (insert text))
-  (message "%s" (substitute-command-keys "Type \\<markdown-view-mode-map>\\[kill-this-buffer] to delete robby view")))
+   (goto-char (point-max))
+   (insert text)
+   (when (eq completep t)
+     (insert "\n___\n")
+     (message "%s" (substitute-command-keys "Type \\<markdown-view-mode-map>\\[kill-this-buffer] to delete robby view")))))
 
 (cl-defun robby-respond-in-conversation (&key text prompt &allow-other-keys)
   "Show TEXT in help window, keep minibuffer open."

@@ -20,6 +20,7 @@
   '(" robby " (:eval (spinner-print robby--spinner))))
 
 (defvar-local robby--spinner nil)
+(put 'robby--spinner 'permanent-local t)
 
 (defun robby--create-spinner ()
   "Create a new spinner for current buffer only."
@@ -27,15 +28,13 @@
 
 (defun robby--spinner-start ()
   "Start spinner for current buffer."
-  (when robby-show-spinner
+  (when (bound-and-true-p robby-spinner-mode)
     (setq robby--spinner (robby--create-spinner))
     (spinner-start robby--spinner)))
 
-(defun robby--spinner-stop (buf)
-  "Stop spinner for current buffer BUF."
-  (with-current-buffer buf
-    (when robby-show-spinner
-      (spinner-stop robby--spinner))))
+(defun robby--spinner-stop ()
+  "Stop spinner."
+  (spinner-stop robby--spinner))
 
 (provide 'robby-spinner)
 

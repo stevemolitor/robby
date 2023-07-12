@@ -18,26 +18,39 @@
   (message (robby--format-message-text text)))
 
 ;;;###autoload
-(cl-defun robby-prepend-response-to-region (&key text beg response-buffer &allow-other-keys)
+(cl-defun robby-prepend-response-to-region (&key text beg chars-processed &allow-other-keys)
   "Prepend AI response to region, or buffer if no selected region."
-  (with-current-buffer (or response-buffer (current-buffer))
+  (when (eq chars-processed 0)
     (goto-char beg)
-    (insert (format "%s\n" text))))
+    (insert "\n"))
+  (goto-char (+ beg chars-processed))
+  (insert (format "%s" text)))
 
 ;;;###autoload
-(cl-defun robby-append-response-to-region (&key text end response-buffer &allow-other-keys)
+(cl-defun robby-append-response-to-region (&key text end response-buffer chars-processed completep &allow-other-keys)
   "Append AI response to region, or buffer if no selected region."
   (with-current-buffer (or response-buffer (current-buffer))
+    (when (eq chars-processed 0)
+      (goto-char end)
+      (insert "\n"))
+    (goto-char (+ 1 end chars-processed))
+    (insert (format "%s" text))))
+
+(cl-defun robby-append-response-to-region (&key text end chars-processed completep &allow-other-keys)
+  "Append AI response to region, or buffer if no selected region."
+  (when (eq chars-processed 0)
     (goto-char end)
-    (insert (format "\n%s" text))))
+    (insert "\n"))
+  (goto-char (+ 1 end chars-processed))
+  (insert (format "%s" text)))
 
 ;;;###autoload
-(cl-defun robby-replace-region-with-response (&key text beg end response-buffer &allow-other-keys)
+(cl-defun robby-replace-region-with-response (&key text beg end chars-processed &allow-other-keys)
   "Append AI response to region, or buffer if no selected region."
-  (with-current-buffer (or response-buffer (current-buffer))
-    (delete-region beg end)
-    (goto-char beg)
-    (insert text)))
+  (when (eq chars-processed 0)
+    (delete-region beg end))
+  (goto-char (+ beg chars-processed))
+  (insert text))
 
 (provide 'robby-actions)
 

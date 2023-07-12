@@ -24,6 +24,7 @@
   (require 'seq)
   (require 'transient))
 
+(require 'robby-curl)
 (require 'robby-customization)
 (require 'robby-prompts)
 (require 'robby-actions)
