@@ -53,7 +53,7 @@ Emacs Lisp, do not print messages if SILENTP is t."
 (defun robby--cleanup-process (err)
   (robby--log (format "# unexpected error in robby process: %S" err))
   (robby--spinner-stop)
-  (kill-process robby--last-process))
+  (robby-kill-last-process t))
 
 ;; TODO rename to match callback - on-text (or rename cb)
 (cl-defun robby--handle-success (&key
@@ -77,11 +77,13 @@ Emacs Lisp, do not print messages if SILENTP is t."
     (run-hooks 'robby-command-complete-hook)))
 
 (defun robby--handle-error (err)
-  (let ((msg (format "Error processing robby request: %s" (error-message-string err))))
-    (robby--log msg)
-    (message msg))
+  (let* ((err-msg (if (stringp err) err (error-message-string err)))
+         (log-msg (format "Error processing robby request: %s" err-msg)))
+    (robby--log log-msg)
+    (message log-msg))
   (robby--spinner-stop)
-  (kill-process robby--last-process))
+  (if (process-live-p robby--last-process)
+      (robby-kill-last-process t)))
 
 (defun robby--parse-error-response (data)
   "Parse raw error response from DATA and try to return descriptive message."

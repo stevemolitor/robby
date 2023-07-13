@@ -4,10 +4,12 @@
 
 (require 'seq)
 (require 'robby-api-key)
+(require 'robby-logging)
 
 ;;; Code:
 (defvar robby--curl-options
   '("--compressed"
+    "--disable"
     "--silent"
     "-m 600"
     "-H" "Content-Type: application/json"))
@@ -46,6 +48,13 @@ of parsed JSON objects: `(:remaining \"text\" :parsed '())'
            (setq new-remaining (buffer-substring pos (point-max))))))
       `(:remaining ,new-remaining :parsed ,(nreverse parsed)))))
 
+(defconst robby--curl-unknown-error "Unexpected error making OpenAI request via curl" )
+
+(defun robby--curl-parse-error (string)
+  (condition-case _err
+      (cdr (assoc 'message (assoc 'error (json-read-from-string string))))
+    (error "")))
+
 (cl-defun robby--curl (&key payload on-text on-error)
   (let* ((input-obj (append '((stream . t)) payload))
          (input-json (json-encode input-obj))
@@ -65,12 +74,16 @@ of parsed JSON objects: `(:remaining \"text\" :parsed '())'
       (set-process-filter
        proc
        (lambda (_proc string)
-         (let* ((data (replace-regexp-in-string (rx bol "data:") "" string))
-                (json (robby--parse-chunk remaining data))
-                (parsed (plist-get json :parsed))
-                (text (string-join (seq-filter #'stringp (seq-map #'robby--chunk-content parsed)))))
-           (setq remaining (plist-get json :remaining))
-           (funcall on-text :text text :completep nil))))
+         (robby--log (format "\n# raw data from curl: %s\n" string))
+         (let ((error-msg (robby--curl-parse-error string)))
+           (if error-msg
+               (funcall on-error error-msg)
+             (let* ((data (replace-regexp-in-string (rx bol "data:") "" string))
+                    (json (robby--parse-chunk remaining data))
+                    (parsed (plist-get json :parsed))
+                    (text (string-join (seq-filter #'stringp (seq-map #'robby--chunk-content parsed)))))
+               (setq remaining (plist-get json :remaining))
+               (funcall on-text :text text :completep nil))))))
       (set-process-sentinel
        proc
        (lambda (_proc _string)
