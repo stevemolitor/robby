@@ -32,6 +32,11 @@ the conversation history."
   :type 'integer
   :group 'robby)
 
+(defcustom robby-stream-p t
+  "Stream responses from OpenAI if t"
+  :type  'boolean
+  :group 'robby)
+
 (defcustom robby-api "chat"
   "Which OpenAI model to use.
 
@@ -40,12 +45,6 @@ change this value, as it needs to clear out the history to avoid
 incompatible history between the two apis."
   :type '(choice (const :tag "Completions" "completions")
                  (const :tag "Chat" "chat"))
-  :group 'robby)
-
-(defcustom robby-show-spinner t
-  "Should robby show a spinner in the modeline while waiting on
-OpenAI requests.
-Set to nil to disable spinner."
   :group 'robby)
 
 ;;; completions api options

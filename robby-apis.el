@@ -26,10 +26,11 @@ Also include prompt history if HISTORYP is true."
           (string-join (flatten-list all-messages) "\n")))
     `((prompt . ,prompt-with-history))))
 
-(cl-defmethod robby--parse-response ((api (eql 'completions)) data)
-  "Parse OpenAI completions API from response DATA."
-  (string-trim (or (assoc-default 'text (seq-first (assoc-default 'choices data))) "")))
-
+(cl-defmethod robby--chunk-content ((api (eql 'completions)) chunk streamp)
+  "Parse message text from chat API response JSON."
+  ;; TODO adjust for completions API
+  (let ((key (if streamp 'delta 'message)))
+    (assoc-default 'content (assoc-default key (seq-first (assoc-default 'choices chunk))))))
 
 ;;; chat methods
 (cl-defmethod robby--request-url ((api (eql 'chat)))
@@ -56,9 +57,10 @@ Also include prompt history if HISTORYP is true."
             `[,system-message ((role . "user") (content . ,prompt))])))
     `((messages . ,formatted-messages))))
 
-(cl-defmethod robby--parse-response ((api (eql 'chat)) data)
-  "Parse OpenAI chat API from response DATA."
-  (string-trim (or (assoc-default 'content (assoc-default 'message (seq-first (assoc-default 'choices data)))) "")))
+(cl-defmethod robby--chunk-content ((api (eql 'chat)) chunk streamp)
+  "Parse message text from chat API response JSON."
+  (let ((key (if streamp 'delta 'message)))
+    (assoc-default 'content (assoc-default key (seq-first (assoc-default 'choices chunk))))))
 
 (provide 'robby-apis)
 

@@ -29,21 +29,20 @@ If there is prefix arg, never prompt for input in a command."
 (cl-defmacro robby-define-command (name
                                    docstring
                                    &key
-                                   historyp
                                    prompt
                                    prompt-args
                                    action
                                    action-args
                                    api
-                                   api-options)
+                                   api-options
+                                   historyp
+                                   never-stream-p)
   "Define a new Robby command.
 
 NAME is the command name, a symbol.
 DOCSTRING is the documentation string for the new command.
 
 Keyword parameters:
-
-HISTORYP - include conversation history in OpenAI request if t.
 
 PROMPT - Function or string.  If a function, command will call
 with interactive prefix arg to obtain the prompt.  If a string,
@@ -61,7 +60,12 @@ if not supplied.
 API-OPTIONS - property list of options to pass to the OpenAI
 API. These options are merged in with the customization options
 specified in the api customization group, either `robby-chat-api'
-or `robby-completions-api'."
+or `robby-completions-api'.
+
+HISTORYP - include conversation history in OpenAI request if t.
+
+NEVER-STREAM-P - Stream reponse if t. if present this value overrides
+the `robby-stream' customization variable."
   `(defun ,name (arg)
      ,docstring
      (interactive "P")
@@ -70,9 +74,11 @@ or `robby-completions-api'."
       :prompt-args (robby--handle-prefix-args arg ,prompt-args)
       :action ,action
       :action-args ,action-args
-      :historyp ,historyp
       :api ,api
-      :api-options ,api-options)))
+      :api-options ,api-options
+      :historyp ,historyp
+      :never-stream-p ,never-stream-p
+      )))
 
 (provide 'robby-define-command)
 

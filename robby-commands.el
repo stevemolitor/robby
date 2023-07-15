@@ -35,7 +35,8 @@
  "Query AI from minibuffer, respond with message."
  :prompt #'robby-get-prompt-from-minibuffer
  :action #'robby-respond-with-message
- :historyp t)
+ :historyp t
+ :never-stream-p t)
 
 ;;;###autoload
 (robby-define-command

@@ -15,6 +15,7 @@
 ;;;###autoload
 (cl-defun robby-respond-with-message (&key text &allow-other-keys)
   "Show TEXT in minibuffer message."
+  (message "")                          ;; clear any end of line from a previous message
   (message (robby--format-message-text text)))
 
 ;;;###autoload
