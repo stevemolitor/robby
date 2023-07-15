@@ -9,6 +9,7 @@
 
 ;;; Code:
 
+;;;###autoload
 (define-minor-mode robby-spinner-mode
   "Minor mode for robby commands."
   :global t

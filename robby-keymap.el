@@ -6,6 +6,7 @@
 
 ;;; Code:
 
+;;;###autoload
 (defvar robby-command-map
   (let ((map (make-sparse-keymap)))
     (define-key map "r" 'robby)
@@ -20,8 +21,10 @@
     map)
   "Robby command map.")
 
+;;;###autoload
 (defvar robby-keymap-prefix (kbd "C-c C-r"))
 
+;;;###autoload
 (defvar robby-spinner-mode-map
   (let ((map (make-sparse-keymap)))
     (define-key map robby-keymap-prefix robby-command-map)

@@ -264,6 +264,7 @@ customization values."
    ("a" "apply options" robby--apply-api-options)])
 
 ;;; Robby transient
+;;;###autoload (autoload 'robby "robby-transients" nil t)
 (transient-define-prefix robby ()
   "Invoke OpenAI Chat API."
   :incompatible '(("prompt=" "prompt-prefix=")
