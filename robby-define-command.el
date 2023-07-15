@@ -21,7 +21,6 @@ If there is prefix arg, never prompt for input in a command."
       (map-merge 'plist prompt-args '(:never-ask-p t))
     prompt-args))
 
-;;;###autoload (autoload 'robby-define-command "robby-define-command" "Define a custom robby command." nil t)
 (cl-defmacro robby-define-command (name
                                    docstring
                                    &key

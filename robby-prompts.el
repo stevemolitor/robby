@@ -6,7 +6,6 @@
 
 ;;; Code:
 
-;;;###autoload
 (defun robby-get-prompt-from-minibuffer ()
   "Get Robby prompt from minibuffer."
   (read-string "Request for AI overlords: "))
@@ -17,7 +16,6 @@
   (read-from-minibuffer
    (concat "Request for AI overloards (" (propertize (substitute-command-keys "\\<global-map>\\[keyboard-quit]" t) 'face '(help-key-binding default)) " to stop): ")))
 
-;;;###autoload
 (cl-defun robby--get-region-or-buffer-text (&optional buffer)
   "Get Robby prompt from buffer region.
 

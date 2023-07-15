@@ -26,7 +26,6 @@
        (let ((inhibit-read-only t))
          ,@body))))
 
-;;;###autoload
 (cl-defun robby-respond-with-robby-view (&key text completep &allow-other-keys)
   "Show TEXT in robby-view-mode buffer."
   (robby--with-robby-view
