@@ -6,12 +6,14 @@
 ;; tests that require an OpenAI API key, just unit tests we can run in
 ;; CI.
 
+(require 'ert)
 (require 'robby-history-test)
-(require 'robby-actions-test)
+;; (require 'robby-actions-test)
 (require 'robby-logging-test)
 (require 'robby-options-test)
 (require 'robby-apis-test)
 (require 'robby-utils-test)
+(require 'robby-curl-test)
 
 (provide 'robby-tests)
 

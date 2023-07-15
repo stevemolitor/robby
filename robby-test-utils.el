@@ -14,6 +14,12 @@
   `(let ((robby--history ,history))
      ,@body))
 
+(defun robby--read-file-into-string (filepath)
+  "Return filepath's file content."
+  (with-temp-buffer
+    (insert-file-contents filepath)
+    (buffer-string))) 
+
 (provide 'robby-test-utils)
 
 ;;; robby-test-utils.el ends here

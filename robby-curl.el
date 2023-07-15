@@ -2,7 +2,10 @@
 
 ;;; Commentary:
 
+(require 'cl-macs)
+(require 'json)
 (require 'seq)
+
 (require 'robby-api-key)
 (require 'robby-logging)
 
@@ -37,7 +40,7 @@ of parsed JSON objects: `(:remaining \"text\" :parsed '())'
       (insert data)
       (goto-char pos)
       (while (and (not done) (not (looking-at " *\\[DONE\\]")))
-        (condition-case nil
+        (condition-case err
             (progn
               (setq pos (point))
               (let* ((json-object-type 'alist)
@@ -53,9 +56,20 @@ of parsed JSON objects: `(:remaining \"text\" :parsed '())'
 (defun robby--curl-parse-error (string)
   (condition-case _err
       (cdr (assoc 'message (assoc 'error (json-read-from-string string))))
-    (error "")))
+    (error nil)))
 
-(cl-defun robby--curl (&key payload on-text on-error)
+(defun robby--curl-parse-response (string remaining)
+  (let ((error-msg (robby--curl-parse-error string)))
+    (if error-msg
+        `(:error ,error-msg)
+      (let* ((data (replace-regexp-in-string (rx bol "data:") "" string))
+             (json (robby--parse-chunk remaining data))
+             (parsed (plist-get json :parsed))
+             (text (string-join (seq-filter #'stringp (seq-map #'robby--chunk-content parsed)))))
+        (setq remaining (plist-get json :remaining))
+        `(:text ,text :remaining ,(plist-get json :remaining))))))
+
+(cl-defun robby--curl (&key payload on-text on-error never-stream-p)
   (let* ((input-obj (append '((stream . t)) payload))
          (input-json (json-encode input-obj))
          (curl-options (append robby--curl-options
