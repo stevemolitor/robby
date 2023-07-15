@@ -28,9 +28,7 @@ Also include prompt history if HISTORYP is true."
 
 (cl-defmethod robby--chunk-content ((api (eql 'completions)) chunk streamp)
   "Parse message text from chat API response JSON."
-  ;; TODO adjust for completions API
-  (let ((key (if streamp 'delta 'message)))
-    (assoc-default 'content (assoc-default key (seq-first (assoc-default 'choices chunk))))))
+  (assoc-default 'text (seq-first (assoc-default 'choices chunk))))
 
 ;;; chat methods
 (cl-defmethod robby--request-url ((api (eql 'chat)))
