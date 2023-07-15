@@ -72,8 +72,7 @@ Emacs Lisp, do not print messages if SILENTP is t."
         (end (cdr response-region)))
     (if completep
         (robby--history-push basic-prompt text))
-    (if (not (string-empty-p text))
-        (apply action (map-merge 'plist action-args `(:text ,text :beg ,beg :end ,end :prompt ,basic-prompt :chars-processed ,chars-processed :completep ,completep))))
+    (apply action (map-merge 'plist action-args `(:text ,text :beg ,beg :end ,end :prompt ,basic-prompt :chars-processed ,chars-processed :completep ,completep)))
     (run-hooks 'robby-command-complete-hook)))
 
 (defun robby--handle-error (err)
@@ -89,7 +88,7 @@ Emacs Lisp, do not print messages if SILENTP is t."
   "Parse raw error response from DATA and try to return descriptive message."
   (or (cdr (assoc 'message (assoc 'error data))) "unknown error"))
 
-(cl-defun robby-run-command (&key prompt prompt-args action action-args historyp api api-options)
+(cl-defun robby-run-command (&key prompt prompt-args action action-args api api-options historyp never-stream-p)
   "Run a command using OpenAI.
 
 PROMPT is a string or a function. If a string it used as is as
@@ -101,8 +100,6 @@ When the response text is received from OpenAI, ACTION is called
 with the property list ACTION-ARGS and `:text text`, where text
 is the text response from OpenAI.
 
-HISTORYP indicates whether or not to use conversation history.
-
 API specifies which OpenAI API to use, for example \"chat\" or
 \"completions\". It defaults to the value of `'robby-api'.
 
@@ -111,7 +108,12 @@ the OpenAI API. Kebab case keys are converted to snake case JSON
 keys. For example `'max-tokens' becomes \"max_tokens\". The
 values in API-OPTIONS are merged with and overwrite equivalent
 values in the customization options specified in for example
-`'robby-chat-options' or `'robby-completion-options'."
+`'robby-chat-options' or `'robby-completion-options'.
+
+HISTORYP indicates whether or not to use conversation history.
+
+NEVER-STREAM-P - Never stream reponse if t. if present this value overrides
+the `robby-stream' customization variable."
   ;; save command history
   (robby--save-last-command-options
    :prompt prompt :prompt-args prompt-args :action action :action-args action-args :historyp historyp :api api :api-options api-options)
@@ -134,9 +136,10 @@ values in the customization options specified in for example
             (robby--curl
              ;; :url url
              :payload payload
+             :never-stream-p never-stream-p
              :on-text
              (cl-function
-              (lambda (&key text chars completep &allow-other-keys)
+              (lambda (&key text completep)
                 (if (buffer-live-p response-buffer)
                     (condition-case err
                         (with-current-buffer response-buffer

@@ -92,12 +92,9 @@ of parsed JSON objects: `(:remaining \"text\" :parsed '())'
          (let ((error-msg (robby--curl-parse-error string)))
            (if error-msg
                (funcall on-error error-msg)
-             (let* ((data (replace-regexp-in-string (rx bol "data:") "" string))
-                    (json (robby--parse-chunk remaining data))
-                    (parsed (plist-get json :parsed))
-                    (text (string-join (seq-filter #'stringp (seq-map #'robby--chunk-content parsed)))))
-               (setq remaining (plist-get json :remaining))
-               (funcall on-text :text text :completep nil))))))
+             (let ((resp (robby--curl-parse-response string remaining)))
+               (setq remaining (plist-get resp :remaining))
+               (funcall on-text :text (plist-get resp :text) :completep nil))))))
       (set-process-sentinel
        proc
        (lambda (_proc _string)
