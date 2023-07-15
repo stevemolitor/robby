@@ -24,14 +24,12 @@
   (require 'seq)
   (require 'transient))
 
-(require 'robby-curl)
-(require 'robby-customization)
-(require 'robby-prompts)
 (require 'robby-actions)
-(require 'robby-run-command)
+(require 'robby-commands)
+(require 'robby-customization)
 (require 'robby-define-command)
 (require 'robby-keymap)
-(require 'robby-commands)
+(require 'robby-prompts)
 (require 'robby-spinner-mode)
 (require 'robby-transients)
 

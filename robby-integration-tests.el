@@ -5,12 +5,9 @@
 (require 'seq)
 
 (require 'robby-commands)
-(require 'robby-define-command)
-(require 'robby-history)
 (require 'robby-customization)
-(require 'robby-prompts)
-(require 'robby-request)
-(require 'robby-api-key)
+(require 'robby-history)
+(require 'robby-run-command)
 
 ;;; Code:
 

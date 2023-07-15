@@ -12,7 +12,6 @@
 (require 'robby-history)
 (require 'robby-logging)
 (require 'robby-options)
-(require 'robby-prompts)
 (require 'robby-save-commands)
 (require 'robby-spinner)
 

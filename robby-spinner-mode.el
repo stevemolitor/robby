@@ -6,7 +6,6 @@
 
 (require 'spinner)
 (require 'robby-spinner)
-(require 'robby-keymap)
 
 ;;; Code:
 

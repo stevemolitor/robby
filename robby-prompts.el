@@ -4,9 +4,6 @@
 
 ;; Functions to get prompts for OpenAI.
 
-(require 'robby-prefix-args)
-(require 'robby-view)
-
 ;;; Code:
 
 ;;;###autoload

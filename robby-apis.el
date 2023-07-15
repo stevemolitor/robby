@@ -7,7 +7,6 @@
 (require 'cl-generic)
 
 (require 'robby-history)
-(require 'robby-customization)
 
 ;;; Code:
 

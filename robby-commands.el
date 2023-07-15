@@ -4,7 +4,6 @@
 
 ;; Built in Robby commands.
 
-(require 'robby-run-command)
 (require 'robby-define-command)
 (require 'robby-prompts)
 (require 'robby-actions)

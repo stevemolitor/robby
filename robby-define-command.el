@@ -9,11 +9,7 @@
 (require 'cl-lib)
 (require 'map)
 
-(require 'robby-request)
-(require 'robby-save-commands)
-(require 'robby-prefix-args)
-(require 'robby-actions)
-(require 'robby-apis)
+(require 'robby-run-command)
 
 ;;; Code:
 

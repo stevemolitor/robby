@@ -4,8 +4,8 @@
 
 ;; Robby test util functions.
 
-(require 'robby-customization)
-(require 'robby-history)
+;; (require 'robby-customization)
+;; (require 'robby-history)
 
 ;;; Code:
 
