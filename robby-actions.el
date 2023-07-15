@@ -25,15 +25,6 @@
   (goto-char (+ beg chars-processed))
   (insert (format "%s" text)))
 
-(cl-defun robby-append-response-to-region (&key text end response-buffer chars-processed completep &allow-other-keys)
-  "Append AI response to region, or buffer if no selected region."
-  (with-current-buffer (or response-buffer (current-buffer))
-    (when (eq chars-processed 0)
-      (goto-char end)
-      (insert "\n"))
-    (goto-char (+ 1 end chars-processed))
-    (insert (format "%s" text))))
-
 (cl-defun robby-append-response-to-region (&key text end chars-processed completep &allow-other-keys)
   "Append AI response to region, or buffer if no selected region."
   (when (eq chars-processed 0)
@@ -43,7 +34,7 @@
   (insert (format "%s" text)))
 
 (cl-defun robby-replace-region-with-response (&key text beg end chars-processed &allow-other-keys)
-  "Append AI response to region, or buffer if no selected region."
+  "Replace region with AI response, or buffer if no selected region."
   (when (eq chars-processed 0)
     (delete-region beg end))
   (goto-char (+ beg chars-processed))
