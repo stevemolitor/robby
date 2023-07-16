@@ -129,7 +129,7 @@ values."
          (prompt (or simple-prompt #'robby-get-prompt-from-region))
          (prompt-args (if simple-prompt
                           '()
-                        `(:prompt-prefix ,prompt-prefix :prompt-suffix ,prompt-suffix :buffer ,prompt-buffer :never-ask-p t)))
+                        `(:prompt-prefix ,prompt-prefix :prompt-suffix ,prompt-suffix :buffer ,prompt-buffer)))
          (response-buffer (transient-arg-value "response-buffer=" args))
          (action-args `(:response-buffer ,response-buffer)))
     (robby-run-command

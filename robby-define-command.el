@@ -13,14 +13,6 @@
 
 ;;; Code:
 
-(defun robby--handle-prefix-args (arg prompt-args)
-  "Mix in appropriate values into PROMPT-ARGS based on prefix ARG.
-
-If there is prefix arg, never prompt for input in a command."
-  (if arg
-      (map-merge 'plist prompt-args '(:never-ask-p t))
-    prompt-args))
-
 (cl-defmacro robby-define-command (name
                                    docstring
                                    &key
@@ -66,7 +58,7 @@ the `robby-stream' customization variable."
      (interactive "P")
      (robby-run-command
       :prompt ,prompt
-      :prompt-args (robby--handle-prefix-args arg ,prompt-args)
+      :prompt-args ,prompt-args
       :action ,action
       :action-args ,action-args
       :api ,api

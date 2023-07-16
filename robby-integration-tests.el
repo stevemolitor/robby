@@ -47,7 +47,7 @@ is complete."
                                (funcall done)))))
         (insert "What year did Abraham Lincoln die?")
         (robby-run-command
-         :prompt #'robby-get-prompt-from-region :prompt-args '(:never-ask-p t)
+         :prompt #'robby-get-prompt-from-region
          :action cb)))))
 
 (ert-deftest-async robby-integration-test--run-command (done)
