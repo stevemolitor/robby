@@ -16,6 +16,7 @@
  robby-view
  "Query AI from minibuffer, respond in robby-view-mode buffer."
  :prompt #'robby-get-prompt-from-minibuffer
+ :prompt-args '(:a 3)
  :action #'robby-respond-with-robby-view
  :action-args `(:response-buffer ,robby--view-buffer)
  :historyp t)
@@ -53,13 +54,16 @@ append results to region or buffer."
  :prompt #'robby-get-prompt-from-region
  :action #'robby-append-response-to-region)
 
-;;;###autoload (autoload 'robby-replace-region "robby-commands" nil t)
+;;;###autoload (autoload 'robby-confirm-replace-region "robby-commands" nil t)
 (robby-define-command
  robby-replace-region
  "Query AI from region or entire buffer if no selected region,
-replace region with response."
+replace region with response.
+
+If prefix arg is supplied, confirm changes in a diff buffer
+before applying."
  :prompt #'robby-get-prompt-from-region
- :action #'robby-replace-region-with-response)
+ :action #'robby-confirm-replace-region-with-response)
 
 (provide 'robby-commands)
 

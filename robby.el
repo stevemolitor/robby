@@ -13,15 +13,17 @@
 ;; reusable custom AI command. See the README for more details.
 
 (eval-when-compile
+  (require 'cl)
   (require 'cl-generic)
   (require 'cl-lib)
   (require 'cl-macs)
   (require 'cus-edit)
+  (require 'diff)
   (require 'json)
   (require 'markdown-mode)
   (require 'map)
-  (require 'request)
   (require 'seq)
+  (require 'spinner)
   (require 'transient))
 
 (require 'robby-commands)

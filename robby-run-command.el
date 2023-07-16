@@ -54,16 +54,16 @@ Emacs Lisp, do not print messages if SILENTP is t."
   (robby--spinner-stop)
   (robby-kill-last-process t))
 
-;; TODO rename to match callback - on-text (or rename cb)
-(cl-defun robby--handle-success (&key
-                                 action
-                                 action-args
-                                 api
-                                 basic-prompt
-                                 chars-processed
-                                 completep
-                                 text
-                                 response-region)
+(cl-defun robby--handle-text (&key
+                              arg
+                              action
+                              action-args
+                              api
+                              basic-prompt
+                              chars-processed
+                              completep
+                              text
+                              response-region)
   (if completep
       (robby--spinner-stop))
   (robby--log (format "# response text:\n%S\ncomplete: %S, chars-processed %d" text completep chars-processed))
@@ -71,7 +71,11 @@ Emacs Lisp, do not print messages if SILENTP is t."
         (end (cdr response-region)))
     (if completep
         (robby--history-push basic-prompt text))
-    (apply action (map-merge 'plist action-args `(:text ,text :beg ,beg :end ,end :prompt ,basic-prompt :chars-processed ,chars-processed :completep ,completep)))
+    (apply
+     action
+     (map-merge
+      'plist action-args
+      `(:arg ,arg :text ,text :beg ,beg :end ,end :prompt ,basic-prompt :chars-processed ,chars-processed :completep ,completep)))
     (run-hooks 'robby-command-complete-hook)))
 
 (defun robby--handle-error (err)
@@ -87,8 +91,11 @@ Emacs Lisp, do not print messages if SILENTP is t."
   "Parse raw error response from DATA and try to return descriptive message."
   (or (cdr (assoc 'message (assoc 'error data))) "unknown error"))
 
-(cl-defun robby-run-command (&key prompt prompt-args action action-args api api-options historyp never-stream-p)
+(cl-defun robby-run-command (&key arg prompt prompt-args action action-args api api-options historyp never-stream-p)
   "Run a command using OpenAI.
+
+ARG is the interactive prefix arg, if any. It is pass to the
+PROMPT and ACTION functions.
 
 PROMPT is a string or a function. If a string it used as is as
 the prompt to send to OpenAI. If PROMPT is a function it is
@@ -111,13 +118,14 @@ values in the customization options specified in for example
 
 HISTORYP indicates whether or not to use conversation history.
 
-NEVER-STREAM-P - Never stream reponse if t. if present this value overrides
+NEVER-STREAM-P - Never stream response if t. if present this value overrides
 the `robby-stream' customization variable."
   ;; save command history
   (robby--save-last-command-options
-   :prompt prompt :prompt-args prompt-args :action action :action-args action-args :historyp historyp :api api :api-options api-options)
+   :arg arg :prompt prompt :prompt-args prompt-args :action action :action-args action-args :historyp historyp :api api :api-options api-options)
 
-  (let* ((basic-prompt (if (functionp prompt) (apply prompt prompt-args) (format "%s" prompt)))
+  (let* ((prompt-args-with-arg (map-merge 'plist prompt-args `(:arg ,arg)))
+         (basic-prompt (if (functionp prompt) (apply prompt prompt-args-with-arg) (format "%s" prompt)))
          (request-api (intern (or api robby-api)))
          (complete-prompt (robby--request-input request-api basic-prompt historyp))
          (streaming-p (and (not never-stream-p) robby-stream-p))
@@ -143,7 +151,8 @@ the `robby-stream' customization variable."
                 (if (buffer-live-p response-buffer)
                     (condition-case err
                         (with-current-buffer response-buffer
-                          (robby--handle-success
+                          (robby--handle-text
+                           :arg arg
                            :action action
                            :action-args action-args
                            :api request-api

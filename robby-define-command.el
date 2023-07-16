@@ -57,6 +57,7 @@ the `robby-stream' customization variable."
      ,docstring
      (interactive "P")
      (robby-run-command
+      :arg arg
       :prompt ,prompt
       :prompt-args ,prompt-args
       :action ,action
@@ -64,8 +65,7 @@ the `robby-stream' customization variable."
       :api ,api
       :api-options ,api-options
       :historyp ,historyp
-      :never-stream-p ,never-stream-p
-      )))
+      :never-stream-p ,never-stream-p)))
 
 (provide 'robby-define-command)
 

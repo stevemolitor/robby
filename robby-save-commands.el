@@ -11,9 +11,11 @@
   "Last robby command.")
 
 ;; How old is Tom Cruise?
-(cl-defun robby--save-last-command-options (&key prompt prompt-args action action-args historyp api api-options)
+(cl-defun robby--save-last-command-options (&key arg prompt prompt-args action action-args historyp api api-options)
   (setq robby--last-command-options
-        `(:prompt
+        `(:arg
+          ,arg
+          :prompt
           ,(if (functionp prompt) `#',prompt prompt)
           :prompt-args
           ',prompt-args

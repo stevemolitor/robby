@@ -6,11 +6,11 @@
 
 ;;; Code:
 
-(defun robby-get-prompt-from-minibuffer ()
+(cl-defun robby-get-prompt-from-minibuffer (&rest)
   "Get Robby prompt from minibuffer."
   (read-string "Request for AI overlords: "))
 
-(defun robby-get-prompt-from-minibuffer-with-stop-message ()
+(cl-defun robby-get-prompt-from-minibuffer-with-stop-message (&rest)
   "Get Robby prompt from minibuffer, with instructions on how to quit."
   (interactive)
   (read-from-minibuffer
@@ -39,8 +39,7 @@ specified, prompt the user for a prompt prefix in the minibuffer."
          (prefix (cond
                   (prompt-prefix prompt-prefix)
                   (prompt-suffix nil)
-                  (read-string "Request for AI overlords: ")
-                  (t nil))))
+                  (t (read-string "Request for AI overlords: ")))))
     (format "%s%s%s"
             (if prefix (concat prefix "\n") "") ; prefix
             prompt-from-region          ; region or buffer text

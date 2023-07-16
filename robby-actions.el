@@ -6,6 +6,7 @@
 ;; as the `:action' parameter when defining custom robby commands via
 ;; `robby-define-command'.
 
+(require 'diff)
 (require 'robby-utils)
 
 ;;; Code:
@@ -43,38 +44,47 @@
 (defvar-local robby--old-temp-buffer nil)
 (defvar-local robby--new-temp-buffer nil)
 
-(cl-defun robby-confirm-replace-region-with-response (&key text beg end chars-processed completep &allow-other-keys)
+(cl-defun robby-confirm-replace-region-with-response (&key arg text beg end chars-processed completep &allow-other-keys)
   "Replace region with AI response, or buffer if no selected region."
 
-  ;; first time:  capture current region text in old temp buffer
-  (when (eq chars-processed 0)
-    (setq robby--old-temp-buffer (generate-new-buffer (format "*robby--old-temp-buffer--%s*" (buffer-name))))
-    (setq robby--new-temp-buffer (generate-new-buffer (format "*robby--new-temp-buffer--%s*" (buffer-name))))
-    (let ((old-text (buffer-substring beg end)))
-      (with-current-buffer robby--old-temp-buffer
-        (insert old-text))))
+  ;; confirm before replacing
+  (when arg
+    ;; first time:  capture current region text in old temp buffer
+    (when (eq chars-processed 0)
+      (setq robby--old-temp-buffer (generate-new-buffer (format "*robby--old-temp-buffer--%s*" (buffer-name))))
+      (setq robby--new-temp-buffer (generate-new-buffer (format "*robby--new-temp-buffer--%s*" (buffer-name))))
+      (let ((old-text (buffer-substring beg end)))
+        (with-current-buffer robby--old-temp-buffer
+          (insert old-text))))
 
-  ;; every time: insert new text received into new temp buffer
-  (with-current-buffer robby--new-temp-buffer
-    (goto-char (+ beg chars-processed))
-    (insert text))
+    ;; every time: insert new text received into new temp buffer
+    (with-current-buffer robby--new-temp-buffer
+      (goto-char (+ beg chars-processed))
+      (insert text))
 
-  ;; last time: show diff, and if confirmed apply changes
-  (when completep
-    (let ((diff-buf (get-buffer-create "*robby-diff*")))
-      (unwind-protect
-          (progn
-            (display-buffer
-             (diff-no-select robby--old-temp-buffer robby--new-temp-buffer nil t diff-buf))
-            (let ((apply-changes-p (y-or-n-p "Apply changes?")))
-              (when apply-changes-p
-                (delete-region beg end)
-                (insert-buffer-substring robby--new-temp-buffer beg))))
-        (kill-buffer robby--old-temp-buffer)
-        (kill-buffer robby--new-temp-buffer)
-        (with-current-buffer diff-buf
-          (kill-buffer-and-window))
-        (message "")))))
+    ;; last time: show diff, and if confirmed apply changes
+    (when completep
+      (let ((diff-buf (get-buffer-create "*robby-diff*")))
+        (unwind-protect
+            (progn
+              (display-buffer
+               (diff-no-select robby--old-temp-buffer robby--new-temp-buffer nil t diff-buf))
+              (let ((apply-changes-p (y-or-n-p "Apply changes?")))
+                (when apply-changes-p
+                  (delete-region beg end)
+                  (insert-buffer-substring robby--new-temp-buffer beg))))
+          (kill-buffer robby--old-temp-buffer)
+          (kill-buffer robby--new-temp-buffer)
+          (with-current-buffer diff-buf
+            (kill-buffer-and-window))
+          (message "")))))
+
+  ;; replace without confirming
+  (when (not arg)
+    (when (eq chars-processed 0)
+      (delete-region beg end))
+   (goto-char (+ beg chars-processed))
+   (insert text)))
 
 (provide 'robby-actions)
 
