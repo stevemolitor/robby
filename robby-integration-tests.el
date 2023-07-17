@@ -11,7 +11,7 @@
 
 ;;; Code:
 
-(defmacro robby-async-region-test (before re done)
+(defmacro robby--async-region-test (before re done)
   "Test async robby region command.
 
 BEFORE is the setup body to run.  It should invoke the robby
@@ -39,7 +39,8 @@ is complete."
 
 ;;; prepend-region tests
 (ert-deftest-async robby-integration-test--run-command-get-prompt-from-region (done)
-  (let ((buffer (generate-new-buffer "*robby-commands-test*")))
+  (let ((robby-stream-p nil)
+        (buffer (generate-new-buffer "*robby-commands-test*")))
     (with-current-buffer buffer
       (let ((cb (cl-function (lambda (&key text &allow-other-keys)
                                (should (string-match-p "1865" text))
@@ -48,24 +49,17 @@ is complete."
         (insert "What year did Abraham Lincoln die?")
         (robby-run-command
          :prompt #'robby-get-prompt-from-region
+         :prompt-args '(:never-ask-p t)
          :action cb)))))
 
 (ert-deftest-async robby-integration-test--run-command (done)
-  (let ((cb (cl-function (lambda (&key text &allow-other-keys)
-                           (message "text %s" text)
-                           ;; (should (string-match-p "1865" text))
+  (let ((robby-stream-p nil)
+        (cb (cl-function (lambda (&key text &allow-other-keys)
+                           (should (string-match-p "1865" text))
                            (funcall done)))))
     (robby-run-command
      :prompt "What year did Abraham Lincoln die?"
      :action cb)))
-
-(defun robby--test-prepend-region (done)
-  (robby-async-region-test
-   (progn
-     (insert "What year did Abraham Lincoln die?")
-     (robby-prepend-region 4))
-   "1865.*\n*What year did Abraham Lincoln die?"
-   done))
 
 ;;; suite
 (defun robby-run-integration-tests ()

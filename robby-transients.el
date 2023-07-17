@@ -116,7 +116,7 @@ values."
         #'robby-get-prompt-fromregion
       prompt)))
 
-(defun robby--run-transient-command (action)
+(defun robby--run-transient-command (action &optional never-stream-p)
   (let* ((scope (or (oref transient-current-prefix scope) (robby--scope-default)))
          (api (robby--scope-selected-api scope))
          (api-str (robby--sym-to-string api))
@@ -129,7 +129,7 @@ values."
          (prompt (or simple-prompt #'robby-get-prompt-from-region))
          (prompt-args (if simple-prompt
                           '()
-                        `(:prompt-prefix ,prompt-prefix :prompt-suffix ,prompt-suffix :buffer ,prompt-buffer)))
+                        `(:prompt-prefix ,prompt-prefix :prompt-suffix ,prompt-suffix :buffer ,prompt-buffer :never-ask-p t)))
          (response-buffer (transient-arg-value "response-buffer=" args))
          (action-args `(:response-buffer ,response-buffer)))
     (robby-run-command
@@ -138,7 +138,8 @@ values."
      :action action
      :action-args action-args
      :api api-str
-     :api-options api-options)))
+     :api-options api-options
+     :never-stream-p never-stream-p)))
 
 ;;; Readers
 (defun robby--read-buffer (prompt initial-input history)
@@ -155,7 +156,7 @@ values."
 (transient-define-suffix
   robby--respond-with-message-suffix ()
   (interactive)
-  (robby--run-transient-command #'robby-respond-with-message))
+  (robby--run-transient-command #'robby-respond-with-message t))
 
 (transient-define-suffix
   robby--respond-with-robby-view-suffix ()
