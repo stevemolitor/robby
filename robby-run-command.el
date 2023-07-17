@@ -76,7 +76,8 @@ Emacs Lisp, do not print messages if SILENTP is t."
      (map-merge
       'plist action-args
       `(:arg ,arg :text ,text :beg ,beg :end ,end :prompt ,basic-prompt :chars-processed ,chars-processed :completep ,completep)))
-    (run-hooks 'robby-command-complete-hook)))
+    (if completep
+        (run-hooks 'robby-command-complete-hook))))
 
 (defun robby--handle-error (err)
   (let* ((err-msg (if (stringp err) err (error-message-string err)))
