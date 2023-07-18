@@ -43,7 +43,7 @@ of parsed JSON objects: `(:remaining \"text\" :parsed '())'
               (let* ((json-object-type 'alist)
                      (obj (json-read)))
                 (setq parsed (cons obj parsed))))
-          ((error)
+          (error
            (setq done t)
            (setq new-remaining (buffer-substring pos (point-max))))))
       `(:remaining ,new-remaining :parsed ,(nreverse parsed)))))
