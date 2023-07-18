@@ -211,6 +211,13 @@ values."
                      :scope new-scope
                      :value robby-value)))
 
+(defun robby--get-scope ()
+  (or (oref transient-current-prefix scope) (robby--scope-default)))
+
+(defun robby--get-scope-value (api-options selected-api)
+  (or (and api-options (robby--plist-to-transient-args api-options))
+                    (robby--api-options-defaults selected-api)))
+
 (transient-define-suffix
   robby--setup-api-options ()
   "Call appropriate API options prefix for API in scope.
@@ -219,20 +226,30 @@ The initial transient value comes from either any previously
 edited options for the API, or default API options from
 customization values."
   (interactive)
-  (let* ((scope (or (oref transient-current-prefix scope) (robby--scope-default)))
+  (let* ((scope (robby--get-scope))
          (selected-api (robby--scope-selected-api scope))
          (api-options (robby--scope-selected-api-options scope))
-         (value (or (and api-options (robby--plist-to-transient-args api-options))
-                    (robby--api-options-defaults selected-api)))
+         (value (robby--get-scope-value api-options selected-api))
          (transient-name (format "robby--%s-api-options" (robby--sym-to-string selected-api))))
     (transient-setup (intern transient-name) nil nil :scope scope :value value)))
+
+(transient-define-suffix
+  robby--reset-api-options ()
+  "Reset current API options to their customization values."
+  :transient 'transient--do-call
+  (interactive)
+  (let* ((scope (robby--get-scope))
+         (selected-api (robby--scope-selected-api scope))
+         (api-options (robby--scope-selected-api-options scope))
+         (value (robby--get-scope-value api-options selected-api)))
+    (transient-setup transient-current-command nil nil :scope scope :value value)))
 
 ;;; API Options Prefixes
 (transient-define-prefix
   robby--chat-api-options ()
   "Chat API options."
   ["Chat API Options"
-   ("m" "model" "model="  :always-read t :choices ("gpt-3.5-turbo" "gpt-4"))
+   ("m" "model" "model=" :always-read t :choices ("gpt-3.5-turbo" "gpt-4"))
    ("s" "suffix" "suffix=" :always-read t)
    ("t" "max tokens" "max-tokens=" :reader transient-read-number-N+ :always-read t)
    ("e" "temperature" "temperature=" :reader robby--read-decimal :always-read t)
@@ -243,9 +260,9 @@ customization values."
    ("r" "presence penalty" "presence-penalty=" :reader robby--read-decimal :always-read t)
    ("f" "frequency penalty" "frequency-penalty=" :reader robby--read-decimal :always-read t)
    ("b" "best of" "best-of=" :reader transient-read-number-N+ :always-read t)
-   ("u" "user" "user=" :always-read t)
-   ""
-   ("a" "apply options" robby--apply-api-options)])
+   ("u" "user" "user=" :always-read t)]
+  [[("a" "apply options" robby--apply-api-options)]
+   [("z" "reset to customization values" robby--reset-api-options)]])
 
 (transient-define-prefix
   robby--completions-api-options ()
