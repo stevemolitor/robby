@@ -63,7 +63,7 @@ replace region with response.
 If prefix arg is supplied, confirm changes in a diff buffer
 before applying."
  :prompt #'robby-get-prompt-from-region
- :action #'robby-confirm-replace-region-with-response)
+ :action #'robby-replace-region-with-response)
 
 (provide 'robby-commands)
 

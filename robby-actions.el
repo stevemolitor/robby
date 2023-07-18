@@ -34,17 +34,10 @@
   (goto-char (+ 1 end chars-processed))
   (insert (format "%s" text)))
 
-(cl-defun robby-replace-region-with-response (&key text beg end chars-processed &allow-other-keys)
-  "Replace region with AI response, or buffer if no selected region."
-  (when (eq chars-processed 0)
-    (delete-region beg end))
-  (goto-char (+ beg chars-processed))
-  (insert text))
-
 (defvar-local robby--old-temp-buffer nil)
 (defvar-local robby--new-temp-buffer nil)
 
-(cl-defun robby-confirm-replace-region-with-response (&key arg text beg end chars-processed completep &allow-other-keys)
+(cl-defun robby-replace-region-with-response (&key arg text beg end chars-processed completep &allow-other-keys)
   "Replace region with AI response, or buffer if no selected region."
 
   ;; confirm before replacing
@@ -72,7 +65,8 @@
               (let ((apply-changes-p (y-or-n-p "Apply changes?")))
                 (when apply-changes-p
                   (delete-region beg end)
-                  (insert-buffer-substring robby--new-temp-buffer beg))))
+                  (goto-char beg)
+                  (insert-buffer-substring robby--new-temp-buffer))))
           (kill-buffer robby--old-temp-buffer)
           (kill-buffer robby--new-temp-buffer)
           (with-current-buffer diff-buf
