@@ -25,7 +25,7 @@
 (ert-deftest-async robby--integration-test-run-command-with-curl-streaming (done)
   (robby--test-run-command :streamp t :done done))
 
-(ert-deftest-async robby--integration-test-run-command-with-curl-streaming (done)
+(ert-deftest-async robby--integration-test-run-command-with-curl-no-streaming (done)
   (robby--test-run-command :streamp nil :done done))
 
 ;;; suite

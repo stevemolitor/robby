@@ -104,8 +104,7 @@ of parsed JSON objects: `(:remaining \"text\" :parsed '())'
                (if error-msg
                    (funcall on-error error-msg)
                  (let ((resp (robby--curl-parse-response api string "" nil)))
-                   (funcall on-text :text (plist-get resp :text) :completep t)))))
-           (funcall on-text :text text :completep t)))))
+                   (funcall on-text :text (plist-get resp :text) :completep t)))))))))
     proc))
 
 (provide 'robby-curl)
