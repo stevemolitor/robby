@@ -72,30 +72,39 @@ of parsed JSON objects: `(:remaining \"text\" :parsed '())'
          (curl-options (append robby--curl-options
                                `("-H" ,(format "Authorization: Bearer %s" (robby-get-api-key-from-auth-source))
                                  "-d" ,input-json)))
+         (proc-buffer (if streamp nil (generate-new-buffer (format "*robby-curl-%s*" (buffer-name)))))
          (proc (condition-case err
                    (apply #'start-process
                           "curl"
-                          "*robby-curl-process*"
+                          proc-buffer
                           "curl"
                           url
                           curl-options)
                  (error (funcall on-error err)))))
     (let ((remaining "")
           (text ""))
-      (set-process-filter
-       proc
-       (lambda (_proc string)
-         (robby--log (format "\n# raw data from curl: %s\n" string))
-         (let ((error-msg (robby--curl-parse-error string)))
-           (if error-msg
-               (funcall on-error error-msg)
-             (let ((resp (robby--curl-parse-response api string remaining streamp)))
-               (setq remaining (plist-get resp :remaining))
-               (funcall on-text :text (plist-get resp :text) :completep (if streamp nil t)))))))
+      (when streamp
+        (set-process-filter
+         proc
+         (lambda (_proc string)
+           (let ((error-msg (robby--curl-parse-error string)))
+             (if error-msg
+                 (funcall on-error error-msg)
+               (let ((resp (robby--curl-parse-response api string remaining streamp)))
+                 (setq remaining (plist-get resp :remaining))
+                 (funcall on-text :text (plist-get resp :text) :completep nil)))))))
       (set-process-sentinel
        proc
-       (lambda (_proc _string)
-         (when streamp
+       (lambda (_proc _status)
+         (if streamp
+             (funcall on-text :text text :completep t)
+           (with-current-buffer proc-buffer
+             (let* ((string (buffer-string))
+                    (error-msg (robby--curl-parse-error string)))
+               (if error-msg
+                   (funcall on-error error-msg)
+                 (let ((resp (robby--curl-parse-response api string "" nil)))
+                   (funcall on-text :text (plist-get resp :text) :completep t)))))
            (funcall on-text :text text :completep t)))))
     proc))
 
