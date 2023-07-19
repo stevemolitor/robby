@@ -33,9 +33,11 @@
 Do nothing if no process is currently running. If called from
 Emacs Lisp, do not print messages if SILENTP is t."
   (interactive)
+  ;; stop the spinner no matter what - it's harmless if already stopped
+  (robby--spinner-stop)
+
   (if (robby--process-running-p)
       (progn
-        (robby--spinner-stop)
         (kill-process robby--last-process)
         (if (not silentp)
             (message "robby process killed")))
@@ -66,7 +68,7 @@ Emacs Lisp, do not print messages if SILENTP is t."
                               response-region)
   (if completep
       (robby--spinner-stop))
-  (robby--log (format "# response text:\n%S\ncomplete: %S, chars-processed %d" text completep chars-processed))
+  (robby--log (format "# robby--handle-text, text:\n%S\ncompletep: %S, chars-processed %d" text completep chars-processed))
   (let ((beg (car response-region))
         (end (cdr response-region)))
     (if completep
@@ -80,11 +82,11 @@ Emacs Lisp, do not print messages if SILENTP is t."
         (run-hooks 'robby-command-complete-hook))))
 
 (defun robby--handle-error (err)
+  (robby--spinner-stop)
   (let* ((err-msg (if (stringp err) err (error-message-string err)))
          (log-msg (format "Error processing robby request: %s" err-msg)))
     (robby--log log-msg)
     (message log-msg))
-  (robby--spinner-stop)
   (if (process-live-p robby--last-process)
       (robby-kill-last-process t)))
 
@@ -142,32 +144,34 @@ the `robby-stream' customization variable."
       (robby-kill-last-process t)
       (robby--spinner-start)
       (setq robby--last-process
-            (robby--curl
-             :api request-api
-             :payload payload
-             :streamp (and (not never-stream-p) robby-stream-p)
-             :on-text
-             (cl-function
-              (lambda (&key text completep)
-                (if (buffer-live-p response-buffer)
-                    (condition-case err
-                        (with-current-buffer response-buffer
-                          (robby--handle-text
-                           :arg arg
-                           :action action
-                           :action-args action-args
-                           :api request-api
-                           :basic-prompt basic-prompt
-                           :chars-processed chars-processed
-                           :completep completep
-                           :response-region response-region
-                           :text text))
-                      (error (robby--handle-error err))))
-                (setq chars-processed (+ chars-processed (length text)))))
-             :on-error
-             (lambda (err)
-               (with-current-buffer response-buffer
-                 (robby--handle-error err))))))))
+            (condition-case curl-err
+                (robby--curl
+                 :api request-api
+                 :payload payload
+                 :streamp (and (not never-stream-p) robby-stream-p)
+                 :on-text
+                 (cl-function
+                  (lambda (&key text completep)
+                    (if (buffer-live-p response-buffer)
+                        (condition-case err
+                            (with-current-buffer response-buffer
+                              (robby--handle-text
+                               :arg arg
+                               :action action
+                               :action-args action-args
+                               :api request-api
+                               :basic-prompt basic-prompt
+                               :chars-processed chars-processed
+                               :completep completep
+                               :response-region response-region
+                               :text text))
+                          (error (robby--handle-error err))))
+                    (setq chars-processed (+ chars-processed (length text)))))
+                 :on-error
+                 (lambda (err)
+                   (with-current-buffer response-buffer
+                     (robby--handle-error err))))
+              (error (robby--handle-error curl-err)))))))
 
 (provide 'robby-run-command)
 
