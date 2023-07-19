@@ -75,10 +75,10 @@
 
   ;; replace without confirming
   (when (not arg)
-    (when (eq chars-processed 0)
+    (when (and (> (point-max) 1) (eq chars-processed 0))
       (delete-region beg end))
-   (goto-char (+ beg chars-processed))
-   (insert text)))
+    (goto-char (+ beg chars-processed))
+    (insert text)))
 
 (provide 'robby-actions)
 
