@@ -44,8 +44,8 @@
   (when arg
     ;; first time:  capture current region text in old temp buffer
     (when (eq chars-processed 0)
-      (setq robby--old-temp-buffer (generate-new-buffer (format "*robby--old-temp-buffer--%s*" (buffer-name))))
-      (setq robby--new-temp-buffer (generate-new-buffer (format "*robby--new-temp-buffer--%s*" (buffer-name))))
+      (setq robby--old-temp-buffer (generate-new-buffer (format "*robby-old-temp-buffer--%s*" (buffer-name))))
+      (setq robby--new-temp-buffer (generate-new-buffer (format "*robby-new-temp-buffer--%s*" (buffer-name))))
       (let ((old-text (buffer-substring beg end)))
         (with-current-buffer robby--old-temp-buffer
           (insert old-text))))
