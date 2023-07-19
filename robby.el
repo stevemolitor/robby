@@ -29,7 +29,7 @@
 (require 'robby-commands)
 (require 'robby-customization)
 (require 'robby-keymap)
-(require 'robby-spinner-mode)
+(require 'robby-spinner)
 (require 'robby-transients)
 
 (provide 'robby)

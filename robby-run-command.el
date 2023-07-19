@@ -12,7 +12,6 @@
 (require 'robby-history)
 (require 'robby-logging)
 (require 'robby-options)
-(require 'robby-save-commands)
 (require 'robby-spinner)
 
 (defvar robby-command-complete-hook nil
@@ -21,6 +20,40 @@
 (defvar-local robby--last-process nil)
 (put 'robby--last-process 'permanent-local t)
 
+;;; save last command
+(defvar robby--last-command-options nil
+  "Last robby command.")
+
+(cl-defun robby--save-last-command-options (&key arg prompt prompt-args action action-args historyp api api-options)
+  (setq robby--last-command-options
+        `(:arg
+          ,arg
+          :prompt
+          ,(if (functionp prompt) `#',prompt prompt)
+          :prompt-args
+          ',prompt-args
+          :action
+          ,`#',action
+          :action-args
+          ',action-args
+          :historyp
+          ,historyp
+          :api
+          ,api
+          :api-options
+          ',api-options)))
+
+(defun robby-insert-last-command (name)
+  "Insert a definition for the last command invoked into current
+buffer.
+
+NAME specifies the new command name, a symbol."
+  (interactive "sCommand name: ")
+  (let* ((docstring (read-string "Doc string: "))
+         (cmd `(robby-define-command ,(intern name) ,docstring ,@robby--last-command-options)))
+    (insert (format "%S" cmd))))
+
+;;; run command 
 (defun robby--process-running-p ()
   "Return non-nil if robby process is currently running."
   (and
