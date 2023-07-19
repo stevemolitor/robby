@@ -22,17 +22,17 @@
      :prompt "What year did Abraham Lincoln die?"
      :action cb)))
 
-(ert-deftest-async robby--test-run-command-with-curl-streaming (done)
+(ert-deftest-async robby--integration-test-run-command-with-curl-streaming (done)
   (robby--test-run-command :streamp t :done done))
 
-(ert-deftest-async robby--test-run-command-with-curl-streaming (done)
+(ert-deftest-async robby--integration-test-run-command-with-curl-streaming (done)
   (robby--test-run-command :streamp nil :done done))
 
 ;;; suite
 (defun robby-run-integration-tests ()
   (interactive)
   (setq ert-async-timeout 20)
-  (ert "^robby-integration"))
+  (ert "^robby--integration"))
 
 (provide 'robby-integration-tests)
 
