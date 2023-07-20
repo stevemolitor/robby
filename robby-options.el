@@ -37,8 +37,7 @@ API specifies the customization group, for example `\"chat\"' or
        (eq (nth 1 elem) 'custom-variable))
      (custom-group-members (intern (format "robby-%s-api" api)) nil)))))
 
-;; TODO add api to vary by chat vs completions!
-(defun robby--options (options)
+(defun robby--options (api options)
   "Get a list of options to pass to the OpenAI API.
 
 Grabs OpenAI customization options for the current API as
@@ -53,7 +52,7 @@ customization options."
     (seq-filter
      (lambda (elem) (not (null (cdr elem))))
      ;; TODO add API param to this function
-     (robby--options-from-group robby-api))
+     (robby--options-from-group api))
     (seq-map
      (lambda (assoc) (cons (robby--kebab-to-snake-case (replace-regexp-in-string "^:" "" (symbol-name (car assoc)))) (cdr assoc)))
      (robby--plist-to-alist options)))))
