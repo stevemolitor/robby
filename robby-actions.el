@@ -75,7 +75,8 @@
 
   ;; replace without confirming
   (when (not arg)
-    (delete-region beg end)
+    (if (eq chars-processed 0)
+        (delete-region beg end))
     (goto-char (+ beg chars-processed))
     (insert text)))
 
