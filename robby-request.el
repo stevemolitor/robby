@@ -3,6 +3,7 @@
 ;;; Commentary:
 
 (require 'cl-macs)
+(require 'files)
 (require 'json)
 (require 'seq)
 
@@ -158,7 +159,8 @@ of parsed JSON objects: `(:remaining \"text\" :parsed '())'
              (funcall on-text :text text :completep t))))))))
 
 ;;; robby--request
-(defun robby--request-available-p () t)    ;; TODO
+(defun robby--request-available-p ()
+  (executable-find "curl"))
 
 (cl-defun robby--request (&key api payload on-text on-error streamp)
   (if (and robby-use-curl (robby--request-available-p))

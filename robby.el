@@ -19,6 +19,7 @@
   (require 'cl-macs)
   (require 'cus-edit)
   (require 'diff)
+  (require 'files)
   (require 'json)
   (require 'markdown-mode)
   (require 'map)
