@@ -37,6 +37,7 @@ API specifies the customization group, for example `\"chat\"' or
        (eq (nth 1 elem) 'custom-variable))
      (custom-group-members (intern (format "robby-%s-api" api)) nil)))))
 
+;; TODO add api to vary by chat vs completions!
 (defun robby--options (options)
   "Get a list of options to pass to the OpenAI API.
 

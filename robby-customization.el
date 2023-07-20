@@ -204,6 +204,16 @@ OpenAI to monitor and detect abuse."
   :type 'string
   :group 'robby)
 
+(defcustom robby-use-curl t
+  "If curl if availble to make HTTP requests to OpenAI.
+
+Set to nil to always use Emacs' built-in url.el library instead
+of curl. If curl is not available robby will still fallback to
+url.el even if `robby-use-curl' is t. Note that url.el does not
+support streaming."
+  :type 'boolean
+  :group 'robby)
+
 (provide 'robby-customization)
 
 ;;; robby-customization.el ends here

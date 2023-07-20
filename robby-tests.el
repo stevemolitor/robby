@@ -13,7 +13,7 @@
 (require 'robby-options-test)
 (require 'robby-apis-test)
 (require 'robby-utils-test)
-(require 'robby-curl-test)
+(require 'robby-request-test)
 
 (provide 'robby-tests)
 

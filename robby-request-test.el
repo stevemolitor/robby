@@ -1,4 +1,4 @@
-(require 'robby-curl)
+(require 'robby-request)
 (require 'robby-test-utils)
 
 (ert-deftest robby--curl-parse-response--streaming-response ()
@@ -15,6 +15,6 @@
   (let ((part2 (robby--curl-parse-response 'chat (robby--read-file-into-string "./fixtures/streaming-response-incomplete-part-2.txt") "{\"id\":\"chatcmpl-a\",\"object\":\"chat.completion.chu" t)))
     (should (equal (plist-get part2 :text) " there!"))))
 
-(provide 'robby-curl-test)
+(provide 'robby-request-test)
 
 

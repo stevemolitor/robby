@@ -7,7 +7,7 @@
 ;;; Code:
 
 (require 'robby-apis)
-(require 'robby-curl)
+(require 'robby-request)
 (require 'robby-customization)
 (require 'robby-history)
 (require 'robby-logging)
@@ -177,7 +177,7 @@ the `robby-stream' customization variable."
       (robby--spinner-start)
       (setq robby--last-process
             (condition-case curl-err
-                (robby--curl
+                (robby--request
                  :api request-api
                  :payload payload
                  :streamp streamp
