@@ -164,13 +164,16 @@ the `robby-stream' customization variable."
          (basic-prompt (if (functionp prompt) (apply prompt prompt-args-with-arg) (format "%s" prompt)))
          (request-api (intern (or api robby-api)))
          (complete-prompt (robby--request-input request-api basic-prompt historyp))
-         (payload (append complete-prompt (robby--options api api-options)))
+         (payload (append complete-prompt (robby--options (or api robby-api) api-options)))
          (response-buffer (get-buffer-create (or (plist-get action-args :response-buffer) (current-buffer))))
          (response-region (robby--get-response-region action-args))
          (streamp (and (not never-stream-p) robby-stream-p))
          (chars-processed 0))
 
     (robby--log (format "# Prompt:\n%S\n# Request body:\n%s\n" complete-prompt payload))
+
+    (if (not (window-live-p (get-buffer-window response-buffer)))
+           (display-buffer response-buffer))
 
     (with-current-buffer response-buffer
       (robby-kill-last-process t)

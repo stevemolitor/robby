@@ -23,7 +23,7 @@
        (if (not (window-live-p (get-buffer-window buf)))
            (display-buffer buf))
        (when (eq (point-max) 1)
-         (display-buffer buf 'display-buffer-reuse-window)
+         ;; (display-buffer buf 'display-buffer-reuse-window)
          (robby-view-mode))
        (let ((inhibit-read-only t))
          ,@body))))
