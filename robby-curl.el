@@ -76,18 +76,15 @@ of parsed JSON objects: `(:remaining \"text\" :parsed '())'
     (error nil)))
 
 (defun robby--curl-parse-response (api string remaining streamp)
-  (let ((error-msg (robby--curl-parse-error string)))
-    (if error-msg
-        `(:error ,error-msg)
-      (let* ((data (replace-regexp-in-string (rx bol "data:") "" string))
-             (json (robby--parse-chunk remaining data))
-             (parsed (plist-get json :parsed))
-             (text (string-join (seq-filter #'stringp (seq-map (lambda (chunk) (robby--chunk-content api chunk streamp)) parsed)))))
-        (setq remaining (plist-get json :remaining))
-        `(:text ,text :remaining ,(plist-get json :remaining))))))
+  (let* ((data (replace-regexp-in-string (rx bol "data:") "" string))
+         (json (robby--parse-chunk remaining data))
+         (parsed (plist-get json :parsed))
+         (text (string-join (seq-filter #'stringp (seq-map (lambda (chunk) (robby--chunk-content api chunk streamp)) parsed)))))
+    (setq remaining (plist-get json :remaining))
+    `(:text ,text :remaining ,(plist-get json :remaining))))
 
 (cl-defun robby--curl (&key api payload on-text on-error streamp)
-  (let* ((input-json (json-encode payload))
+  (let* ((input-json (json-encode (append payload (if streamp '((stream . t)) nil))))
          (url (robby--request-url api))
          (curl-options (append robby--curl-options
                                `("-H" ,(format "Authorization: Bearer %s" (robby-get-api-key-from-auth-source))
