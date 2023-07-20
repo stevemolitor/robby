@@ -16,7 +16,15 @@
  robby-view
  "Query AI from minibuffer, respond in robby-view-mode buffer."
  :prompt #'robby-get-prompt-from-minibuffer
- :prompt-args '(:a 3)
+ :action #'robby-respond-with-robby-view
+ :action-args `(:response-buffer ,robby--view-buffer)
+ :historyp t)
+
+;;;###autoload (autoload 'robby-view-from-region "robby-commands" nil t)
+(robby-define-command
+ robby-view-from-region
+ "Query AI from minibuffer, respond in robby-view-mode buffer."
+ :prompt #'robby-get-prompt-from-region
  :action #'robby-respond-with-robby-view
  :action-args `(:response-buffer ,robby--view-buffer)
  :historyp t)

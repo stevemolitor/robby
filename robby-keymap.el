@@ -18,6 +18,7 @@
     (define-key map "n" 'robby-conversation)
     (define-key map "p" 'robby-prepend-region)
     (define-key map "v" 'robby-view)
+    (define-key map "w" 'robby-view-from-region)
     map)
   "Robby command map.")
 
