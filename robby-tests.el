@@ -7,13 +7,13 @@
 ;; CI.
 
 (require 'ert)
-(require 'robby-history-test)
+
 (require 'robby-actions-test)
-(require 'robby-logging-test)
-(require 'robby-options-test)
 (require 'robby-apis-test)
-(require 'robby-utils-test)
+(require 'robby-history-test)
+(require 'robby-logging-test)
 (require 'robby-request-test)
+(require 'robby-utils-test)
 
 (provide 'robby-tests)
 
