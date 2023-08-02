@@ -13,7 +13,6 @@
 (require 'robby-prompts)
 (require 'robby-run-command)
 (require 'robby-utils)
-(require 'robby-view)
 
 ;;; Code:
 

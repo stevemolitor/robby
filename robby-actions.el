@@ -11,13 +11,13 @@
 
 ;;; Code:
 
-(defvar robby--buffer "*robby*" "Robby help buffer name, for displaying OpenAI responses.")
-
+;;; message actions
 (cl-defun robby-respond-with-message (&key text &allow-other-keys)
   "Show TEXT in minibuffer message."
   (message "")                          ;; clear any end of line from a previous message
   (message (robby--format-message-text text)))
 
+;;; region actions
 (cl-defun robby-prepend-response-to-region (&key text beg chars-processed &allow-other-keys)
   "Prepend AI response to region, or buffer if no selected region."
   (when (eq chars-processed 0)
@@ -79,6 +79,42 @@
         (delete-region beg end))
     (goto-char (+ beg chars-processed))
     (insert text)))
+
+;;; robby-view
+(defvar robby--view-buffer "*robby*" "Buffer to view robby OpenAI responses.")
+
+(define-derived-mode robby-view-mode markdown-view-mode
+  "robby"
+  "Mode for viewing read-only OpenAI robby responses. Press `q` to quit.")
+
+(defmacro robby--with-robby-view (&rest body)
+  ;; TODO handle case when view buffer has no window
+  `(let ((buf (get-buffer-create robby--view-buffer)))
+     (with-current-buffer buf
+       (if (not (window-live-p (get-buffer-window buf)))
+           (display-buffer buf))
+       (when (eq (point-max) 1)
+         ;; (display-buffer buf 'display-buffer-reuse-window)
+         (robby-view-mode))
+       (let ((inhibit-read-only t))
+         ,@body))))
+
+(cl-defun robby-respond-with-robby-view (&key text completep &allow-other-keys)
+  "Show TEXT in robby-view-mode buffer."
+  (robby--with-robby-view
+   (goto-char (point-max))
+   (insert text)
+   (when (eq completep t)
+     (insert "\n___\n")
+     (message "%s" (substitute-command-keys "Type \\<markdown-view-mode-map>\\[kill-this-buffer] to delete robby view")))))
+
+(cl-defun robby-respond-in-conversation (&key text prompt &allow-other-keys)
+  "Show TEXT in help window, keep minibuffer open."
+  (robby--with-robby-view
+   (goto-char (point-max))
+   (insert "> " prompt "\n\n")
+   (insert text "\n\n"))
+  (setq unread-command-events (listify-key-sequence (kbd "M-x robby-conversation RET"))))
 
 (provide 'robby-actions)
 

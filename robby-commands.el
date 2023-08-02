@@ -7,7 +7,6 @@
 (require 'robby-define-command)
 (require 'robby-prompts)
 (require 'robby-actions)
-(require 'robby-view)
 
 ;;; Code:
 
