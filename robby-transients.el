@@ -1,4 +1,4 @@
-;;; robby-transients-bak.el  --- Robby transient menu defintions  -*- lexical-binding:t -*-
+;;; robby-transients-bak.el  --- Robby transient menu definitions  -*- lexical-binding:t -*-
 
 ;;; Commentary:
 
