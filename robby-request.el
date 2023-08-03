@@ -133,7 +133,9 @@ of parsed JSON objects: `(:remaining \"text\" :parsed '())'
 
 ;;; url-retrieve
 (cl-defun robby--url-retrieve (&key api payload on-text on-error &allow-other-keys)
-  (let* ((original-buffer (current-buffer))
+  (let* ((inhibit-message t)
+         (message-log-max nil)
+         (original-buffer (current-buffer))
          (url (robby--request-url api))
          (url-request-method "POST")
          (url-request-data
