@@ -7,7 +7,7 @@
 ;;; Code:
 
 ;;; general settings
-(defcustom robby-openai-api-key #'robby-get-api-key-from-auth-source
+(defcustom robby-openai-api-key #'robby--get-api-key-from-auth-source
   "OpenAI API key.
 
 A string, or a function that returns the API key."
