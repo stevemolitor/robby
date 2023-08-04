@@ -11,7 +11,6 @@
 (require 'robby-customization)
 (require 'robby-history)
 (require 'robby-logging)
-(require 'robby-options)
 (require 'robby-spinner)
 
 (defvar robby-command-complete-hook nil

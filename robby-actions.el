@@ -7,6 +7,8 @@
 ;; `robby-define-command'.
 
 (require 'diff)
+(require 'markdown-mode)
+
 (require 'robby-utils)
 
 ;;; Code:

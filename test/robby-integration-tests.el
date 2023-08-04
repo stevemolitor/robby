@@ -47,12 +47,6 @@
 (ert-deftest-async robby--integration-test-run-command-completions-no-curl-no-streaming (done)
   (robby--test-run-command :api "completions" :use-curl nil :streamp nil :done done))
 
-(ert-deftest-async robby--integration-test-run-command-chat-no-curl-no-streaming (done)
-  (robby--test-run-command :api "chat" :use-curl nil :streamp nil :done done))
-
-(ert-deftest-async robby--integration-test-run-command-completions-no-curl-no-streaming (done)
-  (robby--test-run-command :api "completions" :use-curl nil :streamp nil :done done))
-
 ;;; suite
 (defun robby-run-integration-tests ()
   (interactive)

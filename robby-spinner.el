@@ -6,6 +6,8 @@
 
 (require 'spinner)
 
+(require 'robby-keymap)
+
 ;;; Code:
 
 (defcustom robby-spinner 'rotating-line

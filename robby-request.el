@@ -89,7 +89,7 @@ of parsed JSON objects: `(:remaining \"text\" :parsed '())'
   (let* ((input-json (json-encode (append payload (if streamp '((stream . t)) nil))))
          (url (robby--request-url api))
          (curl-options (append robby--curl-options
-                               `("-H" ,(format "Authorization: Bearer %s" (robby--get-api-key-from-auth-source))
+                               `("-H" ,(format "Authorization: Bearer %s" (robby--get-api-key))
                                  "-d" ,input-json)))
          (proc-buffer (if streamp nil (generate-new-buffer (format "*robby-request-%s*" (buffer-name)))))
          (proc (condition-case err
