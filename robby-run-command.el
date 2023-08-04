@@ -1,10 +1,13 @@
-;;; robby-run-command.el  --- function to run Robby comments  -*- lexical-binding:t -*-
+;;; robby-run-command.el  --- function to defined and run Robby commands  -*- lexical-binding:t -*-
 
 ;;; Commentary:
 
 ;; robby-run-command function, which provides a generic way to run Robby commands defined by robby-define-command.
 
 ;;; Code:
+
+(require 'cl-lib)
+(require 'map)
 
 (require 'robby-apis)
 (require 'robby-request)
@@ -207,6 +210,61 @@ the `robby-stream' customization variable."
                    (with-current-buffer response-buffer
                      (robby--handle-error err))))
               (error (robby--handle-error curl-err)))))))
+
+;;; define command
+(cl-defmacro robby-define-command (name
+                                   docstring
+                                   &key
+                                   prompt
+                                   prompt-args
+                                   action
+                                   action-args
+                                   api
+                                   api-options
+                                   historyp
+                                   never-stream-p)
+  "Define a new Robby command.
+
+NAME is the command name, a symbol.
+DOCSTRING is the documentation string for the new command.
+
+Keyword parameters:
+
+PROMPT - Function or string.  If a function, command will call
+with interactive prefix arg to obtain the prompt.  If a string,
+grab prompt from region or entire buffer context if no region,
+and prefix region text with PROMPT string to build prompt.
+
+ACTION - function to invoke when request is complete.  The
+function is passed the response text and the selected region, and
+must be of the form `(TEXT BEG END)'.
+
+API - the OpenAI API to use, either `chat' or `completions`'.
+Defaults to the value of the `robby-api' customization variable
+if not supplied.
+
+API-OPTIONS - property list of options to pass to the OpenAI
+API. These options are merged in with the customization options
+specified in the api customization group, either `robby-chat-api'
+or `robby-completions-api'.
+
+HISTORYP - include conversation history in OpenAI request if t.
+
+NEVER-STREAM-P - Stream reponse if t. if present this value overrides
+the `robby-stream' customization variable."
+  `(defun ,name (arg)
+     ,docstring
+     (interactive "P")
+     (robby-run-command
+      :arg arg
+      :prompt ,prompt
+      :prompt-args ,prompt-args
+      :action ,action
+      :action-args ,action-args
+      :api ,api
+      :api-options ,api-options
+      :historyp ,historyp
+      :never-stream-p ,never-stream-p)))
 
 (provide 'robby-run-command)
 
