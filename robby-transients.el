@@ -294,7 +294,7 @@ customization values."
            :description (lambda () (robby--transient-api-description :completions)))
           ("A" "API options" robby--setup-api-options :transient transient--do-replace)]
   [["Prompt"
-    ("S" "simple prompt" "prompt=" :always-read t)
+    ("i" "simple prompt" "prompt=" :always-read t)
     ("p" "prompt prefix" "prompt-prefix=" :always-read t)
     ("s" "prompt suffix" "prompt-suffix=" :always-read t)
     ("b" "prompt buffer" "prompt-buffer=" :reader robby--read-buffer :level 5)]]
