@@ -207,6 +207,7 @@ values."
          (args (transient-args transient-current-command))
          (api-options (robby--transient-args-to-options args))
          (new-scope (robby--scope-set-api-options :scope scope :selected-api-options api-options)))
+    (transient-set)
     (transient-setup 'robby nil nil
                      :scope new-scope
                      :value robby-value)))
@@ -216,7 +217,7 @@ values."
 
 (defun robby--get-scope-value (api-options selected-api)
   (or (and api-options (robby--plist-to-transient-args api-options))
-                    (robby--api-options-defaults selected-api)))
+      (robby--api-options-defaults selected-api)))
 
 (transient-define-suffix
   robby--setup-api-options ()
@@ -226,8 +227,7 @@ The initial transient value comes from either any previously
 edited options for the API, or default API options from
 customization values."
   (interactive)
-  (let* ((scope (robby--get-scope))
-         (selected-api (robby--scope-selected-api scope))
+  (let* ((scope (robby--get-scope)) (selected-api (robby--scope-selected-api scope))
          (api-options (robby--scope-selected-api-options scope))
          (value (robby--get-scope-value api-options selected-api))
          (transient-name (format "robby--%s-api-options" (robby--sym-to-string selected-api))))
@@ -238,11 +238,7 @@ customization values."
   "Reset current API options to their customization values."
   :transient 'transient--do-call
   (interactive)
-  (let* ((scope (robby--get-scope))
-         (selected-api (robby--scope-selected-api scope))
-         (api-options (robby--scope-selected-api-options scope))
-         (value (robby--get-scope-value api-options selected-api)))
-    (transient-setup transient-current-command nil nil :scope scope :value value)))
+  (transient-reset))
 
 ;;; Misc Suffixes
 (transient-define-suffix
@@ -274,7 +270,7 @@ customization values."
   robby--completions-api-options ()
   "Completions API options."
   ["Completions API Options"
-   ("m" "model" "model="  :always-read t)
+   ("m" "model" "model=" :always-read t)
    ("s" "suffix" "suffix=" :always-read t)
    ("t" "max tokens" "max-tokens=" :reader transient-read-number-N+ :always-read t)
    ("e" "temperature" "temperature=" :reader robby--read-decimal :always-read t)
@@ -283,8 +279,8 @@ customization values."
    ("r" "presence penalty" "presence-penalty=" :reader robby--read-decimal :always-read t)
    ("f" "frequency penalty" "frequency-penalty=" :reader robby--read-decimal :always-read t)
    ("l" "logit bias" "logit-bias=" :reader robby--read-decimal :always-read t)
-   ""
-   ("a" "apply options" robby--apply-api-options)])
+   [[("a" "apply options" robby--apply-api-options)]
+    [("z" "reset to customization values" robby--reset-api-options)]]])
 
 ;;; Robby transient
 ;;;###autoload (autoload 'robby "robby-transients" nil t)
