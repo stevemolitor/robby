@@ -130,7 +130,8 @@ values."
                           '()
                         `(:prompt-prefix ,prompt-prefix :prompt-suffix ,prompt-suffix :buffer ,prompt-buffer :never-ask-p t)))
          (response-buffer (transient-arg-value "response-buffer=" args))
-         (action-args `(:response-buffer ,response-buffer)))
+         (action-args `(:response-buffer ,response-buffer))
+         (historyp (transient-arg-value "historyp" args)))
     (robby-run-command
      :prompt prompt
      :prompt-args prompt-args
@@ -243,6 +244,12 @@ customization values."
          (value (robby--get-scope-value api-options selected-api)))
     (transient-setup transient-current-command nil nil :scope scope :value value)))
 
+;;; Misc Suffixes
+(transient-define-suffix
+  robby--clear-history-suffix ()
+  (interactive)
+  (robby-clear-history))
+
 ;;; API Options Prefixes
 (transient-define-prefix
   robby--chat-api-options ()
@@ -306,7 +313,10 @@ customization values."
    [""
     ("v" "respond in robby view buffer" robby--respond-with-robby-view-suffix)
     ("m" "respond with message" robby--respond-with-message-suffix)
-    ("n" "start a conversation with AI" robby--respond-in-conversation-suffix)]])
+    ("n" "start a conversation with AI" robby--respond-in-conversation-suffix)]]
+  [5 "History" :description (lambda () (format "History %s" (propertize (format "(%d)" (length robby--history)) 'face 'transient-inactive-value)))
+     ("h" "use history" "historyp")
+     ("l" "clear history" robby--clear-history-suffix :transient t)])
 
 (provide 'robby-transients)
 
