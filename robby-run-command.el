@@ -250,7 +250,7 @@ or `robby-completions-api'.
 
 HISTORYP - include conversation history in OpenAI request if t.
 
-NEVER-STREAM-P - Stream reponse if t. if present this value overrides
+NEVER-STREAM-P - Stream response if t. if present this value overrides
 the `robby-stream' customization variable."
   `(defun ,name (arg)
      ,docstring
