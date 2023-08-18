@@ -23,7 +23,8 @@ If no region return all text in buffer."
   (with-current-buffer (or buffer (current-buffer))
     (if (use-region-p)
         (buffer-substring-no-properties (region-beginning) (region-end))
-      (buffer-substring-no-properties (point-min) (point-max)))))
+      (let ((proceedp (and robby-confirm-whole-buffer-p (yes-or-no-p "Send entire buffer contents as prompt?"))))
+        (buffer-substring-no-properties (point-min) (point-max))))))
 
 (cl-defun robby-get-prompt-from-region (&key prompt-buffer prompt-prefix prompt-suffix never-ask-p &allow-other-keys)
   "Get prompt from region, or entire buffer if no selected
@@ -39,7 +40,7 @@ specified, prompt the user for a prompt prefix in the minibuffer."
          (prefix (cond
                   (prompt-prefix prompt-prefix)
                   (prompt-suffix nil)
-                  ((not never-ask-p) (read-string "Request for AI overlords: "))
+                  ((not never-ask-p) (read-string "Extra prompt prefix: "))
                   (t nil))))
     (format "%s%s%s"
             (if prefix (concat prefix "\n") "") ; prefix

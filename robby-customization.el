@@ -47,6 +47,21 @@ incompatible history between the two apis."
                  (const :tag "Chat" "chat"))
   :group 'robby)
 
+(defcustom robby-use-curl t
+  "If curl if availble to make HTTP requests to OpenAI.
+
+Set to nil to always use Emacs' built-in url.el library instead
+of curl. If curl is not available robby will still fallback to
+url.el even if `robby-use-curl' is t. Note that url.el does not
+support streaming."
+  :type 'boolean
+  :group 'robby)
+
+(defcustom robby-confirm-whole-buffer-p t
+  "If true, confirm before sending the entire buffer as the prompt."
+  :type 'boolean
+  :group 'robby)
+
 ;;; completions api options
 (defgroup robby-completions-api nil
   "Options to pass to the completions API."
@@ -202,16 +217,6 @@ OpenAI to monitor and detect abuse."
 (defcustom robby-chat-system-message "You are a large language model living in Emacs and a helpful assistant. Respond concisely."
   "System message used with Chat API"
   :type 'string
-  :group 'robby)
-
-(defcustom robby-use-curl t
-  "If curl if availble to make HTTP requests to OpenAI.
-
-Set to nil to always use Emacs' built-in url.el library instead
-of curl. If curl is not available robby will still fallback to
-url.el even if `robby-use-curl' is t. Note that url.el does not
-support streaming."
-  :type 'boolean
   :group 'robby)
 
 (provide 'robby-customization)
