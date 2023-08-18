@@ -296,24 +296,27 @@ customization values."
           ("o" "Completions" robby--select-completions-suffix
            :description (lambda () (robby--transient-api-description :completions)))
           ("A" "API options" robby--setup-api-options :transient transient--do-replace)]
-  [["Prompt"
-    ("i" "simple prompt" "prompt=" :always-read t)
-    ("p" "prompt prefix" "prompt-prefix=" :always-read t)
-    ("s" "prompt suffix" "prompt-suffix=" :always-read t)
-    ("b" "prompt buffer" "prompt-buffer=" :reader robby--read-buffer :level 5)]]
-  [["Action"
+  ["Prompt"
+   ("i" "simple prompt" "prompt=" :always-read t)]
+  ["Prompt from Region or Buffer Options"
+   ("p" "prompt prefix" "prompt-prefix=" :always-read t)
+   ("s" "prompt suffix" "prompt-suffix=" :always-read t)
+   ("b" "prompt buffer" "prompt-buffer=" :reader robby--read-buffer :level 5)]
+  [["Region Actions"
     ("x" "prefix region with response" robby--prefix-region-with-response-suffix)
     ("a" "append response to region" robby--append-response-to-region-suffix)
-    ("r" "replace region with response" robby--replace-region-with-response-suffix)
-    ("f" "response buffer" "response-buffer=" :reader robby--read-buffer :level 5)]
-   [""
+    ("r" "replace region with response" robby--replace-region-with-response-suffix)]
+   ["Misc Actions"
     ("v" "respond in robby view buffer" robby--respond-with-robby-view-suffix)
     ("m" "respond with message" robby--respond-with-message-suffix)
     ("n" "start a conversation with AI" robby--respond-in-conversation-suffix)]]
-  [5 "History" :description (lambda () (format "History %s" (propertize (format "(%d)" (length robby--history)) 'face 'transient-inactive-value)))
-     ("h" "use history" "historyp")
-     ("l" "clear history" robby--clear-history-suffix :transient t)])
+  ["Region Action Options"
+   ("f" "response buffer" "response-buffer=" :reader robby--read-buffer :level 5)]
+  ["History" :description (lambda () (concat (propertize "History " 'face 'transient-heading) (propertize (format "(%d)" (length robby--history)) 'face 'transient-inactive-value)))
+   ("h" "use history" "historyp")
+   ("l" "clear history" robby--clear-history-suffix :transient t)])
 
 (provide 'robby-transients)
 
 ;; robby-transients.el ends here
+
