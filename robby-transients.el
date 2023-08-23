@@ -282,6 +282,18 @@ customization values."
    [[("a" "apply options" robby--apply-api-options)]
     [("z" "reset to customization values" robby--reset-api-options)]]])
 
+;;; Canned commands transient
+;;;###autoload (autoload 'robby-commands "robby-transients" "Display menu of custom robby commands." t)
+(transient-define-prefix robby-commands ()
+  "Display menu of custom robby commands."
+  ["Robby Commands"
+   ("d" "describe code" robby-describe-code)
+   ("f" "fix code" robby-fix-code)
+   ("o" "add comments" robby-add-comments)
+   ("t" "write tests" robby-write-tests)
+   ("x" "proof read text" robby-proof-read)
+   ])
+
 ;;; Robby transient
 ;;;###autoload (autoload 'robby "robby-transients" nil t)
 (transient-define-prefix robby ()
