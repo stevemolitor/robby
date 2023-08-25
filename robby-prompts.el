@@ -23,8 +23,7 @@ If no region return all text in buffer."
   (with-current-buffer (or buffer (current-buffer))
     (if (use-region-p)
         (buffer-substring-no-properties (region-beginning) (region-end))
-      (let ((proceedp (and robby-confirm-whole-buffer-p (yes-or-no-p "Send entire buffer contents as prompt?"))))
-        (buffer-substring-no-properties (point-min) (point-max))))))
+      (buffer-substring-no-properties (point-min) (point-max)))))
 
 (cl-defun robby-get-prompt-from-region (&key prompt-buffer prompt-prefix prompt-suffix never-ask-p &allow-other-keys)
   "Get prompt from region, or entire buffer if no selected

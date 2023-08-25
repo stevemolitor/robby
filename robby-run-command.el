@@ -129,6 +129,15 @@ Emacs Lisp, do not print messages if SILENTP is t."
   "Parse raw error response from DATA and try to return descriptive message."
   (or (cdr (assoc 'message (assoc 'error data))) "unknown error"))
 
+(cl-defun robby--validate-args (&key arg action)
+  ;; confirm before replacing entire buffer
+  (when (and (eq action 'robby-replace-region-with-response)
+             robby-confirm-whole-buffer-p
+             (not (use-region-p)))
+    (let ((proceedp (and robby-confirm-whole-buffer-p (yes-or-no-p "Overwrite entire buffer contents with response?"))))
+      (when (not proceedp)
+        (user-error "Select a region and then re-run robby command.")))))
+
 (cl-defun robby-run-command (&key arg prompt prompt-args action action-args api api-options historyp never-stream-p)
   "Run a command using OpenAI.
 
@@ -158,6 +167,8 @@ HISTORYP indicates whether or not to use conversation history.
 
 NEVER-STREAM-P - Never stream response if t. if present this value overrides
 the `robby-stream' customization variable."
+  (robby--validate-args :arg arg :action action)
+  
   ;; save command history
   (robby--save-last-command-options
    :arg arg :prompt prompt :prompt-args prompt-args :action action :action-args action-args :historyp historyp :api api :api-options api-options)
@@ -175,7 +186,7 @@ the `robby-stream' customization variable."
     (robby--log (format "# Prompt:\n%S\n# Request body:\n%s\n" complete-prompt payload))
 
     (if (not (window-live-p (get-buffer-window response-buffer)))
-           (display-buffer response-buffer))
+        (display-buffer response-buffer))
 
     (with-current-buffer response-buffer
       (robby-kill-last-process t)

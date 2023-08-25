@@ -115,7 +115,7 @@ values."
         #'robby-get-prompt-fromregion
       prompt)))
 
-(defun robby--run-transient-command (action &optional never-stream-p)
+(defun robby--run-transient-command (action &optional arg)
   (let* ((scope (or (oref transient-current-prefix scope) (robby--scope-default)))
          (api (robby--scope-selected-api scope))
          (api-str (robby--sym-to-string api))
@@ -133,13 +133,13 @@ values."
          (action-args `(:response-buffer ,response-buffer))
          (historyp (transient-arg-value "historyp" args)))
     (robby-run-command
+     :arg arg
      :prompt prompt
      :prompt-args prompt-args
      :action action
      :action-args action-args
      :api api-str
-     :api-options api-options
-     :never-stream-p never-stream-p)))
+     :api-options api-options)))
 
 ;;; Readers
 (defun robby--read-buffer (prompt initial-input history)
@@ -181,7 +181,9 @@ values."
 (transient-define-suffix
   robby--replace-region-with-response-suffix ()
   (interactive)
-  (robby--run-transient-command #'robby-replace-region-with-response))
+  (let* ((args (transient-args transient-current-command))
+         (diff-preview (transient-arg-value "diff-preview" args)))
+    (robby--run-transient-command #'robby-replace-region-with-response diff-preview)))
 
 ;;; API Related Suffixes
 (transient-define-suffix
@@ -323,7 +325,8 @@ customization values."
     ("m" "respond with message" robby--respond-with-message-suffix)
     ("n" "start a conversation with AI" robby--respond-in-conversation-suffix)]]
   ["Region Action Options"
-   ("f" "response buffer" "response-buffer=" :reader robby--read-buffer :level 5)]
+   ("f" "response buffer" "response-buffer=" :reader robby--read-buffer :level 5)
+   ("d" "show diff preview before replacing region" "diff-preview" :reader robby--read-buffer :level 5)]
   ["History" :description (lambda () (concat (propertize "History " 'face 'transient-heading) (propertize (format "(%d)" (length robby--history)) 'face 'transient-inactive-value)))
    ("h" "use history" "historyp")
    ("l" "clear history" robby--clear-history-suffix :transient t)])

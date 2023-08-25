@@ -41,7 +41,7 @@
 
 (cl-defun robby-replace-region-with-response (&key arg text beg end chars-processed completep &allow-other-keys)
   "Replace region with AI response, or buffer if no selected region."
-
+  
   ;; confirm before replacing
   (when arg
     ;; first time:  capture current region text in old temp buffer
