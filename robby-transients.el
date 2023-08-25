@@ -319,7 +319,7 @@ customization values."
   [["Region Actions"
     ("x" "prefix region with response" robby--prefix-region-with-response-suffix)
     ("a" "append response to region" robby--append-response-to-region-suffix)
-    ("r" "replace region with response" robby--replace-region-with-response-suffix)]
+    ("g" "replace region with response" robby--replace-region-with-response-suffix)]
    ["Misc Actions"
     ("v" "respond in robby view buffer" robby--respond-with-robby-view-suffix)
     ("m" "respond with message" robby--respond-with-message-suffix)
