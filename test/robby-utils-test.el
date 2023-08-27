@@ -23,6 +23,10 @@
   (should (equal (robby--plist-to-transient-args '(:a 1 :b "2"))
                  '("a=1" "b=2"))))
 
+(ert-deftest robby--plist-keys ()
+  (should (equal (robby--plist-keys '(:a 1 :b "2"))
+                 '(:a :b))))
+
 ;;; robby--options test
 (ert-deftest robby--options ()
   (let ((api "completions")

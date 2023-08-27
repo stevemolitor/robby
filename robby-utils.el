@@ -54,6 +54,12 @@ For example \"a_b_c\" becomes \"a b c\""
          (format "%s=%s" key value)))
      alist)))
 
+(defun robby--plist-keys (plist)
+  "Get the keys from PLIST."
+  (cl-loop for (key) on plist by 'cddr
+           collect
+           key))
+
 ;;; API options util
 
 (defun robby--remove-api-prefix (api string)

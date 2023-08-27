@@ -26,33 +26,68 @@
 (defvar robby--last-command-options nil
   "Last robby command.")
 
-(cl-defun robby--save-last-command-options (&key arg prompt prompt-args action action-args historyp api api-options)
+(cl-defun robby--save-last-command-options (&key arg prompt prompt-args action action-args historyp api api-options never-stream-p)
   (setq robby--last-command-options
-        `(:arg
-          ,arg
-          :prompt
-          ,(if (functionp prompt) `#',prompt prompt)
+        `(:prompt
+          ,prompt
           :prompt-args
-          ',prompt-args
+          ,prompt-args
           :action
-          ,`#',action
+          ,action
           :action-args
-          ',action-args
+          ,action-args
           :historyp
           ,historyp
           :api
           ,api
           :api-options
-          ',api-options)))
+          ,api-options
+          :never-stream-p
+          ,never-stream-p)))
 
-(defun robby-insert-last-command (name)
-  "Insert a definition for the last command invoked into current
-buffer.
+(defun robby-run-last-command ()
+  "Re-run the robby command last executed."
+  (interactive)
+  (apply #'robby-run-command robby--last-command-options))
 
-NAME specifies the new command name, a symbol."
-  (interactive "sCommand name: ")
-  (let* ((docstring (read-string "Doc string: "))
-         (cmd `(robby-define-command ,(intern name) ,docstring ,@robby--last-command-options)))
+(defvar robby--named-commands nil "Data for executing commands named via `robby-name-last-command'.")
+
+(defun robby-name-last-command (name)
+  (interactive "Sname: ")
+  (setq robby--named-commands
+        (plist-put robby--named-commands name `(:docstring docstring :options ,robby--last-command-options)))
+  (fset name (lambda ()
+               (interactive)
+               (apply #'robby-run-command (plist-get (plist-get robby--named-commands name) :options)))))
+
+(defun robby-insert-command (name docstring)
+  "Insert a definition for a name robby command invoked into current
+buffer."
+  (interactive (list (intern (completing-read "command: " (robby--plist-keys robby--named-commands) nil t))
+                     (read-string "docstring: ")))
+  (let* ((options (plist-get (plist-get robby--named-commands name) :options))
+         (prompt (plist-get options :prompt))
+         (prompt-args (plist-get options :prompt-args))
+         (action (plist-get options :action))
+         (action-args (plist-get options :action-args))
+         (historyp (plist-get options :historyp))
+         (api (plist-get options :api))
+         (api-options (plist-get options :api-options))
+         (quoted-options `(:prompt
+                           ,(if (functionp prompt) `#',prompt prompt)
+                           :prompt-args
+                           ',prompt-args
+                           :action
+                           ,`#',action
+                           :action-args
+                           ',action-args
+                           :historyp
+                           ,historyp
+                           :api
+                           ,api
+                           :api-options
+                           ',api-options))
+         (cmd `(robby-define-command ,name ,docstring ,@quoted-options)))
     (insert (format "%S" cmd))))
 
 ;;; run command 
@@ -77,7 +112,7 @@ Emacs Lisp, do not print messages if SILENTP is t."
         (if (not silentp)
             (message "robby process killed")))
     (if (not silentp)
-        (message "no robby process running"))))
+        (message "no robby process associated with current buffer"))))
 
 (defun robby--get-response-region (action-args)
   (let ((response-buffer (or (plist-get action-args :response-buffer) (current-buffer))))
@@ -171,7 +206,7 @@ the `robby-stream' customization variable."
   
   ;; save command history
   (robby--save-last-command-options
-   :arg arg :prompt prompt :prompt-args prompt-args :action action :action-args action-args :historyp historyp :api api :api-options api-options)
+   :arg arg :prompt prompt :prompt-args prompt-args :action action :action-args action-args :historyp historyp :api api :api-options api-options :never-stream-p never-stream-p)
 
   (let* ((prompt-args-with-arg (map-merge 'plist prompt-args `(:arg ,arg)))
          (basic-prompt (if (functionp prompt) (apply prompt prompt-args-with-arg) (format "%s" prompt)))
