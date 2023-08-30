@@ -337,11 +337,13 @@ customization values."
    ("f" "response buffer" "response-buffer=" :reader robby--read-buffer :level 5)
    ("d" "show diff preview before replacing region" "diff-preview" :reader robby--read-buffer :level 5)]
   ["History" :description (lambda () (concat (propertize "History " 'face 'transient-heading) (propertize (format "(%d)" (length robby--history)) 'face 'transient-inactive-value)))
-   ("h" "use history" "historyp")
-   ("l" "clear history" robby--clear-history-suffix :transient t)]
-  ["Misc"
-   ("e" "Save last command" "save-last-command" robby-insert-last-command :level 6)
-   ("m" "Canned Commands" robby-commands :level 6)
+   ("h" "use history" "historyp" :level 5)
+   ("l" "clear history" robby--clear-history-suffix :transient t :level 5)]
+  ["Commands"
+   ("u" "Re-run last command" robby-run-last-command :level 6)
+   ("e" "Name last command" "name-last-command" robby-name-last-command :level 6)
+   ("c" "Save named command" "save-command" robby-save-command :level 6)
+   ("m" "Saved Commands" robby-commands :level 6)
    ])
 
 (provide 'robby-transients)

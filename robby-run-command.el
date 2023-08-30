@@ -60,8 +60,8 @@
                (interactive)
                (apply #'robby-run-command (plist-get (plist-get robby--named-commands name) :options)))))
 
-(defun robby-insert-command (name docstring)
-  "Insert a definition for a name robby command invoked into current
+(defun robby-save-command (name docstring)
+  "Insert a definition for a named robby command invoked into current
 buffer."
   (interactive (list (intern (completing-read "command: " (robby--plist-keys robby--named-commands) nil t))
                      (read-string "docstring: ")))
