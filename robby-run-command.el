@@ -45,15 +45,24 @@
           :never-stream-p
           ,never-stream-p)))
 
+(defun robby--check-for-last-command ()
+  "Signal a user-error if there is no `robby--last-command-options'.
+
+Return t if there is a last command."
+  (when (not robby--last-command-options) (user-error "No last robby command to run. Run at least one command first."))
+  t)
+
 (defun robby-run-last-command ()
   "Re-run the robby command last executed."
   (interactive)
+  (robby--check-for-last-command)
   (apply #'robby-run-command robby--last-command-options))
 
 (defvar robby--named-commands nil "Data for executing commands named via `robby-name-last-command'.")
 
 (defun robby-name-last-command (name)
-  (interactive "Sname: ")
+  (interactive (list (and (robby--check-for-last-command (intern (read-string "name: "))))))
+  (robby--check-for-last-command)
   (setq robby--named-commands
         (plist-put robby--named-commands name `(:docstring docstring :options ,robby--last-command-options)))
   (fset name (lambda ()
