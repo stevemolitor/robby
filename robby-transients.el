@@ -233,7 +233,9 @@ customization values."
          (api-options (robby--scope-selected-api-options scope))
          (value (robby--get-scope-value api-options selected-api))
          (transient-name (format "robby--%s-api-options" (robby--sym-to-string selected-api))))
-    (transient-setup (intern transient-name) nil nil :scope scope :value value)))
+    (robby-update-models
+     (lambda ()
+       (transient-setup (intern transient-name) nil nil :scope scope :value value)))))
 
 (transient-define-suffix
   robby--reset-api-options ()
@@ -253,7 +255,7 @@ customization values."
   robby--chat-api-options ()
   "Chat API options."
   ["Chat API Options"
-   ("m" "model" "model=" :always-read t :choices ("gpt-3.5-turbo" "gpt-4"))
+   ("m" "model" "model=" :always-read t :choices (lambda (_a _b _c) robby-models))
    ("s" "suffix" "suffix=" :always-read t)
    ("t" "max tokens" "max-tokens=" :reader transient-read-number-N+ :always-read t)
    ("e" "temperature" "temperature=" :reader robby--read-decimal :always-read t)

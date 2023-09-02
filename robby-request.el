@@ -8,6 +8,7 @@
 (require 'seq)
 
 (require 'robby-apis)
+(require 'robby-custom)
 (require 'robby-logging)
 
 ;;; API key 
@@ -31,9 +32,12 @@
    (t (error "`robby-openai-api-key` not set"))))
 
 ;;; shared utils
-(defun robby--request-parse-error (err)
+(defun robby--request-parse-error-data (data)
+  (cdr (assoc 'message (assoc 'error data))))
+
+(defun robby--request-parse-error-string (err)
   (condition-case _err
-      (cdr (assoc 'message (assoc 'error (json-read-from-string err))))
+      (robby--request-parse-error-data (json-read-from-string err))
     (error nil)))
 
 ;;; curl
@@ -108,7 +112,7 @@ of parsed JSON objects: `(:remaining \"text\" :parsed '())'
          proc
          (lambda (_proc string)
            ;; TODO error parsing seems wrong here - it's not expecting a string. Validate.
-           (let ((error-msg (robby--request-parse-error string)))
+           (let ((error-msg (robby--request-parse-error-string string)))
              (if error-msg
                  (progn
                    (setq errored t)
@@ -124,7 +128,7 @@ of parsed JSON objects: `(:remaining \"text\" :parsed '())'
                  (funcall on-text :text text :completep t))
            (with-current-buffer proc-buffer
              (let* ((string (buffer-string))
-                    (error-msg (robby--request-parse-error string)))
+                    (error-msg (robby--request-parse-error-string string)))
                (if error-msg
                    (funcall on-error error-msg)
                  (let ((resp (robby--curl-parse-response api string "" nil)))
@@ -153,7 +157,7 @@ of parsed JSON objects: `(:remaining \"text\" :parsed '())'
        (backward-char 1)
        (let* ((json-object-type 'alist)
               (resp (json-read))
-              (err (robby--request-parse-error resp)))
+              (err (robby--request-parse-error-data resp)))
          (if err
              (funcall on-error error-msg)
            ;; TODO maybe rename robby--chunk-content
@@ -168,6 +172,56 @@ of parsed JSON objects: `(:remaining \"text\" :parsed '())'
   (if (and robby-use-curl (robby--request-available-p))
       (robby--curl :api api :payload payload :on-text on-text :on-error on-error :streamp streamp)
     (robby--url-retrieve :api api :payload payload :on-text on-text :on-error on-error)))
+
+;;; robby--get-models
+(defun robby--get-models-callback (status on-success on-error)
+  (goto-char (point-min))
+  (let* ((json-object-type 'alist)
+         (resp (json-read))
+         (err (robby--request-parse-error-string resp)))
+    (if err
+        (funcall on-error err)
+      (funcall on-success (assoc 'data resp)))))
+
+(defun robby--get-models (on-success on-error)
+  (let* ((inhibit-message t)
+         (message-log-max nil)
+         (original-buffer (current-buffer))
+         (url "https://api.openai.com/v1/models")
+         (url-request-method "GET")
+         (url-request-extra-headers
+          `(("Content-Type" . "application/json")
+            ("Authorization" . ,(concat "Bearer " (robby--get-api-key)))))
+         (inhibit-message t)
+         (message-log-max nil))
+    (url-retrieve
+     url
+     (lambda (status)
+       (goto-char (point-min))
+       (re-search-forward "^{")
+       (backward-char 1)
+       (let* ((json-object-type 'alist)
+              (resp (json-read))
+              (err (robby--request-parse-error-data resp)))
+         (if err
+             (funcall on-error err)
+           (let ((models
+                  (seq-filter
+                   (lambda (name) (string-prefix-p "gpt" name))
+                   (seq-map (lambda (obj) (cdr (assoc 'id obj))) (cdr (assoc 'data resp))))))
+             (funcall on-success models))
+           ))))))
+
+(defun robby-update-models (callback)
+  "Update models from OpenAI."
+  (if robby-models
+      (funcall callback)
+    (robby--get-models
+     (lambda (models)
+       (setq robby-models models)
+       (funcall callback))
+     (lambda (err)
+       (error (format "Error fetching models from OpenAI: %s" err))))))
 
 (provide 'robby-request)
 

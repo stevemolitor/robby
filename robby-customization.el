@@ -219,6 +219,13 @@ OpenAI to monitor and detect abuse."
   :type 'string
   :group 'robby)
 
+(defcustom robby-models nil
+  "The list of available Chat GPT models.
+
+If nil robby will fetch the list from OpenAI the first time the
+API options transient is opened in an Emacs session. You can
+instead hard code the list of models to avoid that HTTP request.")
+
 (provide 'robby-customization)
 
 ;;; robby-customization.el ends here
