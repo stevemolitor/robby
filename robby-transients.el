@@ -314,7 +314,6 @@ customization values."
   :incompatible '(("prompt=" "prompt-prefix=")
                   ("prompt=" "prompt-suffix=")
                   ("prompt=" "prompt-buffer="))
-
   [:class transient-row "API"
           ("c" "Chat" robby--select-chat-suffix
            :description (lambda () (robby--transient-api-description :chat)))
@@ -336,19 +335,17 @@ customization values."
     ("n" "start a conversation with AI" robby--respond-in-conversation-suffix)
     ("n" "start a conversation with AI" robby--respond-in-conversation-suffix)]]
   ["Region Action Options"
-   ("f" "response buffer" "response-buffer=" :reader robby--read-buffer :level 5)
-   ("d" "show diff preview before replacing region" "diff-preview" :reader robby--read-buffer :level 5)]
+   ("f" "response buffer" "response-buffer=" :reader robby--read-buffer :level 6)
+   ("d" "show diff preview before replacing region" "diff-preview" :reader robby--read-buffer :level 6)]
   ["History" :description (lambda () (concat (propertize "History " 'face 'transient-heading) (propertize (format "(%d)" (length robby--history)) 'face 'transient-inactive-value)))
-   ("h" "use history" "historyp" :level 5)
-   ("l" "clear history" robby--clear-history-suffix :transient t :level 5)]
+   ("h" "use history" "historyp" :level 6)
+   ("l" "clear history" robby--clear-history-suffix :transient t :level 6)]
   ["Commands"
-   ("u" "Re-run last command" robby-run-last-command :level 4)
-   ("e" "Name last command" robby-name-last-command :level 4)
-   ("c" "Save named command" robby-save-command :level 4)
-   ("m" "Canned Commands" robby-commands :level 6)
-   ]
-  ["Misc"
-   ("k" "Kill running command" robby-kill-last-process)])
+   ("u" "Re-run last command" robby-run-last-command :level 6)
+   ("e" "Name last command" robby-name-last-command :level 6)
+   ("c" "Save named command" robby-save-command :level 6)
+   ("m" "Canned Commands" robby-commands :level 7)
+   ])
 
 (provide 'robby-transients)
 
