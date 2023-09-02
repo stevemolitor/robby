@@ -340,11 +340,13 @@ customization values."
    ("h" "use history" "historyp" :level 5)
    ("l" "clear history" robby--clear-history-suffix :transient t :level 5)]
   ["Commands"
-   ("u" "Re-run last command" robby-run-last-command :level 6)
-   ("e" "Name last command" "name-last-command" robby-name-last-command :level 6)
-   ("c" "Save named command" "save-command" robby-save-command :level 6)
-   ("m" "Saved Commands" robby-commands :level 6)
-   ])
+   ("u" "Re-run last command" robby-run-last-command :level 4)
+   ("e" "Name last command" robby-name-last-command :level 4)
+   ("c" "Save named command" robby-save-command :level 4)
+   ("m" "Canned Commands" robby-commands :level 6)
+   ]
+  ["Misc"
+   ("k" "Kill running command" robby-kill-last-process)])
 
 (provide 'robby-transients)
 
