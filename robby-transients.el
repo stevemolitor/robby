@@ -10,6 +10,7 @@
 
 (require 'robby-actions)
 (require 'robby-customization)
+(require 'robby-models)
 (require 'robby-prompts)
 (require 'robby-run-command)
 (require 'robby-utils)
@@ -255,7 +256,7 @@ customization values."
   robby--chat-api-options ()
   "Chat API options."
   ["Chat API Options"
-   ("m" "model" "model=" :always-read t :choices (lambda (_a _b _c) robby-models))
+   ("m" "model" "model=" :always-read t :choices (lambda (_a _b _c) (robby--models-for-api 'chat robby-models)))
    ("s" "suffix" "suffix=" :always-read t)
    ("t" "max tokens" "max-tokens=" :reader transient-read-number-N+ :always-read t)
    ("e" "temperature" "temperature=" :reader robby--read-decimal :always-read t)
@@ -274,7 +275,7 @@ customization values."
   robby--completions-api-options ()
   "Completions API options."
   ["Completions API Options"
-   ("m" "model" "model=" :always-read t)
+   ("m" "model" "model=" :always-read t :choices (lambda (_a _b _c) (robby--models-for-api 'completions robby-models)))
    ("s" "suffix" "suffix=" :always-read t)
    ("t" "max tokens" "max-tokens=" :reader transient-read-number-N+ :always-read t)
    ("e" "temperature" "temperature=" :reader robby--read-decimal :always-read t)
@@ -282,9 +283,9 @@ customization values."
    ("n" "n" "n=" :reader transient-read-number-N+ :always-read t)
    ("r" "presence penalty" "presence-penalty=" :reader robby--read-decimal :always-read t)
    ("f" "frequency penalty" "frequency-penalty=" :reader robby--read-decimal :always-read t)
-   ("l" "logit bias" "logit-bias=" :reader robby--read-decimal :always-read t)
-   [[("a" "apply options" robby--apply-api-options)]
-    [("z" "reset to customization values" robby--reset-api-options)]]])
+   ("l" "logit bias" "logit-bias=" :reader robby--read-decimal :always-read t)]
+  [[("a" "apply options" robby--apply-api-options)]
+   [("z" "reset to customization values" robby--reset-api-options)]])
 
 ;;; Canned commands transient
 (transient-define-suffix

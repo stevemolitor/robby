@@ -18,6 +18,10 @@
    (should (equal (robby--request-input 'completions "Where was it played?" t)
                   '((prompt . "Who won the world series in 2020?\nThe Los Angeles Dodgers won the World Series in 2020.\nWhere was it played?"))))))
 
+(ert-deftest robby--models-for-api--completions-api ()
+  (let ((all-models '("gpt-3.5-turbo" "gpt-4" "text-davinci-003" "text-davinci-002" "text-davinci-edit-001")))
+    (should (equal (robby--models-for-api 'completions all-models) '("text-davinci-003" "text-davinci-002")))))
+
 ;;; chat api
 (ert-deftest robby--request-input--no-history--chat-api ()
   (robby--with-history
@@ -38,6 +42,10 @@
                          ((role . "assistant") (content . "The Los Angeles Dodgers won the World Series in 2020."))
                          ((role . "user") (content . "Where was it played?"))
                          ]))))))
+
+(ert-deftest robby--models-for-api--chat-api ()
+  (let ((all-models '("gpt-3.5-turbo" "gpt-4" "text-davinci-003" "text-davinci-002" "text-davinci-edit-001")))
+    (should (equal (robby--models-for-api 'chat all-models) '("gpt-3.5-turbo" "gpt-4")))))
 
 (provide 'robby-apis-test)
 

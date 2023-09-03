@@ -1,14 +1,11 @@
 ;;; robby-request.el  --- Make robby requests via curl or url-retrieve  -*- lexical-binding:t -*-
 
-;;; Commentary:
-
 (require 'cl-macs)
 (require 'files)
 (require 'json)
 (require 'seq)
 
 (require 'robby-apis)
-(require 'robby-customization)
 (require 'robby-logging)
 
 ;;; API key 
@@ -172,56 +169,6 @@ of parsed JSON objects: `(:remaining \"text\" :parsed '())'
   (if (and robby-use-curl (robby--request-available-p))
       (robby--curl :api api :payload payload :on-text on-text :on-error on-error :streamp streamp)
     (robby--url-retrieve :api api :payload payload :on-text on-text :on-error on-error)))
-
-;;; robby--get-models
-(defun robby--get-models-callback (status on-success on-error)
-  (goto-char (point-min))
-  (let* ((json-object-type 'alist)
-         (resp (json-read))
-         (err (robby--request-parse-error-string resp)))
-    (if err
-        (funcall on-error err)
-      (funcall on-success (assoc 'data resp)))))
-
-(defun robby--get-models (on-success on-error)
-  (let* ((inhibit-message t)
-         (message-log-max nil)
-         (original-buffer (current-buffer))
-         (url "https://api.openai.com/v1/models")
-         (url-request-method "GET")
-         (url-request-extra-headers
-          `(("Content-Type" . "application/json")
-            ("Authorization" . ,(concat "Bearer " (robby--get-api-key)))))
-         (inhibit-message t)
-         (message-log-max nil))
-    (url-retrieve
-     url
-     (lambda (status)
-       (goto-char (point-min))
-       (re-search-forward "^{")
-       (backward-char 1)
-       (let* ((json-object-type 'alist)
-              (resp (json-read))
-              (err (robby--request-parse-error-data resp)))
-         (if err
-             (funcall on-error err)
-           (let ((models
-                  (seq-filter
-                   (lambda (name) (string-prefix-p "gpt" name))
-                   (seq-map (lambda (obj) (cdr (assoc 'id obj))) (cdr (assoc 'data resp))))))
-             (funcall on-success models))
-           ))))))
-
-(defun robby-update-models (callback)
-  "Update models from OpenAI."
-  (if robby-models
-      (funcall callback)
-    (robby--get-models
-     (lambda (models)
-       (setq robby-models models)
-       (funcall callback))
-     (lambda (err)
-       (error (format "Error fetching models from OpenAI: %s" err))))))
 
 (provide 'robby-request)
 

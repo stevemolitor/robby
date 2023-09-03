@@ -29,6 +29,11 @@ Also include prompt history if HISTORYP is true."
   "Parse message text from chat API response JSON."
   (assoc-default 'text (seq-first (assoc-default 'choices chunk))))
 
+(cl-defmethod robby--models-for-api ((api (eql 'completions)) all-models)
+  (seq-filter
+   (lambda (name) (and (not (string-prefix-p "gpt" name)) (not (string-match-p "-edit-" name))))
+   all-models))
+
 ;;; chat methods
 (cl-defmethod robby--request-url ((api (eql 'chat)))
   "Return OpenAI chat API URL."
@@ -58,6 +63,11 @@ Also include prompt history if HISTORYP is true."
   "Parse message text from chat API response JSON."
   (let ((key (if streamp 'delta 'message)))
     (assoc-default 'content (assoc-default key (seq-first (assoc-default 'choices chunk))))))
+
+(cl-defmethod robby--models-for-api ((api (eql 'chat)) all-models)
+  (seq-filter
+   (lambda (name) (string-prefix-p "gpt" name))
+   all-models))
 
 (provide 'robby-apis)
 
