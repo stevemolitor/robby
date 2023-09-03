@@ -44,6 +44,7 @@
  "Query AI from minibuffer, respond with message."
  :prompt #'robby-get-prompt-from-minibuffer
  :action #'robby-respond-with-message
+ :grounding-fn #'robby-format-message-text
  :historyp t
  :never-stream-p t)
 
@@ -98,6 +99,7 @@ before applying."
 (robby-define-command
  robby-fix-code
  "Fix code in region."
+ :grounding-fn #'robby-extract-code-block
  :historyp nil
  :never-stream-p t
  :prompt #'robby-get-prompt-from-region

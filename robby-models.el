@@ -41,16 +41,14 @@
                   (seq-map (lambda (obj) (cdr (assoc 'id obj))) (cdr (assoc 'data resp)))))
              (funcall on-success models))))))))
 
-(defun robby-update-models (callback)
+(defun robby--update-models (callback)
   "Update models from OpenAI."
-  (if robby-models
-      (funcall callback)
-    (robby--get-models
-     (lambda (models)
-       (setq robby-models models)
-       (funcall callback))
-     (lambda (err)
-       (error (format "Error fetching models from OpenAI: %s" err))))))
+  (robby--get-models
+   (lambda (models)
+     (setq robby-models models)
+     (funcall callback))
+   (lambda (err)
+     (error (format "Error fetching models from OpenAI: %s" err)))))
 
 (provide 'robby-models)
 

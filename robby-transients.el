@@ -234,7 +234,7 @@ customization values."
          (api-options (robby--scope-selected-api-options scope))
          (value (robby--get-scope-value api-options selected-api))
          (transient-name (format "robby--%s-api-options" (robby--sym-to-string selected-api))))
-    (robby-update-models
+    (robby--update-models
      (lambda ()
        (transient-setup (intern transient-name) nil nil :scope scope :value value)))))
 

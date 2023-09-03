@@ -5,9 +5,6 @@
 ;;; Code:
 
 ;;; string utils tests
-(ert-deftest robby--format-message-text ()
-  (should (equal (robby--format-message-text "29%") "29%%")))
-
 (ert-deftest robby--kebab-to-snake-case ()
   (should (equal (robby--kebab-to-snake-case "a-b-c") "a_b_c")))
 

@@ -143,20 +143,25 @@ Emacs Lisp, do not print messages if SILENTP is t."
                               basic-prompt
                               chars-processed
                               completep
+                              grounding-fn
+                              never-stream-p
                               text
                               response-region)
   (if completep
       (robby--spinner-stop))
   (robby--log (format "# robby--handle-text, text:\n%S\ncompletep: %S, chars-processed %d" text completep chars-processed))
   (let ((beg (car response-region))
-        (end (cdr response-region)))
+        (end (cdr response-region))
+        (grounded-text (if (and never-stream-p grounding-fn)
+                           (funcall grounding-fn text)
+                         text)))
     (if completep
         (robby--history-push basic-prompt text))
     (apply
      action
      (map-merge
       'plist action-args
-      `(:arg ,arg :text ,text :beg ,beg :end ,end :prompt ,basic-prompt :chars-processed ,chars-processed :completep ,completep)))
+      `(:arg ,arg :text ,grounded-text :beg ,beg :end ,end :prompt ,basic-prompt :chars-processed ,chars-processed :completep ,completep)))
     (if completep
         (run-hooks 'robby-command-complete-hook))))
 
@@ -182,7 +187,7 @@ Emacs Lisp, do not print messages if SILENTP is t."
       (when (not proceedp)
         (user-error "Select a region and then re-run robby command.")))))
 
-(cl-defun robby-run-command (&key arg prompt prompt-args action action-args api api-options historyp never-stream-p)
+(cl-defun robby-run-command (&key arg prompt prompt-args action action-args api api-options grounding-fn historyp never-stream-p)
   "Run a command using OpenAI.
 
 ARG is the interactive prefix arg, if any. It is pass to the
@@ -206,6 +211,9 @@ keys. For example `'max-tokens' becomes \"max_tokens\". The
 values in API-OPTIONS are merged with and overwrite equivalent
 values in the customization options specified in for example
 `'robby-chat-options' or `'robby-completion-options'.
+
+GROUNDING-FN - Format the response from OpenAI before returning
+it. Only used if `NEVER-STREAM-P' is t.
 
 HISTORYP indicates whether or not to use conversation history.
 
@@ -249,13 +257,15 @@ the `robby-stream' customization variable."
                         (condition-case err
                             (with-current-buffer response-buffer
                               (robby--handle-text
-                               :arg arg
                                :action action
                                :action-args action-args
                                :api request-api
+                               :arg arg
                                :basic-prompt basic-prompt
                                :chars-processed chars-processed
                                :completep completep
+                               :grounding-fn grounding-fn
+                               :never-stream-p never-stream-p
                                :response-region response-region
                                :text text))
                           (error (robby--handle-error err))))
@@ -276,6 +286,7 @@ the `robby-stream' customization variable."
                                    action-args
                                    api
                                    api-options
+                                   grounding-fn
                                    historyp
                                    never-stream-p)
   "Define a new Robby command.
@@ -303,6 +314,9 @@ API. These options are merged in with the customization options
 specified in the api customization group, either `robby-chat-api'
 or `robby-completions-api'.
 
+GROUNDING-FN - Format the response from OpenAI before returning
+it. Only used if `NEVER-STREAM-P' is t.
+
 HISTORYP - include conversation history in OpenAI request if t.
 
 NEVER-STREAM-P - Stream response if t. if present this value overrides
@@ -318,6 +332,7 @@ the `robby-stream' customization variable."
       :action-args ,action-args
       :api ,api
       :api-options ,api-options
+      :grounding-fn ,grounding-fn
       :historyp ,historyp
       :never-stream-p ,never-stream-p)))
 
