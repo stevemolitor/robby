@@ -47,6 +47,26 @@
   (let ((all-models '("gpt-3.5-turbo" "gpt-4" "text-davinci-003" "text-davinci-002" "text-davinci-edit-001")))
     (should (equal (robby--models-for-api 'chat all-models) '("gpt-3.5-turbo" "gpt-4")))))
 
+(ert-deftest robby--chunk-content--chat-api-no-streaming ()
+  (let ((resp '((choices . [((index . 0)
+                             (message
+                              (role . "assistant")
+                              (content . "Hello! How can I assist you today?"))
+                             (finish_reason . "stop"))]))))
+    (should (equal
+             (robby--chunk-content 'chat resp nil)
+             "Hello! How can I assist you today?"))))
+
+(ert-deftest robby--chunk-content--chat-api-streaming ()
+  (let ((resp '((choices . [((index . 0)
+                             (delta
+                              (role . "assistant")
+                              (content . "Hello"))
+                             (finish_reason . "stop"))]))))
+    (should (equal
+             (robby--chunk-content 'chat resp t)
+             "Hello"))))
+
 (provide 'robby-apis-test)
 
 ;;; robby-apis-test.el ends here
