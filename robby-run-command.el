@@ -9,13 +9,13 @@
 (require 'cl-lib)
 (require 'map)
 
-(require 'robby-apis)
 (require 'robby-request)
 (require 'robby-customization)
 (require 'robby-history)
 (require 'robby-logging)
 (require 'robby-spinner)
 
+;;; variables
 (defvar robby-command-complete-hook nil
   "Hook called when a robby OpenAI command completes successfully.")
 
@@ -26,7 +26,7 @@
 (defvar robby--last-command-options nil
   "Last robby command.")
 
-(cl-defun robby--save-last-command-options (&key arg prompt prompt-args action action-args historyp api api-options never-stream-p)
+(cl-defun robby--save-last-command-options (&key arg prompt prompt-args action action-args historyp api-options never-stream-p)
   (setq robby--last-command-options
         `(:prompt
           ,prompt
@@ -38,8 +38,6 @@
           ,action-args
           :historyp
           ,historyp
-          :api
-          ,api
           :api-options
           ,api-options
           :never-stream-p
@@ -80,7 +78,6 @@ buffer."
          (action (plist-get options :action))
          (action-args (plist-get options :action-args))
          (historyp (plist-get options :historyp))
-         (api (plist-get options :api))
          (api-options (plist-get options :api-options))
          (quoted-options `(:prompt
                            ,(if (functionp prompt) `#',prompt prompt)
@@ -92,8 +89,6 @@ buffer."
                            ',action-args
                            :historyp
                            ,historyp
-                           :api
-                           ,api
                            :api-options
                            ',api-options))
          (cmd `(robby-define-command ,name ,docstring ,@quoted-options)))
@@ -139,7 +134,6 @@ Emacs Lisp, do not print messages if SILENTP is t."
                               arg
                               action
                               action-args
-                              api
                               basic-prompt
                               chars-processed
                               completep
@@ -187,7 +181,7 @@ Emacs Lisp, do not print messages if SILENTP is t."
       (when (not proceedp)
         (user-error "Select a region and then re-run robby command.")))))
 
-(cl-defun robby-run-command (&key arg prompt prompt-args action action-args api api-options grounding-fn historyp never-stream-p)
+(cl-defun robby-run-command (&key arg prompt prompt-args action action-args api-options grounding-fn historyp never-stream-p)
   "Run a command using OpenAI.
 
 ARG is the interactive prefix arg, if any. It is pass to the
@@ -201,9 +195,6 @@ d
 When the response text is received from OpenAI, ACTION is called
 with the property list ACTION-ARGS and `:text text`, where text
 is the text response from OpenAI.
-
-API specifies which OpenAI API to use, for example \"chat\" or
-\"completions\". It defaults to the value of `'robby-api'.
 
 API-OPTIONS is an optional property list of options to pass to
 the OpenAI API. Kebab case keys are converted to snake case JSON
@@ -223,13 +214,12 @@ the `robby-stream' customization variable."
   
   ;; save command history
   (robby--save-last-command-options
-   :arg arg :prompt prompt :prompt-args prompt-args :action action :action-args action-args :historyp historyp :api api :api-options api-options :never-stream-p never-stream-p)
+   :arg arg :prompt prompt :prompt-args prompt-args :action action :action-args action-args :historyp historyp :api-options api-options :never-stream-p never-stream-p)
 
   (let* ((prompt-args-with-arg (map-merge 'plist prompt-args `(:arg ,arg)))
          (basic-prompt (if (functionp prompt) (apply prompt prompt-args-with-arg) (format "%s" prompt)))
-         (request-api (intern (or api robby-api)))
-         (complete-prompt (robby--request-input request-api basic-prompt historyp))
-         (payload (append complete-prompt (robby--options (or api robby-api) api-options)))
+         (complete-prompt (robby--request-input basic-prompt historyp))
+         (payload (append complete-prompt (robby--options api-options)))
          (response-buffer (get-buffer-create (or (plist-get action-args :response-buffer) (current-buffer))))
          (response-region (robby--get-response-region action-args))
          (streamp (and (not never-stream-p) robby-stream-p))
@@ -247,7 +237,6 @@ the `robby-stream' customization variable."
       (setq robby--last-process
             (condition-case curl-err
                 (robby--request
-                 :api request-api
                  :payload payload
                  :streamp streamp
                  :on-text
@@ -259,7 +248,6 @@ the `robby-stream' customization variable."
                               (robby--handle-text
                                :action action
                                :action-args action-args
-                               :api request-api
                                :arg arg
                                :basic-prompt basic-prompt
                                :chars-processed chars-processed
@@ -284,7 +272,6 @@ the `robby-stream' customization variable."
                                    prompt-args
                                    action
                                    action-args
-                                   api
                                    api-options
                                    grounding-fn
                                    historyp
@@ -304,10 +291,6 @@ and prefix region text with PROMPT string to build prompt.
 ACTION - function to invoke when request is complete.  The
 function is passed the response text and the selected region, and
 must be of the form `(TEXT BEG END)'.
-
-API - the OpenAI API to use, either `chat' or `completions`'.
-Defaults to the value of the `robby-api' customization variable
-if not supplied.
 
 API-OPTIONS - property list of options to pass to the OpenAI
 API. These options are merged in with the customization options
@@ -330,7 +313,6 @@ the `robby-stream' customization variable."
       :prompt-args ,prompt-args
       :action ,action
       :action-args ,action-args
-      :api ,api
       :api-options ,api-options
       :grounding-fn ,grounding-fn
       :historyp ,historyp

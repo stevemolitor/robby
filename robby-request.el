@@ -5,8 +5,11 @@
 (require 'json)
 (require 'seq)
 
-(require 'robby-apis)
 (require 'robby-logging)
+(require 'robby-utils)
+
+;;; constants
+(defconst robby--request-url "https://api.openai.com/v1/chat/completions")
 
 ;;; API key 
 (defun robby--get-api-key-from-auth-source ()
@@ -28,7 +31,7 @@
    ((functionp robby-openai-api-key) (funcall robby-openai-api-key))
    (t (error "`robby-openai-api-key` not set"))))
 
-;;; shared utils
+;;; util functions
 (defun robby--request-parse-error-data (data)
   (cdr (assoc 'message (assoc 'error data))))
 
@@ -54,8 +57,7 @@ remaining incomplete text in this document.
 Ignores `\"[DONE]\".
 
 Returns a plist with remaining un-parsed text (if any) and a list
-of parsed JSON objects: `(:remaining \"text\" :parsed '())'
-"
+of parsed JSON objects: `(:remaining \"text\" :parsed '())'"
   (with-temp-buffer
     (let ((new-remaining "")
           (parsed '())
@@ -78,17 +80,16 @@ of parsed JSON objects: `(:remaining \"text\" :parsed '())'
 
 (defconst robby--curl-unknown-error "Unexpected error making OpenAI request via curl" )
 
-(defun robby--curl-parse-response (api string remaining streamp)
+(defun robby--curl-parse-response (string remaining streamp)
   (let* ((data (replace-regexp-in-string (rx bol "data:") "" string))
          (json (robby--curl-parse-chunk remaining data))
          (parsed (plist-get json :parsed))
-         (text (string-join (seq-filter #'stringp (seq-map (lambda (chunk) (robby--chunk-content api chunk streamp)) parsed)))))
+         (text (string-join (seq-filter #'stringp (seq-map (lambda (chunk) (robby--chunk-content chunk streamp)) parsed)))))
     (setq remaining (plist-get json :remaining))
     `(:text ,text :remaining ,(plist-get json :remaining))))
 
-(cl-defun robby--curl (&key api payload on-text on-error streamp)
+(cl-defun robby--curl (&key payload on-text on-error streamp)
   (let* ((input-json (json-encode (append payload (if streamp '((stream . t)) nil))))
-         (url (robby--request-url api))
          (curl-options (append robby--curl-options
                                `("-H" ,(format "Authorization: Bearer %s" (robby--get-api-key))
                                  "-d" ,input-json)))
@@ -98,7 +99,7 @@ of parsed JSON objects: `(:remaining \"text\" :parsed '())'
                           "curl"
                           proc-buffer
                           "curl"
-                          url
+                          robby--request-url
                           curl-options)
                  (error (funcall on-error err)))))
     (let ((remaining "")
@@ -114,7 +115,7 @@ of parsed JSON objects: `(:remaining \"text\" :parsed '())'
                  (progn
                    (setq errored t)
                    (funcall on-error error-msg))
-               (let ((resp (robby--curl-parse-response api string remaining streamp)))
+               (let ((resp (robby--curl-parse-response string remaining streamp)))
                  (setq remaining (plist-get resp :remaining))
                  (funcall on-text :text (plist-get resp :text) :completep nil)))))))
       (set-process-sentinel
@@ -128,16 +129,15 @@ of parsed JSON objects: `(:remaining \"text\" :parsed '())'
                     (error-msg (robby--request-parse-error-string string)))
                (if error-msg
                    (funcall on-error error-msg)
-                 (let ((resp (robby--curl-parse-response api string "" nil)))
+                 (let ((resp (robby--curl-parse-response string "" nil)))
                    (funcall on-text :text (plist-get resp :text) :completep t)))))))))
     proc))
 
 ;;; url-retrieve
-(cl-defun robby--url-retrieve (&key api payload on-text on-error &allow-other-keys)
+(cl-defun robby--url-retrieve (&key payload on-text on-error &allow-other-keys)
   (let* ((inhibit-message t)
          (message-log-max nil)
          (original-buffer (current-buffer))
-         (url (robby--request-url api))
          (url-request-method "POST")
          (url-request-data
           (encode-coding-string (json-encode payload) 'utf-8))
@@ -147,7 +147,7 @@ of parsed JSON objects: `(:remaining \"text\" :parsed '())'
          (inhibit-message t)
          (message-log-max nil))
     (url-retrieve
-     url
+     robby--request-url
      (lambda (_status)
        (goto-char (point-min))
        (re-search-forward "^{")
@@ -157,18 +157,17 @@ of parsed JSON objects: `(:remaining \"text\" :parsed '())'
               (err (robby--request-parse-error-data resp)))
          (if err
              (funcall on-error error-msg)
-           ;; TODO maybe rename robby--chunk-content
-           (let ((text (robby--chunk-content api resp nil)))
+           (let ((text (robby--chunk-content resp nil)))
              (funcall on-text :text text :completep t))))))))
 
 ;;; robby--request
 (defun robby--request-available-p ()
   (executable-find "curl"))
 
-(cl-defun robby--request (&key api payload on-text on-error streamp)
+(cl-defun robby--request (&key payload on-text on-error streamp)
   (if (and robby-use-curl (robby--request-available-p))
-      (robby--curl :api api :payload payload :on-text on-text :on-error on-error :streamp streamp)
-    (robby--url-retrieve :api api :payload payload :on-text on-text :on-error on-error)))
+      (robby--curl :payload payload :on-text on-text :on-error on-error :streamp streamp)
+    (robby--url-retrieve :payload payload :on-text on-text :on-error on-error)))
 
 (provide 'robby-request)
 

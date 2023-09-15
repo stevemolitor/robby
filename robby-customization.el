@@ -37,16 +37,6 @@ the conversation history."
   :type  'boolean
   :group 'robby)
 
-(defcustom robby-api "chat"
-  "Which OpenAI model to use.
-
-Use the customization interface or `custom-set-variables to
-change this value, as it needs to clear out the history to avoid
-incompatible history between the two apis."
-  :type '(choice (const :tag "Completions" "completions")
-                 (const :tag "Chat" "chat"))
-  :group 'robby)
-
 (defcustom robby-use-curl t
   "If curl if availble to make HTTP requests to OpenAI.
 
@@ -61,72 +51,6 @@ support streaming."
   "If true, confirm before sending the entire buffer as the prompt."
   :type 'boolean
   :group 'robby)
-
-;;; completions api options
-(defgroup robby-completions-api nil
-  "Options to pass to the completions API."
-  :group 'robby)
-
-(defcustom robby-completions-model "text-davinci-003"
-  "The model to use with the completions API."
-  :type :string
-  :group 'robby-completions-api)
-
-(defcustom robby-completions-suffix nil
-  "The suffix that comes after a completion of inserted text."
-  :type '(choice string (const nil))
-  :group 'robby-completions-api)
-
-(defcustom robby-completions-max-tokens 300
-  "The maximum number of tokens to generate in the completion."
-  :type '(choice integer (const nil))
-  :group 'robby-completions-api)
-
-(defcustom robby-completions-temperature nil
-  "What sampling temperature to use.  Defaults to 1."
-  :type '(choice number (const nil))
-  :group 'robby-completions-api)
-
-(defcustom robby-completions-top-p nil
-  "An alternative to sampling with temperature, called nucleus
-sampling, where the model considers the results of the tokens
-with top_p probability mass. So 0.1 means only the tokens
-comprising the top 10% probability mass are considered."
-  :type '(choice number (const nil))
-  :group 'robby-completions-api)
-
-(defcustom robby-completions-n nil
-  "How many completions to generate for each prompt. Defaults to 1."
-  :type '(choice integer (const nil))
-  :group 'robby-completions-api)
-
-(defcustom robby-completions-presence-penalty nil
-  "Number between -2.0 and 2.0. Positive values penalize new tokens
-based on whether they appear in the text so far, increasing the
-model's likelihood to talk about new topics."
-  :type '(choice number (const nil))
-  :group 'robby-completions-api)
-
-(defcustom robby-completions-frequency-penalty nil
-  "Number between -2.0 and 2.0. Positive values penalize new tokens
-based on their existing frequency in the text so far, decreasing
-the model's likelihood to repeat the same line verbatim."
-  :type  '(choice integer (const nil))
-  :group 'robby-completions-api)
-
-(defcustom robby-completions-best-of nil
-  "Generates best_of completions server-side and returns the
-\"best\" (the one with the highest log probability per
-token). Results cannot be streamed."
-  :type '(choice integer (const nil))
-  :group 'robby-completions-api)
-
-(defcustom robby-completions-logit-bias nil
-  "Generates best_of completions server-side and returns the
-\"best\" (the one with the highest log probability per
-token). Results cannot be streamed."
-  :type '(choice integer (const nil))
-  :group 'robby-completions-api)
 
 ;;; chat api options
 (defgroup robby-chat-api nil

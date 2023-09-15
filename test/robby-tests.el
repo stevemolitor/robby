@@ -7,7 +7,6 @@
 ;; CI.
 
 (require 'robby-actions-test)
-(require 'robby-apis-test)
 (require 'robby-grounding-fns-test)
 (require 'robby-history-test)
 (require 'robby-logging-test)

@@ -12,7 +12,7 @@
 ;;; Code:
 
 ;;; tests
-(cl-defun robby--test-run-command (&key api use-curl streamp done)
+(cl-defun robby--test-run-command (&key use-curl streamp done)
   (let ((robby-stream-p streamp)
         (robby-use-curl use-curl)
         (cb (cl-function (lambda (&key text completep &allow-other-keys)
@@ -23,29 +23,11 @@
      :prompt "What year did Abraham Lincoln die?"
      :action cb)))
 
-(ert-deftest-async robby--integration-test-run-command-chat-curl-streaming (done)
-  (robby--test-run-command :api "chat" :use-curl t :streamp t :done done))
+(ert-deftest-async robby--integration-test-run-command-curl-streaming (done)
+  (robby--test-run-command :use-curl t :streamp t :done done))
 
-(ert-deftest-async robby--integration-test-run-command-completions-curl-streaming (done)
-  (robby--test-run-command :api "completions" :use-curl t :streamp t :done done))
-
-(ert-deftest-async robby--integration-test-run-command-chat-curl-no-streaming (done)
-  (robby--test-run-command :api "chat" :use-curl t :streamp nil :done done))
-
-(ert-deftest-async robby--integration-test-run-command-completions-curl-no-streaming (done)
-  (robby--test-run-command :api "completions" :use-curl t :streamp nil :done done))
-
-(ert-deftest-async robby--integration-test-run-command-chat-no-curl-streaming (done)
-  (robby--test-run-command :api "chat" :use-curl nil :streamp t :done done))
-
-(ert-deftest-async robby--integration-test-run-command-completions-no-curl-streaming (done)
-  (robby--test-run-command :api "completions" :use-curl nil :streamp t :done done))
-
-(ert-deftest-async robby--integration-test-run-command-chat-no-curl-no-streaming (done)
-  (robby--test-run-command :api "chat" :use-curl nil :streamp nil :done done))
-
-(ert-deftest-async robby--integration-test-run-command-completions-no-curl-no-streaming (done)
-  (robby--test-run-command :api "completions" :use-curl nil :streamp nil :done done))
+(ert-deftest-async robby--integration-test-run-command-no-curl-no-streaming (done)
+  (robby--test-run-command :use-curl nil :streamp nil :done done))
 
 ;;; suite
 (defun robby-run-integration-tests ()

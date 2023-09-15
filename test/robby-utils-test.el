@@ -26,14 +26,57 @@
 
 ;;; robby--options test
 (ert-deftest robby--options ()
-  (let ((api "completions")
-        (robby-completions-max-tokens 1)
-        (robby-completions-model "text-davinci-003")
-        (robby-completions-temperature 1.0))
-    (should (equal (robby--options api '(:max-tokens 2))
+  (let ((robby-chat-model "gpt-4")
+        (robby-chat-max-tokens 100)
+        (robby-chat-temperature 1.0))
+    (should (equal (robby--options '(:max-tokens 2))
                    '(("max_tokens" . 2)
-                     ("model" . "text-davinci-003")
+                     ("model" . "gpt-4")
                      ("temperature" . 1.0))))))
+
+(ert-deftest robby--request-input--no-history ()
+  (robby--with-history
+   nil
+   (let ((expected-json "{\"messages\":[{\"role\":\"user\",\"content\":\"hello\"}]}")
+         (input (robby--request-input "hello" nil)))
+     (should (equal input `((messages . [((role . "system") (content . ,robby-chat-system-message))
+                                         ((role . "user") (content . "hello"))])))))))
+
+(ert-deftest robby--request-input--with-history ()
+  (robby--with-history
+   '(("Who won the world series in 2020?" . "The Los Angeles Dodgers won the World Series in 2020."))
+   (should (equal
+            (robby--request-input "Where was it played?" t)
+            `((messages .
+                        [((role . "system") (content . ,robby-chat-system-message))
+                         ((role . "user") (content . "Who won the world series in 2020?"))
+                         ((role . "assistant") (content . "The Los Angeles Dodgers won the World Series in 2020."))
+                         ((role . "user") (content . "Where was it played?"))
+                         ]))))))
+
+(ert-deftest robby--chunk-content--no-streaming ()
+  (let ((resp '((choices . [((index . 0)
+                             (message
+                              (role . "assistant")
+                              (content . "Hello! How can I assist you today?"))
+                             (finish_reason . "stop"))]))))
+    (should (equal
+             (robby--chunk-content resp nil)
+             "Hello! How can I assist you today?"))))
+
+(ert-deftest robby--chunk-content--streaming ()
+  (let ((resp '((choices . [((index . 0)
+                             (delta
+                              (role . "assistant")
+                              (content . "Hello"))
+                             (finish_reason . "stop"))]))))
+    (should (equal
+             (robby--chunk-content resp t)
+             "Hello"))))
+
+(ert-deftest robby--models-for-api ()
+  (let ((all-models '("gpt-3.5-turbo" "gpt-4" "text-davinci-003" "text-davinci-002" "text-davinci-edit-001")))
+    (should (equal (robby--models-for-api all-models) '("gpt-3.5-turbo" "gpt-4")))))
 
 (provide 'robby-utils-test)
 

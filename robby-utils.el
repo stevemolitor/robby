@@ -60,50 +60,76 @@ For example \"a_b_c\" becomes \"a b c\""
            collect
            key))
 
-;;; API options util
-
-(defun robby--remove-api-prefix (api string)
-  "Remove api prefix API from STRING.
-For example, \"robby-chat-temperature\" becomes \"temperature\""
-  (let ((regexp (format "^robby-%s-" api)))
-    (replace-regexp-in-string regexp "" string)))
-
-(defun robby--options-from-group (api)
-  "Get list of options from a Robby customization group.
+(defun robby--options-from-group ()
+  "Get list of options from a Robby `robby-chat-api' customization group.
 
 API specifies the customization group, for example `\"chat\"' or
 `\"completions\"'.  Returns an association list of options."
   (seq-map
    (lambda (sym)
      (cons
-      (robby--kebab-to-snake-case (robby--remove-api-prefix api (symbol-name sym)))
+      (robby--kebab-to-snake-case (robby--remove-api-prefix "chat" (symbol-name sym)))
       (symbol-value sym)))
    (seq-map
     #'car
     (seq-filter
      (lambda (elem)
        (eq (nth 1 elem) 'custom-variable))
-     (custom-group-members (intern (format "robby-%s-api" api)) nil)))))
+     (custom-group-members 'robby-chat-api nil)))))
 
-(defun robby--options (api options)
+(defun robby--options (options)
   "Get a list of options to pass to the OpenAI API.
 
-Grabs OpenAI customization options for the current API as
-specified in the `robby-api' custom variable and merges them in
-with any specific options passed in OPTIONS. OPTIONS overrides
-customization options."
+Grabs OpenAI customization options for the chat API as and merges
+them in with any specific options passed in OPTIONS. OPTIONS
+overrides customization options."
   (seq-sort-by
    #'car #'string<
-
    (map-merge
     'alist
     (seq-filter
      (lambda (elem) (not (null (cdr elem))))
-     ;; TODO add API param to this function
-     (robby--options-from-group api))
+     (robby--options-from-group))
     (seq-map
      (lambda (assoc) (cons (robby--kebab-to-snake-case (replace-regexp-in-string "^:" "" (symbol-name (car assoc)))) (cdr assoc)))
      (robby--plist-to-alist options)))))
+
+;;; API utils
+(defun robby--remove-api-prefix (api string)
+  "Remove api prefix API from STRING.
+For example, \"robby-chat-temperature\" becomes \"temperature\""
+  (let ((regexp (format "^robby-%s-" api)))
+    (replace-regexp-in-string regexp "" string)))
+
+(defun robby--request-input (prompt historyp)
+  "Return OpenAI chat API input data including PROMPT.
+Also include prompt history if HISTORYP is true."
+  (let* ((system-message `((role . "system") (content . ,robby-chat-system-message)))
+         (formatted-messages
+          (if historyp
+              (vconcat
+               `(,system-message)
+               (seq-reduce
+                (lambda (vec history-elem)
+                  (vconcat
+                   vec
+                   `(((role . "user") (content . ,(car history-elem)))
+                     ((role . "assistant") (content . ,(cdr history-elem))))))
+                robby--history
+                '[])
+               `(((role . "user") (content . ,prompt))))
+            `[,system-message ((role . "user") (content . ,prompt))])))
+    `((messages . ,formatted-messages))))
+
+(defun robby--chunk-content (chunk streamp)
+  "Parse message text from chat API response JSON."
+  (let ((key (if streamp 'delta 'message)))
+    (assoc-default 'content (assoc-default key (seq-first (assoc-default 'choices chunk))))))
+
+(defun robby--models-for-api (all-models)
+  (seq-filter
+   (lambda (name) (string-prefix-p "gpt" name))
+   all-models))
 
 (provide 'robby-utils)
 
