@@ -44,8 +44,7 @@ Use the customization interface or `custom-set-variables to
 change this value, as it needs to clear out the history to avoid
 incompatible history between the two apis."
   :type '(choice (const :tag "Completions" "completions")
-                 (const :tag "Chat" "chat")
-                 (const :tag "Images" "images"))
+                 (const :tag "Chat" "chat"))
   :group 'robby)
 
 (defcustom robby-use-curl t
@@ -221,20 +220,5 @@ OpenAI to monitor and detect abuse."
   :group 'robby)
 
 (provide 'robby-customization)
-
-;;; images api options
-(defgroup robby-images-api nil
-  "Options to pass to the images API."
-  :group 'robby)
-
-(defcustom robby-images-n nil
-  "How many images to generate for each prompt. Defaults to 1."
-  :type '(choice number (const nil))
-  :group 'robby-images-api)
-
-(defcustom robby-images-size "1024x1024"
-  "The size of the image to generate."
-  :type '(choice (const "256x256") (const "512x512") (const "1024x1024"))
-  :group 'robby-images-api)
 
 ;;; robby-customization.el ends here

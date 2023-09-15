@@ -232,7 +232,7 @@ the `robby-stream' customization variable."
          (payload (append complete-prompt (robby--options (or api robby-api) api-options)))
          (response-buffer (get-buffer-create (or (plist-get action-args :response-buffer) (current-buffer))))
          (response-region (robby--get-response-region action-args))
-         (streamp (and (not never-stream-p) (robby--streaming-api-p request-api) robby-stream-p))
+         (streamp (and (not never-stream-p) robby-stream-p))
          (chars-processed 0))
 
     (robby--log (format "# Prompt:\n%S\n# Request body:\n%s\n" complete-prompt payload))

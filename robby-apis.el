@@ -34,10 +34,6 @@ Also include prompt history if HISTORYP is true."
    (lambda (name) (and (not (string-prefix-p "gpt" name)) (not (string-match-p "-edit-" name))))
    all-models))
 
-(cl-defmethod robby--streaming-api-p ((api (eql 'completions)))
-  "Does this API support streaming?"
-  t)
-
 ;;; chat methods
 (cl-defmethod robby--request-url ((api (eql 'chat)))
   "Return OpenAI chat API URL."
@@ -72,34 +68,6 @@ Also include prompt history if HISTORYP is true."
   (seq-filter
    (lambda (name) (string-prefix-p "gpt" name))
    all-models))
-
-(cl-defmethod robby--streaming-api-p ((api (eql 'chat)))
-  "Does this API support streaming?"
-  t)
-
-;;; images methods
-(cl-defmethod robby--request-url ((api (eql 'images)))
-  "Return OpenAI chat API URL."
-  "https://api.openai.com/v1/images/generations")
-
-(cl-defmethod robby--request-input ((api (eql 'images)) prompt historyp)
-  "Return OpenAI completions API input data including PROMPT.
-Also include prompt history if HISTORYP is true."
-  ;; TODO DRY up getting prompt-with-history?
-  `((prompt . ,prompt)
-    ;; defaults - size is required, n defaults to 1 so we need size but can skip n:
-    (size . "1024x1024")))
-
-(cl-defmethod robby--chunk-content ((api (eql 'images)) chunk streamp)
-  "Image API does not support streaming."
-  (assoc-default 'url (seq-first (assoc-default 'data chunk))))
-
-(cl-defmethod robby--models-for-api ((api (eql 'images)) all-models)
-  nil)
-
-(cl-defmethod robby--streaming-api-pj ((api (eql 'images)))
-  "Does this API support streaming?"
-  nil)
 
 (provide 'robby-apis)
 

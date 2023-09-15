@@ -26,7 +26,8 @@
 (ert-deftest robby--request-input--no-history--chat-api ()
   (robby--with-history
    nil
-   (let ((input (robby--request-input 'chat "hello" nil)))
+   (let ((expected-json "{\"messages\":[{\"role\":\"user\",\"content\":\"hello\"}]}")
+         (input (robby--request-input 'chat "hello" nil)))
      (should (equal input `((messages . [((role . "system") (content . ,robby-chat-system-message))
                                          ((role . "user") (content . "hello"))])))))))
 
@@ -65,21 +66,6 @@
     (should (equal
              (robby--chunk-content 'chat resp t)
              "Hello"))))
-
-;;; images api
-(ert-deftest robby--request-input--images-api ()
-  (robby--with-history
-   nil
-   (let ((input (robby--request-input 'images "a white siamese cat" nil)))
-     (should (equal
-              input
-              '((prompt . "a white siamese cat") (size . "1024x1024")))))))
-
-(ert-deftest robby--chunk-content--images-api ()
-            (let ((resp '((created . 1694693216) (data . [((url . "https://image-url"))]))))
-              (should (equal
-                       "https://image-url"
-                       (robby--chunk-content 'images resp nil)))))
 
 (provide 'robby-apis-test)
 
