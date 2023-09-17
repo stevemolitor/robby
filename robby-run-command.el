@@ -47,7 +47,8 @@
   "Signal a user-error if there is no `robby--last-command-options'.
 
 Return t if there is a last command."
-  (when (not robby--last-command-options) (user-error "No last robby command to run. Run at least one command first."))
+  (when (not robby--last-command-options)
+    (user-error "No last robby command to run. Run at least one command first."))
   t)
 
 (defun robby-run-last-command ()
@@ -56,23 +57,17 @@ Return t if there is a last command."
   (robby--check-for-last-command)
   (apply #'robby-run-command robby--last-command-options))
 
-(defvar robby--named-commands nil "Data for executing commands named via `robby-name-last-command'.")
+(defun robby--pp-cmd (cmd)
+  "Insert `cmd' into current buffer."
+  (if (version< emacs-version "29.0")
+      (pp cmd)
+    (let ((pp-max-width 70))
+      (pp-emacs-lisp-code cmd))))
 
-(defun robby-name-last-command (name)
-  (interactive (list (and (robby--check-for-last-command (intern (read-string "name: "))))))
-  (robby--check-for-last-command)
-  (setq robby--named-commands
-        (plist-put robby--named-commands name `(:docstring docstring :options ,robby--last-command-options)))
-  (fset name (lambda ()
-               (interactive)
-               (apply #'robby-run-command (plist-get (plist-get robby--named-commands name) :options)))))
-
-(defun robby-save-command (name docstring)
-  "Insert a definition for a named robby command invoked into current
-buffer."
-  (interactive (list (intern (completing-read "command: " (robby--plist-keys robby--named-commands) nil t))
-                     (read-string "docstring: ")))
-  (let* ((options (plist-get (plist-get robby--named-commands name) :options))
+(defun robby-save-last-command (name docstring)
+  "Insert elisp definition of the last robby command in current buffer at point."
+  (interactive "Sname: \nsdocstring: ")
+  (let* ((options robby--last-command-options)
          (prompt (plist-get options :prompt))
          (prompt-args (plist-get options :prompt-args))
          (action (plist-get options :action))
@@ -92,7 +87,7 @@ buffer."
                            :api-options
                            ',api-options))
          (cmd `(robby-define-command ,name ,docstring ,@quoted-options)))
-    (insert (format "%S" cmd))))
+    (insert (robby--pp-cmd cmd))))
 
 ;;; run command 
 (defun robby--process-running-p ()

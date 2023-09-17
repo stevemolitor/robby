@@ -258,32 +258,31 @@ customization values."
                   ("prompt=" "prompt-suffix=")
                   ("prompt=" "prompt-buffer="))
   ["Prompt"
-   ("i" "simple prompt" "prompt=" :always-read t)]
+   ("i" "simple prompt" "prompt=" :always-read t :level 3)]
   ["Prompt from Region or Buffer Options"
-   ("p" "prompt prefix" "prompt-prefix=" :always-read t)
-   ("s" "prompt suffix" "prompt-suffix=" :always-read t)
-   ("b" "prompt buffer" "prompt-buffer=" :reader robby--read-buffer :level 5)]
+   ("p" "prompt prefix" "prompt-prefix=" :always-read t :level 3)
+   ("s" "prompt suffix" "prompt-suffix=" :always-read t :level 3)
+   ("b" "prompt buffer" "prompt-buffer=" :reader robby--read-buffer :level 6)]
   [["Region Actions"
-    ("x" "prefix region with response" robby--prefix-region-with-response-suffix)
-    ("a" "append response to region" robby--append-response-to-region-suffix)
-    ("g" "replace region with response" robby--replace-region-with-response-suffix)]
+    ("x" "prefix region with response" robby--prefix-region-with-response-suffix :level 3)
+    ("a" "append response to region" robby--append-response-to-region-suffix :level 3)
+    ("g" "replace region with response" robby--replace-region-with-response-suffix :level 3)]
    ["Misc Actions"
-    ("v" "respond in robby view buffer" robby--respond-with-robby-view-suffix)
-    ("n" "start a conversation with AI" robby--respond-in-conversation-suffix)
-    ("n" "start a conversation with AI" robby--respond-in-conversation-suffix)]]
+    ("v" "respond in robby view buffer" robby--respond-with-robby-view-suffix :level 3)
+    ("n" "start a conversation with AI" robby--respond-in-conversation-suffix :level 3)
+    ("n" "start a conversation with AI" robby--respond-in-conversation-suffix :level 3)]]
   ["Region Action Options"
    ("f" "response buffer" "response-buffer=" :reader robby--read-buffer :level 6)
-   ("d" "show diff preview before replacing region" "diff-preview" :reader robby--read-buffer :level 6)]
-  ["Request Options"
-   ("A" "API options" robby--setup-api-options :transient transient--do-replace)]
-  ["History" :description (lambda () (concat (propertize "History " 'face 'transient-heading) (propertize (format "(%d)" (length robby--history)) 'face 'transient-inactive-value)))
-   ("h" "use history" "historyp" :level 6)
-   ("l" "clear history" robby--clear-history-suffix :transient t :level 6)]
+   ("d" "show diff preview before replacing region" "diff-preview" :reader robby--read-buffer :level 5)]
   ["Commands"
-   ("u" "Re-run last command" robby-run-last-command :level 6)
-   ("e" "Name last command" robby-name-last-command :level 6)
-   ("c" "Save named command" robby-save-command :level 6)
-   ("m" "Canned Commands" robby-commands :level 7)])
+   ("u" "re-run last command" robby-run-last-command :level 4)
+   ("i" "insert last command" robby-save-last-command :level 4)
+   ("m" "canned commands" robby-commands :level 6)]
+  ["History" :description (lambda () (concat (propertize "History " 'face 'transient-heading) (propertize (format "(%d)" (length robby--history)) 'face 'transient-inactive-value)))
+   ("h" "use history" "historyp" :level 5)
+   ("l" "clear history" robby--clear-history-suffix :transient t :level 5)]
+  ["API"
+   ("A" "API options" robby--setup-api-options :transient transient--do-replace :level 5)])
 
 (provide 'robby-transients)
 
