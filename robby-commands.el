@@ -103,9 +103,15 @@ before applying."
  :historyp nil
  :never-stream-p t
  :prompt #'robby-get-prompt-from-region
- :prompt-args '(:prompt-prefix "Fix this code. Return the correct code inside markdown a code fence, for example ```var x = 1;```. If the code is correct say 'the code is correct'.")
+ :prompt-args '(:prompt-prefix "Fix this code. Return the correct code inside markdown a code fence, for example ```var x = 1;```. If the original code supplied was correct respond with 'the code is correct', but only if the original code was correct. For example, if the code is correct then respond with:
+
+\"the code is correct\"
+
+However if the code is NOT correct, respond with the fixed code and do NOT use the word \"correct\" in your response if the code is not correct. Never use the word \"correct\" unless the original code was correct.
+ ")
  :action #'robby-replace-region-with-response
- :grounding-fns '(robby-extract-code-block))
+ :grounding-fns '(robby-extract-code-block)
+ :no-op-pattern (rx (or "the code is correct" "the original code is correct")))
 
 ;;;###autoload (autoload 'robby-proof-read "robby-commands" "Proof read text." t)
 (robby-define-command

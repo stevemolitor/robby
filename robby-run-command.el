@@ -133,7 +133,8 @@ Emacs Lisp, do not print messages if SILENTP is t."
                               chars-processed
                               completep
                               grounding-fns
-                              never-stream-p
+                              no-op-pattern
+                              no-op-message
                               text
                               response-region)
   (if completep
@@ -144,11 +145,13 @@ Emacs Lisp, do not print messages if SILENTP is t."
         (grounded-text (robby--ground-response text grounding-fns)))
     (if completep
         (robby--history-push basic-prompt text))
-    (apply
-     action
-     (map-merge
-      'plist action-args
-      `(:arg ,arg :text ,grounded-text :beg ,beg :end ,end :prompt ,basic-prompt :chars-processed ,chars-processed :completep ,completep)))
+    (if (and no-op-pattern (string-match-p no-op-pattern text))
+        (message (or no-op-message) "no action to perform")
+      (apply
+       action
+       (map-merge
+        'plist action-args
+        `(:arg ,arg :text ,grounded-text :beg ,beg :end ,end :prompt ,basic-prompt :chars-processed ,chars-processed :completep ,completep))))
     (if completep
         (run-hooks 'robby-command-complete-hook))))
 
@@ -165,16 +168,20 @@ Emacs Lisp, do not print messages if SILENTP is t."
   "Parse raw error response from DATA and try to return descriptive message."
   (or (cdr (assoc 'message (assoc 'error data))) "unknown error"))
 
-(cl-defun robby--validate-args (&key arg action)
+(cl-defun robby--validate-args (&key arg action no-op-pattern never-stream-p)
   ;; confirm before replacing entire buffer
   (when (and (eq action 'robby-replace-region-with-response)
              robby-confirm-whole-buffer-p
              (not (use-region-p)))
     (let ((proceedp (and robby-confirm-whole-buffer-p (yes-or-no-p "Overwrite entire buffer contents with response?"))))
       (when (not proceedp)
-        (user-error "Select a region and then re-run robby command.")))))
+        (user-error "Select a region and then re-run robby command."))))
 
-(cl-defun robby-run-command (&key arg prompt prompt-args action action-args api-options grounding-fns historyp never-stream-p)
+  ;; no-op-pattern can only be used when never-stream-p is t
+  (when (and no-op-pattern (not (or never-stream-p (not robby-stream-p))))
+    (user-error "NO-OP-PATTERN can only be when streaming is off. Add `:never-stream-p t` to your command definition.")))
+
+(cl-defun robby-run-command (&key arg prompt prompt-args action action-args api-options grounding-fns no-op-pattern no-op-message historyp never-stream-p)
   "Run a command using OpenAI.
 
 ARG is the interactive prefix arg, if any. It is pass to the
@@ -199,11 +206,22 @@ values in the customization options specified in for example
 GROUNDING-FNS - Format the response from OpenAI before returning
 it. Only used if `NEVER-STREAM-P' is t.
 
+NO-OP-PATTERN - If the response matches this regular expression,
+do not perform the action. Useful with a prompt that tells OpenAI
+to respond with a certain response if there is nothing to do. For
+example with a prompt of \"Fix this code. Respond with 'the code
+is correct' if the code is correct\", then a NO-OP-PATTERN of
+\"code is correct\" will tell robby to not replace the region
+when the pattern matches. Only use NO-OP-PATTERN when
+NEVER-STREAM-P is t.
+
+NO-OP-MESSAGE - Message to display when NO-OP-PATTERN matches. Optional.
+
 HISTORYP indicates whether or not to use conversation history.
 
-NEVER-STREAM-P - Never stream response if t. if present this value overrides
-the `robby-stream' customization variable."
-  (robby--validate-args :arg arg :action action)
+NEVER-STREAM-P - Never stream response if t. if present this
+value overrides the `robby-stream' customization variable."
+  (robby--validate-args :arg arg :action action :no-op-pattern no-op-pattern :never-stream-p never-stream-p)
   
   ;; save command history
   (robby--save-last-command-options
@@ -235,21 +253,22 @@ the `robby-stream' customization variable."
                  :on-text
                  (cl-function
                   (lambda (&key text completep)
-                    (if (buffer-live-p response-buffer)
-                        (condition-case err
-                            (with-current-buffer response-buffer
-                              (robby--handle-text
-                               :action action
-                               :action-args action-args
-                               :arg arg
-                               :basic-prompt basic-prompt
-                               :chars-processed chars-processed
-                               :completep completep
-                               :grounding-fns grounding-fns
-                               :never-stream-p never-stream-p
-                               :response-region response-region
-                               :text text))
-                          (error (robby--handle-error err))))
+                    (when (buffer-live-p response-buffer)
+                      (condition-case err
+                          (with-current-buffer response-buffer
+                            (robby--handle-text
+                             :action action
+                             :action-args action-args
+                             :arg arg
+                             :basic-prompt basic-prompt
+                             :chars-processed chars-processed
+                             :completep completep
+                             :grounding-fns grounding-fns
+                             :no-op-pattern no-op-pattern
+                             :no-op-message no-op-message
+                             :response-region response-region
+                             :text text))
+                        (error (robby--handle-error err))))
                     (setq chars-processed (+ chars-processed (length text)))))
                  :on-error
                  (lambda (err)
@@ -267,6 +286,8 @@ the `robby-stream' customization variable."
                                    action-args
                                    api-options
                                    grounding-fns
+                                   no-op-pattern
+                                   no-op-message
                                    historyp
                                    never-stream-p)
   "Define a new Robby command.
@@ -293,10 +314,21 @@ or `robby-completions-api'.
 GROUNDING-FNS - Format the response from OpenAI before returning
 it. Only used if `NEVER-STREAM-P' is t.
 
+NO-OP-PATTERN - If the response matches this regular expression,
+do not perform the action. Useful with a prompt that tells OpenAI
+to respond with a certain response if there is nothing to do. For
+example with a prompt of \"Fix this code. Respond with 'the code
+is correct' if the code is correct\", then a NO-OP-PATTERN of
+\"code is correct\" will tell robby to not replace the region
+when the pattern matches. Only use NO-OP-PATTERN when
+NEVER-STREAM-P is t.
+
+NO-OP-MESSAGE - Message to display when NO-OP-PATTERN matches. Optional.
+
 HISTORYP - include conversation history in OpenAI request if t.
 
-NEVER-STREAM-P - Stream response if t. if present this value overrides
-the `robby-stream' customization variable."
+NEVER-STREAM-P - Stream response if t. If present this value
+overrides the `robby-stream' customization variable."
   `(defun ,name (arg)
      ,docstring
      (interactive "P")
@@ -308,6 +340,8 @@ the `robby-stream' customization variable."
       :action-args ,action-args
       :api-options ,api-options
       :grounding-fns ,grounding-fns
+      :no-op-pattern ,no-op-pattern
+      :no-op-message ,no-op-message
       :historyp ,historyp
       :never-stream-p ,never-stream-p)))
 
