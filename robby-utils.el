@@ -131,6 +131,15 @@ Also include prompt history if HISTORYP is true."
    (lambda (name) (string-prefix-p "gpt" name))
    all-models))
 
+;;; grounding
+(defun robby--ground-response (response grounding-fns)
+  (if (seqp grounding-fns)
+      (seq-reduce
+       (lambda (resp fn) (funcall fn resp))
+       grounding-fns
+       response)
+    (funcall grounding-fns response)))
+
 (provide 'robby-utils)
 
 ;;; robby-utils.el ends here

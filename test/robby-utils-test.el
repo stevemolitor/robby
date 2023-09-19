@@ -78,6 +78,19 @@
   (let ((all-models '("gpt-3.5-turbo" "gpt-4" "text-davinci-003" "text-davinci-002" "text-davinci-edit-001")))
     (should (equal (robby--models-for-api all-models) '("gpt-3.5-turbo" "gpt-4")))))
 
+;;; grounding
+(ert-deftest robby--ground-response--chain-fns ()
+  (cl-letf (((symbol-function 'upper) (lambda (resp) (upcase resp)))
+            ((symbol-function 'twice) (lambda (resp) (concat resp resp))))
+    (should (equal (robby--ground-response "response" '(upper twice))
+                   "RESPONSERESPONSE"))))
+
+(ert-deftest robby--ground-response--single-fn ()
+  (cl-letf (((symbol-function 'upper) (lambda (resp) (upcase resp))))
+    (should (equal (robby--ground-response "response" #'upper)
+                   "RESPONSE"))))
+
 (provide 'robby-utils-test)
 
 ;;; robby-utils-test.el ends here
+

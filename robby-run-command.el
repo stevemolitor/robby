@@ -64,7 +64,7 @@ Return t if there is a last command."
     (let ((pp-max-width 70))
       (pp-emacs-lisp-code cmd))))
 
-(defun robby-save-last-command (name docstring)
+(defun robby-insert-last-command (name docstring)
   "Insert elisp definition of the last robby command in current buffer at point."
   (interactive "Sname: \nsdocstring: ")
   (let* ((options robby--last-command-options)
@@ -87,7 +87,7 @@ Return t if there is a last command."
                            :api-options
                            ',api-options))
          (cmd `(robby-define-command ,name ,docstring ,@quoted-options)))
-    (insert (robby--pp-cmd cmd))))
+    (robby--pp-cmd cmd)))
 
 ;;; run command 
 (defun robby--process-running-p ()
@@ -132,7 +132,7 @@ Emacs Lisp, do not print messages if SILENTP is t."
                               basic-prompt
                               chars-processed
                               completep
-                              grounding-fn
+                              grounding-fns
                               never-stream-p
                               text
                               response-region)
@@ -141,9 +141,7 @@ Emacs Lisp, do not print messages if SILENTP is t."
   (robby--log (format "# robby--handle-text, text:\n%S\ncompletep: %S, chars-processed %d" text completep chars-processed))
   (let ((beg (car response-region))
         (end (cdr response-region))
-        (grounded-text (if (and never-stream-p grounding-fn)
-                           (funcall grounding-fn text)
-                         text)))
+        (grounded-text (robby--ground-response text grounding-fns)))
     (if completep
         (robby--history-push basic-prompt text))
     (apply
@@ -176,7 +174,7 @@ Emacs Lisp, do not print messages if SILENTP is t."
       (when (not proceedp)
         (user-error "Select a region and then re-run robby command.")))))
 
-(cl-defun robby-run-command (&key arg prompt prompt-args action action-args api-options grounding-fn historyp never-stream-p)
+(cl-defun robby-run-command (&key arg prompt prompt-args action action-args api-options grounding-fns historyp never-stream-p)
   "Run a command using OpenAI.
 
 ARG is the interactive prefix arg, if any. It is pass to the
@@ -198,7 +196,7 @@ values in API-OPTIONS are merged with and overwrite equivalent
 values in the customization options specified in for example
 `'robby-chat-options' or `'robby-completion-options'.
 
-GROUNDING-FN - Format the response from OpenAI before returning
+GROUNDING-FNS - Format the response from OpenAI before returning
 it. Only used if `NEVER-STREAM-P' is t.
 
 HISTORYP indicates whether or not to use conversation history.
@@ -247,7 +245,7 @@ the `robby-stream' customization variable."
                                :basic-prompt basic-prompt
                                :chars-processed chars-processed
                                :completep completep
-                               :grounding-fn grounding-fn
+                               :grounding-fns grounding-fns
                                :never-stream-p never-stream-p
                                :response-region response-region
                                :text text))
@@ -268,7 +266,7 @@ the `robby-stream' customization variable."
                                    action
                                    action-args
                                    api-options
-                                   grounding-fn
+                                   grounding-fns
                                    historyp
                                    never-stream-p)
   "Define a new Robby command.
@@ -292,7 +290,7 @@ API. These options are merged in with the customization options
 specified in the api customization group, either `robby-chat-api'
 or `robby-completions-api'.
 
-GROUNDING-FN - Format the response from OpenAI before returning
+GROUNDING-FNS - Format the response from OpenAI before returning
 it. Only used if `NEVER-STREAM-P' is t.
 
 HISTORYP - include conversation history in OpenAI request if t.
@@ -309,7 +307,7 @@ the `robby-stream' customization variable."
       :action ,action
       :action-args ,action-args
       :api-options ,api-options
-      :grounding-fn ,grounding-fn
+      :grounding-fns ,grounding-fns
       :historyp ,historyp
       :never-stream-p ,never-stream-p)))
 

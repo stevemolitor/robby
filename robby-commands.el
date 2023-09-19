@@ -7,6 +7,7 @@
 (require 'robby-run-command)
 (require 'robby-prompts)
 (require 'robby-actions)
+(require 'robby-grounding-fns)
 
 ;;; Code:
 
@@ -44,7 +45,7 @@
  "Query AI from minibuffer, respond with message."
  :prompt #'robby-get-prompt-from-minibuffer
  :action #'robby-respond-with-message
- :grounding-fn #'robby-format-message-text
+ :grounding-fns #'robby-format-message-text
  :historyp t
  :never-stream-p t)
 
@@ -99,12 +100,12 @@ before applying."
 (robby-define-command
  robby-fix-code
  "Fix code in region."
- :grounding-fn #'robby-extract-code-block
  :historyp nil
  :never-stream-p t
  :prompt #'robby-get-prompt-from-region
- :prompt-args '(:prompt-prefix "Fix this code. If the code is correct, just respond with the original code, nothing else. Do not respond with any commentary; just respond with the code.")
- :action #'robby-replace-region-with-response)
+ :prompt-args '(:prompt-prefix "Fix this code. Return the correct code inside markdown a code fence, for example ```var x = 1;```. If the code is correct say 'the code is correct'.")
+ :action #'robby-replace-region-with-response
+ :grounding-fns '(robby-extract-code-block))
 
 ;;;###autoload (autoload 'robby-proof-read "robby-commands" "Proof read text." t)
 (robby-define-command

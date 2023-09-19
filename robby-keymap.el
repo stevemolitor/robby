@@ -9,6 +9,7 @@
     (define-key map "a" 'robby-append-region)
     (define-key map "c" 'robby-save-command)
     (define-key map "e" 'robby-name-last-command)
+    (define-key map "f" 'robby-fix-code)
     (define-key map "g" 'robby-replace-region)
     (define-key map "k" 'robby-kill-last-process)
     (define-key map "l" 'robby-clear-history)
