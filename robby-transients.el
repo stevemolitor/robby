@@ -276,7 +276,7 @@ customization values."
    ("d" "show diff preview before replacing region" "diff-preview" :reader robby--read-buffer :level 5)]
   ["Commands"
    ("u" "re-run last command" robby-run-last-command :level 4)
-   ("i" "insert last command" robby-save-last-command :level 4)
+   ("i" "insert last command" robby-insert-last-command :level 4)
    ("m" "canned commands" robby-commands :level 6)]
   ["History" :description (lambda () (concat (propertize "History " 'face 'transient-heading) (propertize (format "(%d)" (length robby--history)) 'face 'transient-inactive-value)))
    ("h" "use history" "historyp" :level 5)
