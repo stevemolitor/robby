@@ -6,8 +6,8 @@
 
 (require 'robby-grounding-fns)
 
-;;; robby-extract-code-block tests
-(ert-deftest robby-extract-code-block--has-block ()
+;;; robby-extract-fenced-text tests
+(ert-deftest robby-extract-fenced-text--has-block ()
   (let ((response "Here is some example code:
 
 ```
@@ -15,16 +15,16 @@
   (+ a b)
 ```
 "))
-    (should (equal (robby-extract-code-block response) "(defun add (a b)
+    (should (equal (robby-extract-fenced-text response) "(defun add (a b)
   (+ a b)
 "))))
 
-(ert-deftest robby-extract-code-block--no-block ()
+(ert-deftest robby-extract-fenced-text--no-block ()
   (let ((response "
 (defun add (a b)
   (+ a b)
 "))
-    (should (equal (robby-extract-code-block response) response))))
+    (should (equal (robby-extract-fenced-text response) response))))
 
 ;;; robby-format-message-text tests
 (ert-deftest robby-format-message-text ()

@@ -18,6 +18,7 @@
     (define-key map "m" 'robby-message)
     (define-key map "n" 'robby-conversation)
     (define-key map "o" 'robby-add-comments)
+    (define-key map "s" 'robby-summarize)
     (define-key map "t" 'robby-write-tests)
     (define-key map "p" 'robby-prepend-region)
     (define-key map "u" 'robby-run-last-command)

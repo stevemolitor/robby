@@ -6,7 +6,7 @@
 
 ;;; Code:
 
-(defun robby-extract-code-block (response)
+(defun robby-extract-fenced-text (response)
   (with-temp-buffer
     (insert response)
     (goto-char (point-min))

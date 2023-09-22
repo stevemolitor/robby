@@ -84,8 +84,12 @@ before applying."
  "Write some tests for the code in the region, append to region."
  :historyp nil
  :prompt #'robby-get-prompt-from-region
- :prompt-args '(:prompt-prefix "Write some unit tests for this code: ")
- :action #'robby-append-response-to-region)
+ :prompt-args '(:prompt-prefix
+                "Write some unit tests for the code delimited by triple backticks. Return the test code inside markdown a code fence delmited by triple backticks.\n ```"
+                :prompt-suffix
+                "```")
+ :action #'robby-append-response-to-region
+ :grounding-fns #'robby-extract-fenced-text)
 
 ;;;###autoload (autoload 'robby-add-comments "robby-commands" "Write a documentation comment for the code in the selected region, prepending comment to the region." t)
 (robby-define-command
@@ -93,8 +97,12 @@ before applying."
  "Write a documentation comment for the code in the selected region, prepending comment to the region."
  :historyp nil
  :prompt #'robby-get-prompt-from-region
- :prompt-args '(:prompt-prefix "Write a documentation comment for this code. If it looks like the code could be Javascript or Typescript, assume Typescript and write Typescript style documentation comments. But if the code looks like Emacs Lisp code, definitely use Emacs Lisp style comments. Do not repeat the code in your response; just add a comment.")
- :action #'robby-prepend-response-to-region)
+ :prompt-args '(:prompt-prefix
+                "Write a documentation comment for the code delimited by triple backticks.\n```"
+                :prompt-suffix
+                "```")
+ :action #'robby-prepend-response-to-region
+ :grounding-fns #'robby-extract-fenced-text)
 
 ;;;###autoload (autoload 'robby-fix-code "robby-commands" "Fix code in region." t)
 (robby-define-command
@@ -103,14 +111,15 @@ before applying."
  :historyp nil
  :never-stream-p t
  :prompt #'robby-get-prompt-from-region
- :prompt-args '(:prompt-prefix "Fix this code. Return the correct code inside markdown a code fence, for example ```var x = 1;```. If the original code supplied was correct respond with 'the code is correct', but only if the original code was correct. For example, if the code is correct then respond with:
+ :prompt-args '(:prompt-prefix
+                "Fix the code delimited by triple backticks. Return the corrected code inside markdown a code fence, for example ```var x = 1;```. If the original code supplied was correct respond with 'the code is correct', but only if the original code was correct. For example, if the code is correct then respond with:
 
 \"the code is correct\"
 
-However if the code is NOT correct, respond with the fixed code and do NOT use the word \"correct\" in your response if the code is not correct. Never use the word \"correct\" unless the original code was correct.
- ")
+However if the code is NOT correct, respond with the fixed code and do NOT use the word \"correct\" in your response if the code is not correct. Never use the word \"correct\" unless the original code was correct. Here is the code to correct:\n```"
+                :prompt-suffix "```")
  :action #'robby-replace-region-with-response
- :grounding-fns '(robby-extract-code-block)
+ :grounding-fns #'robby-extract-fenced-text
  :no-op-pattern (rx (or "the code is correct" "the original code is correct")))
 
 ;;;###autoload (autoload 'robby-proof-read "robby-commands" "Proof read text." t)
@@ -120,8 +129,12 @@ However if the code is NOT correct, respond with the fixed code and do NOT use t
  :never-stream-p t
  :historyp nil
  :prompt #'robby-get-prompt-from-region
- :prompt-args '(:prompt-prefix "Please proofread the following text for spelling and grammar errors. Do not respond with any commentary; just respond with the corrected text. If there are no issues just respond with the original text. Please put a newline character at the end of your response if the original text had a newline character. Here is the text to correct: ")
- :action #'robby-replace-region-with-response)
+ :prompt-args '(:prompt-prefix
+                "Please proof read the text delimited by triple backticks. Preserve the original formatting including line breaks or end of line characters.\n```"
+                :prompt-suffix
+                "```")
+ :action #'robby-replace-region-with-response
+ :grounding-fns #'robby-extract-fenced-text)
 
 ;;;###autoload (autoload 'robby-describe-code "robby-commands" "Describe code in the selected region, show description in robby view window." t)
 (robby-define-command
@@ -129,9 +142,28 @@ However if the code is NOT correct, respond with the fixed code and do NOT use t
  "Describe code in the selected region, show description in robby view window."
  :historyp nil
  :prompt #'robby-get-prompt-from-region
- :prompt-args '(:prompt-prefix "Describe the following code: ")
+ :prompt-args '(:prompt-prefix
+                "Describe the code delimited by triple backticks.\n```"
+                :prompt-suffix
+                "```")
  :action #'robby-respond-with-robby-view
- :api-options '(:max-tokens 2000))
+ :api-options '(:max-tokens 2000)
+ :grounding-fns #'robby-extract-fenced-text)
+
+;;;###autoload (autoload 'robby-summarize "robby-commands" "Summarize text." t)
+(robby-define-command
+ robby-summarize
+ "Summarize the text in the selected region or entire buffer if no
+selected region, show description in robby view window."
+ :historyp nil
+ :prompt #'robby-get-prompt-from-region
+ :prompt-args '(:prompt-prefix
+                "Briefly summarize the text delimited by triple backticks.\n```"
+                :prompt-suffix
+                "```")
+ :action #'robby-respond-with-robby-view
+ :api-options '(:max-tokens 2000)
+ :grounding-fns #'robby-extract-fenced-text)
 
 (provide 'robby-commands)
 
