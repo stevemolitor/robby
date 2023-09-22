@@ -19,6 +19,18 @@
   (+ a b)
 "))))
 
+(ert-deftest robby-extract-fenced-text--has-language ()
+  (let ((response "Here is some example code:
+
+```emacs-lisp
+(defun add (a b)
+  (+ a b)
+```
+"))
+    (should (equal (robby-extract-fenced-text response) "(defun add (a b)
+  (+ a b)
+"))))
+
 (ert-deftest robby-extract-fenced-text--no-block ()
   (let ((response "
 (defun add (a b)

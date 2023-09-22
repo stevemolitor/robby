@@ -52,6 +52,18 @@ support streaming."
   :type 'boolean
   :group 'robby)
 
+(defcustom robby-prompt-spec-fn #'robby-make-prompt-spec
+  "Function that returns a prompt format spec.
+
+FILE-NAME and FILE-EXT will be set to the base file name and file
+extension of the file associated with the current buffer, or to
+nil if the buffer has no associated file.
+
+The function return an association list suitable for use with
+`format-spec'."
+  :type 'function
+  :group 'robby)
+
 ;;; chat api options
 (defgroup robby-chat-api nil
   "Options to pass to the chat API."

@@ -78,6 +78,22 @@
   (let ((all-models '("gpt-3.5-turbo" "gpt-4" "text-davinci-003" "text-davinci-002" "text-davinci-edit-001")))
     (should (equal (robby--models-for-api all-models) '("gpt-3.5-turbo" "gpt-4")))))
 
+;;; prompt templates
+(ert-deftest robby--format-prompt--with-prompt-spec-arg ()
+  (should (equal
+           (robby--format-prompt "file extension: %e" '((?e . "el")))
+           "file extension: el")))
+
+(ert-deftest robby--format-prompt--with-repeats ()
+  (should (equal
+           (robby--format-prompt "file extension: %e %e" '((?e . "el")))
+           "file extension: el el")))
+
+(ert-deftest robby--format-prompt--with-missing-args ()
+  (should (equal
+           (robby--format-prompt "file extension:" '((?e . "el")))
+           "file extension:")))
+
 ;;; grounding
 (ert-deftest robby--ground-response--chain-fns ()
   (cl-letf (((symbol-function 'upper) (lambda (resp) (upcase resp)))

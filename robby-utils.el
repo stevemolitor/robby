@@ -1,3 +1,5 @@
+;;; Code:
+
 ;;; robby-utils.el  --- robby utility functions -*- lexical-binding:t -*-
 
 ;;; Commentary:
@@ -130,6 +132,41 @@ Also include prompt history if HISTORYP is true."
   (seq-filter
    (lambda (name) (string-prefix-p "gpt" name))
    all-models))
+
+;;; robby--format-prompt
+(defun robby--prompt-file-name-base ()
+  "Return the base file, no directory no extension, for use in prompt specs."
+  (if buffer-file-name
+      (file-name-base buffer-file-name)
+    ""))
+
+(defun robby--prompt-file-ext ()
+  "Return the file extension for use in prompt specs."
+  (if buffer-file-name
+      (file-name-extension buffer-file-name)
+    ""))
+
+(defun robby-make-prompt-spec (file-name file-ext)
+  "Make a prompt format spec.
+
+FILE-NAME and FILE-EXT will be set to the base file name and file
+extension of the file associated with the current buffer, or to
+nil if the buffer has no associated file.
+
+Returns an association list suitable for use with `format-spec'."
+  `((?e . ,file-ext)
+    (?f . ,file-name)
+    (?l . ,user-login-name)
+    (?n . ,user-full-name)))
+
+(defun robby--format-prompt (prompt &optional spec)
+  "Format PROMPT string using `format-spec', using the format spec returned by SPEC-FN."
+  (let* ((file-name (robby--prompt-file-name-base))
+         (file-ext (robby--prompt-file-ext))
+         (prompt-spec (or
+                       spec
+                       (funcall robby-prompt-spec-fn file-name file-ext))))
+    (format-spec prompt prompt-spec 'ignore)))
 
 ;;; grounding
 (defun robby--ground-response (response grounding-fns)

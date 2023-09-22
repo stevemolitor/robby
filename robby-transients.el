@@ -246,7 +246,7 @@ customization values."
   ["Robby Commands"
    ("d" "describe code" robby-describe-code)
    ("f" "fix code" robby-fix-code)
-   ("o" "add comments" robby-add-comments)
+   ("o" "add comments" robby-add-comment)
    ("t" "write tests" robby-write-tests)
    ("x" "proof read text" robby-proof-read)])
 

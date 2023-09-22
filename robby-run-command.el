@@ -168,7 +168,7 @@ Emacs Lisp, do not print messages if SILENTP is t."
   "Parse raw error response from DATA and try to return descriptive message."
   (or (cdr (assoc 'message (assoc 'error data))) "unknown error"))
 
-(cl-defun robby--validate-args (&key arg action no-op-pattern never-stream-p)
+(cl-defun robby--validate-args (&key arg action never-stream-p no-op-pattern grounding-fns)
   ;; confirm before replacing entire buffer
   (when (and (eq action 'robby-replace-region-with-response)
              robby-confirm-whole-buffer-p
@@ -177,9 +177,14 @@ Emacs Lisp, do not print messages if SILENTP is t."
       (when (not proceedp)
         (user-error "Select a region and then re-run robby command."))))
 
-  ;; no-op-pattern can only be used when never-stream-p is t
-  (when (and no-op-pattern (not (or never-stream-p (not robby-stream-p))))
-    (user-error "NO-OP-PATTERN can only be when streaming is off. Add `:never-stream-p t` to your command definition.")))
+  (let ((streaming-on-p (not (or never-stream-p (not robby-stream-p)))))
+    ;; no-op-pattern can only be used when streaming is off
+    (when (and no-op-pattern streaming-on-p)
+      (user-error "NO-OP-PATTERN can only be when streaming is off. Add `:never-stream-p t` to your command definition."))
+
+    ;; grounding-fns only make sense when streaming is off
+    (when (and grounding-fns streaming-on-p)
+      (user-error "GROUNDING-FNS can only be when streaming is off. Add `:never-stream-p t` to your command definition."))))
 
 (cl-defun robby-run-command (&key arg prompt prompt-args action action-args api-options grounding-fns no-op-pattern no-op-message historyp never-stream-p)
   "Run a command using OpenAI.
@@ -191,7 +196,7 @@ PROMPT is a string or a function. If a string it used as is as
 the prompt to send to OpenAI. If PROMPT is a function it is
 called with PROMPT-ARGS to produce the prompt. PROMPT-ARGS is a
 key / value style property list.
-d
+
 When the response text is received from OpenAI, ACTION is called
 with the property list ACTION-ARGS and `:text text`, where text
 is the text response from OpenAI.
@@ -221,22 +226,23 @@ HISTORYP indicates whether or not to use conversation history.
 
 NEVER-STREAM-P - Never stream response if t. if present this
 value overrides the `robby-stream' customization variable."
-  (robby--validate-args :arg arg :action action :no-op-pattern no-op-pattern :never-stream-p never-stream-p)
+  (robby--validate-args :arg arg :action action :never-stream-p never-stream-p :no-op-pattern no-op-pattern :grounding-fns grounding-fns)
   
   ;; save command history
   (robby--save-last-command-options
    :arg arg :prompt prompt :prompt-args prompt-args :action action :action-args action-args :historyp historyp :api-options api-options :never-stream-p never-stream-p)
 
   (let* ((prompt-args-with-arg (map-merge 'plist prompt-args `(:arg ,arg)))
-         (basic-prompt (if (functionp prompt) (apply prompt prompt-args-with-arg) (format "%s" prompt)))
-         (complete-prompt (robby--request-input basic-prompt historyp))
-         (payload (append complete-prompt (robby--options api-options)))
+         (prompt-result (if (functionp prompt) (apply prompt prompt-args-with-arg) (format "%s" prompt)))
+         (basic-prompt (robby--format-prompt prompt-result))
+         (request-input (robby--request-input basic-prompt historyp))
+         (payload (append request-input (robby--options api-options)))
          (response-buffer (get-buffer-create (or (plist-get action-args :response-buffer) (current-buffer))))
          (response-region (robby--get-response-region action-args))
          (streamp (and (not never-stream-p) robby-stream-p))
          (chars-processed 0))
 
-    (robby--log (format "# Prompt:\n%S\n# Request body:\n%s\n" complete-prompt payload))
+    (robby--log (format "# Request body:\n%s\n" payload))
 
     (if (not (window-live-p (get-buffer-window response-buffer)))
         (display-buffer response-buffer))

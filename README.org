@@ -77,7 +77,7 @@ The interactive command ~robby-insert-last-command~ will prompt for a command na
  :action robby--append-response-after-region)
 
 (robby-define-command
- robby-add-comments
+ robby-add-comment
  "Write a documentation comment for the code in the selected region, prepending comment to the region."
  :historyp nil
  :prompt "Write a documentation comment for this code: "

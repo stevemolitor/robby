@@ -91,16 +91,16 @@ before applying."
  :action #'robby-append-response-to-region
  :grounding-fns #'robby-extract-fenced-text)
 
-;;;###autoload (autoload 'robby-add-comments "robby-commands" "Write a documentation comment for the code in the selected region, prepending comment to the region." t)
+;;;###autoload (autoload 'robby-add-comment "robby-commands" "Add a comment for the code in the selected region or buffer." t)
 (robby-define-command
- robby-add-comments
- "Write a documentation comment for the code in the selected region, prepending comment to the region."
+ robby-add-comment
+ "Add a comment for the code in the selected region or buffer."
  :historyp nil
+ :never-stream-p t
  :prompt #'robby-get-prompt-from-region
  :prompt-args '(:prompt-prefix
-                "Write a documentation comment for the code delimited by triple backticks.\n```"
-                :prompt-suffix
-                "```")
+                "The file extension for this code is \"%e\". First, determine the programming language based on the file extension. Then, write a documentation comment for the code delimted by triple backticks, formatted with the appropriate comment delimeters for the programming language, and based on the type of thing it is - code block, function definition, class definition, etc. Return the comment inside a markdown code fence, delimited by triple backticks. Here is the code: ```"
+                :prompt-suffix "```")
  :action #'robby-prepend-response-to-region
  :grounding-fns #'robby-extract-fenced-text)
 
@@ -141,6 +141,7 @@ However if the code is NOT correct, respond with the fixed code and do NOT use t
  robby-describe-code
  "Describe code in the selected region, show description in robby view window."
  :historyp nil
+ :never-stream-p t
  :prompt #'robby-get-prompt-from-region
  :prompt-args '(:prompt-prefix
                 "Describe the code delimited by triple backticks.\n```"
@@ -156,6 +157,7 @@ However if the code is NOT correct, respond with the fixed code and do NOT use t
  "Summarize the text in the selected region or entire buffer if no
 selected region, show description in robby view window."
  :historyp nil
+ :never-stream-p t
  :prompt #'robby-get-prompt-from-region
  :prompt-args '(:prompt-prefix
                 "Briefly summarize the text delimited by triple backticks.\n```"
