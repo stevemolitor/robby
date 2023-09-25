@@ -20,20 +20,10 @@
   "Replace % with %% in TEXT to avoid format string errors calling `message."
   (replace-regexp-in-string "%" "%%" response))
 
-(defun robby-no-op (no-op-pattern)
-  "Return a grounding function that returns the original input if
-OpenAI response matches NO-OP-PATTERN.
-
-Useful when you want OpenAI to respond with specific text to
-signal that no change should be applied. For example, if the
-prompt is 'Fix this code. If the code is correct respond with
-\"the code is correct\", then you would use `(robby-no-op \"the
-code is correct\" to create a grounding function that returns the
-original input when the response is \"the code is correct\"."
-  (lambda (prompt response)
-    (if (string-match no-op-pattern response)
-        prompt
-      response)))
+(defun robby-remove-trailing-end-of-line (string)
+  "Remove the end of line character at the very end of a string if present."
+  (replace-regexp-in-string "
+$" "" string))
 
 (provide 'robby-grounding-fns)
 

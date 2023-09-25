@@ -102,7 +102,7 @@ before applying."
                 "The file extension for this code is \"%e\". First, determine the programming language based on the file extension. Then, write a documentation comment for the code delimted by triple backticks, formatted with the appropriate comment delimeters for the programming language, and based on the type of thing it is - code block, function definition, class definition, etc. Return the comment inside a markdown code fence, delimited by triple backticks. Here is the code: ```"
                 :prompt-suffix "```")
  :action #'robby-prepend-response-to-region
- :grounding-fns #'robby-extract-fenced-text)
+ :grounding-fns #'(robby-extract-fenced-text robby-remove-trailing-end-of-line))
 
 ;;;###autoload (autoload 'robby-fix-code "robby-commands" "Fix code in region." t)
 (robby-define-command
@@ -119,7 +119,7 @@ before applying."
 However if the code is NOT correct, respond with the fixed code and do NOT use the word \"correct\" in your response if the code is not correct. Never use the word \"correct\" unless the original code was correct. Here is the code to correct:\n```"
                 :prompt-suffix "```")
  :action #'robby-replace-region-with-response
- :grounding-fns #'robby-extract-fenced-text
+ :grounding-fns #'(robby-extract-fenced-text robby-remove-trailing-end-of-line)
  :no-op-pattern (rx (or "the code is correct" "the original code is correct")))
 
 ;;;###autoload (autoload 'robby-proof-read "robby-commands" "Proof read text." t)

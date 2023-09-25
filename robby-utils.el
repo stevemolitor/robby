@@ -43,8 +43,8 @@ For example \"a_b_c\" becomes \"a b c\""
 (defun robby--plist-to-alist (plist)
   "Convert PLIST to an association list (alist)."
   (cl-loop for (key value . rest) on plist by 'cddr
-        collect
-        (cons key value)))
+           collect
+           (cons key value)))
 
 (defun robby--plist-to-transient-args (plist)
   "Convert PLIST to transient args list."

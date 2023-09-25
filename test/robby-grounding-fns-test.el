@@ -42,6 +42,13 @@
 (ert-deftest robby-format-message-text ()
   (should (equal (robby-format-message-text "29%") "29%%")))
 
+;;; robby-newlines tests
+(ert-deftest robby-remove-trailing-end-of-line ()
+  (should (equal (robby-remove-trailing-end-of-line "Hello, \nworld!\n") "Hello, \nworld!"))
+  (should (equal (robby-remove-trailing-end-of-line "Hello, world!\n\n") "Hello, world!"))
+  (should (equal (robby-remove-trailing-end-of-line "No end of line character") "No end of line character"))
+  (should (equal (robby-remove-trailing-end-of-line "") "")))
+
 (provide 'robby-grounding-fns-test)
 
 ;; robby-grounding-fns-test.el ends here
