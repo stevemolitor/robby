@@ -79,7 +79,7 @@ The function return an association list suitable for use with
   :type '(choice string (const nil))
   :group 'robby-chat-api)
 
-(defcustom robby-chat-max-tokens 300
+(defcustom robby-chat-max-tokens 2000
   "The maximum number of tokens to generate in the completion."
   :type '(choice integer (const nil))
   :group 'robby-chat-api)
