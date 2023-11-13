@@ -18,6 +18,7 @@
         (cb (cl-function (lambda (&key text completep &allow-other-keys)
                            (if completep
                                (should (string-match-p "1865" text)))
+                           ;; TODO done is called multiple times
                            (funcall done)))))
     (robby-run-command
      :prompt "What year did Abraham Lincoln die?"
