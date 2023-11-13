@@ -74,7 +74,9 @@ replace region with response.
 If prefix arg is supplied, confirm changes in a diff buffer
 before applying."
  :prompt #'robby-get-prompt-from-region
- :action #'robby-replace-region-with-response)
+ :action #'robby-replace-region-with-response
+ :grounding-fns #'robby-extract-fenced-text
+ :never-stream-p)
 
 ;;; Commands to perform specific tasks
 
