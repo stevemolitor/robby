@@ -39,7 +39,7 @@ specified, prompt the user for a prompt prefix in the minibuffer."
          (prefix (cond
                   (prompt-prefix prompt-prefix)
                   (prompt-suffix nil)
-                  ((not never-ask-p) (read-string "Extra prompt prefix: "))
+                  ((not never-ask-p) (read-string "Request for AI overlords: "))
                   (t nil))))
     (format "%s%s%s"
             (if prefix (concat prefix "\n") "") ; prefix
