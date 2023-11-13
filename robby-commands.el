@@ -76,7 +76,7 @@ before applying."
  :prompt #'robby-get-prompt-from-region
  :action #'robby-replace-region-with-response
  :grounding-fns #'robby-extract-fenced-text
- :never-stream-p)
+ :never-stream-p t)
 
 ;;; Commands to perform specific tasks
 
