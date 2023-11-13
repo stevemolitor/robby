@@ -247,40 +247,41 @@ value overrides the `robby-stream' customization variable."
     (if (not (window-live-p (get-buffer-window response-buffer)))
         (display-buffer response-buffer))
 
-    (with-current-buffer response-buffer
-      (robby-kill-last-process t)
-      (robby--spinner-start)
-      ;; TODO can't kill url-retrieve process
-      (setq robby--last-process
-            (condition-case curl-err
-                (robby--request
-                 :payload payload
-                 :streamp streamp
-                 :on-text
-                 (cl-function
-                  (lambda (&key text completep)
-                    (when (buffer-live-p response-buffer)
-                      (condition-case err
-                          (with-current-buffer response-buffer
-                            (robby--handle-text
-                             :action action
-                             :action-args action-args
-                             :arg arg
-                             :basic-prompt basic-prompt
-                             :chars-processed chars-processed
-                             :completep completep
-                             :grounding-fns grounding-fns
-                             :no-op-pattern no-op-pattern
-                             :no-op-message no-op-message
-                             :response-region response-region
-                             :text text))
-                        (error (robby--handle-error err))))
-                    (setq chars-processed (+ chars-processed (length text)))))
-                 :on-error
-                 (lambda (err)
-                   (with-current-buffer response-buffer
-                     (robby--handle-error err))))
-              (error (robby--handle-error curl-err)))))))
+    (with-undo-amalgamate
+      (with-current-buffer response-buffer
+        (robby-kill-last-process t)
+        (robby--spinner-start)
+        ;; TODO can't kill url-retrieve process
+        (setq robby--last-process
+              (condition-case curl-err
+                  (robby--request
+                   :payload payload
+                   :streamp streamp
+                   :on-text
+                   (cl-function
+                    (lambda (&key text completep)
+                      (when (buffer-live-p response-buffer)
+                        (condition-case err
+                            (with-current-buffer response-buffer
+                              (robby--handle-text
+                               :action action
+                               :action-args action-args
+                               :arg arg
+                               :basic-prompt basic-prompt
+                               :chars-processed chars-processed
+                               :completep completep
+                               :grounding-fns grounding-fns
+                               :no-op-pattern no-op-pattern
+                               :no-op-message no-op-message
+                               :response-region response-region
+                               :text text))
+                          (error (robby--handle-error err))))
+                      (setq chars-processed (+ chars-processed (length text)))))
+                   :on-error
+                   (lambda (err)
+                     (with-current-buffer response-buffer
+                       (robby--handle-error err))))
+                (error (robby--handle-error curl-err))))))))
 
 ;;; define command
 (cl-defmacro robby-define-command (name
