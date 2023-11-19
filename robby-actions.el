@@ -103,10 +103,13 @@
 
 (defconst robby--end-view-message "\n___\n")
 
-(cl-defun robby-respond-with-robby-view (&key text completep &allow-other-keys)
+(cl-defun robby-respond-with-robby-view (&key chars-processed prompt text completep &allow-other-keys)
   "Show TEXT in robby-view-mode buffer."
   (robby--with-robby-view
-   (goto-char (point-max))
+   (when (zerop chars-processed)
+     (goto-char (point-max))
+     (insert "> " prompt "\n\n"))
+   ;; (goto-char (point-max))
    (insert text)
    (when (eq completep t)
      (insert robby--end-view-message)
