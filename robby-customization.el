@@ -64,6 +64,19 @@ The function return an association list suitable for use with
   :type 'function
   :group 'robby)
 
+(defcustom robby-spinner 'rotating-line
+  "What kind of spinner to use to show progress."
+  :type `(choice :tag "Spinner type"
+                 ,@(mapcar (lambda (c) (list 'const (car c)))
+                           spinner-types))
+  :group 'robby)
+
+(defcustom robby-spinner-lighter
+  '(" robby " (:eval (spinner-print robby--spinner)))
+  "Mode line lighter for robby-spinner-mode."
+  :type 'sexp
+  :group 'robby)
+
 ;;; chat api options
 (defgroup robby-chat-api nil
   "Options to pass to the chat API."

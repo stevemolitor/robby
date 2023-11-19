@@ -6,20 +6,10 @@
 
 (require 'spinner)
 
+(require 'robby-customization)
 (require 'robby-keymap)
 
 ;;; Code:
-
-(defcustom robby-spinner 'rotating-line
-  "What kind of spinner to use to show progress."
-  :group 'lsp-mode
-  :type `(choice :tag "Spinner type"
-                 ,@(mapcar (lambda (c) (list 'const (car c)))
-                           spinner-types))
-  :group 'robby)
-
-(defconst robby--lighter
-  '(" robby " (:eval (spinner-print robby--spinner))))
 
 (defvar-local robby--spinner nil)
 (put 'robby--spinner 'permanent-local t)
@@ -42,7 +32,7 @@
 (define-minor-mode robby-spinner-mode
   "Minor mode for robby commands."
   :global t
-  :lighter robby--lighter
+  :lighter robby-spinner-lighter
   :keymap robby-spinner-mode-map
   ;; autoload built in command, robby transient when entering robby-spinner-mode
   (require 'robby-commands)
