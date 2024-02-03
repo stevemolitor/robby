@@ -55,7 +55,9 @@
  "Query AI from region or entire buffer if no selected region,
 prepend results to region or buffer."
  :prompt #'robby-get-prompt-from-region
- :action #'robby-prepend-response-to-region)
+ :action #'robby-prepend-response-to-region
+ :grounding-fns #'robby-extract-fenced-text-in-prog-modes
+ :never-stream-p t)
 
 ;;;###autoload (autoload 'robby-prepend-region "robby-commands" "Query AI from region or entire buffer if no selected region, append results to region or buffer." t)
 (robby-define-command
@@ -63,7 +65,9 @@ prepend results to region or buffer."
  "Query AI from region or entire buffer if no selected region,
 append results to region or buffer."
  :prompt #'robby-get-prompt-from-region
- :action #'robby-append-response-to-region)
+ :action #'robby-append-response-to-region
+ :grounding-fns #'robby-extract-fenced-text-in-prog-modes
+ :never-stream-p t)
 
 ;;;###autoload (autoload 'robby-prepend-region "robby-commands" "Query AI from region or entire buffer if no selected region, replace regoin with response." t)
 (robby-define-command
@@ -75,7 +79,7 @@ If prefix arg is supplied, confirm changes in a diff buffer
 before applying."
  :prompt #'robby-get-prompt-from-region
  :action #'robby-replace-region-with-response
- :grounding-fns #'robby-extract-fenced-text
+ :grounding-fns #'robby-extract-fenced-text-in-prog-modes
  :never-stream-p t)
 
 ;;; Commands to perform specific tasks

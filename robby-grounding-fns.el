@@ -16,6 +16,11 @@
           (buffer-substring-no-properties (+ beg 1) (- end 3))
         response))))
 
+(defun robby-extract-fenced-text-in-prog-modes (response)
+  (if (derived-mode-p 'prog-mode)
+      (robby-extract-fenced-text response)
+    response))
+
 (defun robby-format-message-text (response)
   "Replace % with %% in TEXT to avoid format string errors calling `message."
   (replace-regexp-in-string "%" "%%" response))
