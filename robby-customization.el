@@ -6,6 +6,8 @@
 
 ;;; Code:
 
+(require 'spinner)
+
 ;;; general settings
 (defcustom robby-openai-api-key #'robby--get-api-key-from-auth-source
   "OpenAI API key.
