@@ -109,7 +109,6 @@
    (when (zerop chars-processed)
      (goto-char (point-max))
      (insert "> " prompt "\n\n"))
-   ;; (goto-char (point-max))
    (insert text)
    (when (eq completep t)
      (insert robby--end-view-message)
