@@ -216,7 +216,7 @@ customization values."
   robby--chat-api-options ()
   "Chat API options."
   ["Chat API Options"
-   ("m" "model" "model=" :always-read t :choices (lambda (_a _b _c) (robby--models-for-api robby-models)))
+   ("m" "model" "model=" :always-read t :choices (lambda () (robby--models-for-api robby-models)))
    ("s" "suffix" "suffix=" :always-read t)
    ("t" "max tokens" "max-tokens=" :reader transient-read-number-N+ :always-read t)
    ("e" "temperature" "temperature=" :reader robby--read-decimal :always-read t)
