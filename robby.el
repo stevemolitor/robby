@@ -4,7 +4,7 @@
 ;; Package-Requires: ((emacs "28.1") (ert-async "0.1.2") (spinner "1.7.2") (transient "0.4.0") (markdown-mode "2.5")
 ;; Homepage: https://github.com/stevemolitor/robby
 
-;;; Commentary
+;;; Commentary:
 
 ;; Robby provides an extensible Emacs interface to OpenAI. It provides
 ;; basic commands to use OpenAI with regions, the minibuffer, and help
