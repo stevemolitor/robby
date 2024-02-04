@@ -12,6 +12,7 @@
 (require 'seq)
 
 (require 'robby-customization)
+(require 'robby-history)
 
 ;;; Code:
 
