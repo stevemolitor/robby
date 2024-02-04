@@ -78,7 +78,7 @@
   ;; replace without confirming
   (when (not arg)
     (if (eq chars-processed 0)
-        (delete-region beg end))
+        (delete-region beg (min end (point-max))))
     (goto-char (+ beg chars-processed))
     (insert text)))
 
