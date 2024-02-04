@@ -136,22 +136,22 @@ Emacs Lisp, do not print messages if SILENTP is t."
                               no-op-message
                               text
                               response-region)
-  (if completep
+  (when completep
       (robby--spinner-stop))
   (robby--log (format "# robby--handle-text, text:\n%S\ncompletep: %S, chars-processed %d" text completep chars-processed))
   (let ((beg (car response-region))
         (end (cdr response-region))
         (grounded-text (robby--ground-response text grounding-fns)))
-    (if completep
+    (when completep
         (robby--history-push basic-prompt text))
-    (if (and no-op-pattern (string-match-p no-op-pattern text))
+    (when (and no-op-pattern (string-match-p no-op-pattern text))
         (message (or no-op-message) "no action to perform")
       (apply
        action
        (map-merge
         'plist action-args
         `(:arg ,arg :text ,grounded-text :beg ,beg :end ,end :prompt ,basic-prompt :chars-processed ,chars-processed :completep ,completep))))
-    (if completep
+    (when completep
         (run-hooks 'robby-command-complete-hook))))
 
 (defun robby--handle-error (err)
@@ -160,7 +160,7 @@ Emacs Lisp, do not print messages if SILENTP is t."
          (log-msg (format "Error processing robby request: %s" err-msg)))
     (robby--log log-msg)
     (message log-msg))
-  (if (process-live-p robby--last-process)
+  (when (process-live-p robby--last-process)
       (robby-kill-last-process t)))
 
 (defun robby--parse-error-response (data)
