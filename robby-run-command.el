@@ -76,18 +76,17 @@ Return t if there is a last command."
          (api-options (plist-get options :api-options))
          (quoted-options `(:prompt
                            ,(if (functionp prompt) `#',prompt prompt)
-                           :prompt-args
-                           ',prompt-args
                            :action
-                           ,`#',action
-                           :action-args
-                           ',action-args
-                           :historyp
-                           ,historyp
-                           :api-options
-                           ',api-options))
-         (cmd `(robby-define-command ,name ,docstring ,@quoted-options)))
-    (robby--pp-cmd cmd)))
+                           ,`#',action)))
+    (when prompt-args
+      (setq quoted-options (plist-put quoted-options :prompt-args `',prompt-args)))
+    (when action-args
+      (setq quoted-options (plist-put quoted-options :action-args `',action-args)))
+    (when historyp
+      (setq quoted-options (plist-put quoted-options :historyp t)))
+    (when api-options
+      (setq quoted-options (plist-put quoted-options :api-options `',api-options)))
+    (robby--pp-cmd `(robby-define-command ,name ,docstring ,@quoted-options))))
 
 ;;; run command 
 (defun robby--process-running-p ()
