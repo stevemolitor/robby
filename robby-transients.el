@@ -72,14 +72,6 @@ values."
          (format "%s=%s" key (symbol-value var))))
      custom-variables)))
 
-(defun robby--get-transient-prompt ()
-  (let* ((args (transient-args transient-current-command))
-         (from-region-p (transient-arg-value "-fromregion" args))
-         (prompt (transient-arg-value "prompt=" args)))
-    (if from-region-p
-        #'robby-get-prompt-from-region
-      prompt)))
-
 (defun robby--run-transient-command (action &optional arg)
   (let* ((scope (or (oref transient-current-prefix scope) (robby--scope-default)))
          (api-options (robby--scope-api-options scope))
