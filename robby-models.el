@@ -41,6 +41,8 @@
                   (seq-map (lambda (obj) (cdr (assoc 'id obj))) (cdr (assoc 'data resp)))))
              (funcall on-success models))))))))
 
+(defvar robby-models nil)
+
 (defun robby--update-models (callback)
   "Update models from OpenAI."
   (robby--get-models

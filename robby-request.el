@@ -109,7 +109,6 @@ of parsed JSON objects: `(:remaining \"text\" :parsed '())'"
         (set-process-filter
          proc
          (lambda (_proc string)
-           ;; TODO error parsing seems wrong here - it's not expecting a string. Validate.
            (let ((error-msg (robby--request-parse-error-string string)))
              (if error-msg
                  (progn

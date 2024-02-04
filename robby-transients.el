@@ -149,20 +149,6 @@ values."
 
 ;;; API Related Suffixes
 (transient-define-suffix
-  robby--select-chat-suffix ()
-  "Select the Chat API."
-  :transient 'transient--do-exit
-  (interactive)
-  (robby--select-api :chat))
-
-(transient-define-suffix
-  robby--select-completions-suffix ()
-  "Select the Completions API."
-  :transient 'transient--do-exit
-  (interactive)
-  (robby--select-api :completions))
-
-(transient-define-suffix
   robby--apply-api-options ()
   :transient 'transient--do-exit
   (interactive)

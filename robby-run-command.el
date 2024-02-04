@@ -144,13 +144,14 @@ Emacs Lisp, do not print messages if SILENTP is t."
         (grounded-text (robby--ground-response text grounding-fns)))
     (when completep
         (robby--history-push basic-prompt text))
-    (when (and no-op-pattern (string-match-p no-op-pattern text))
+    (if (and no-op-pattern (string-match-p no-op-pattern text))
         (message (or no-op-message) "no action to perform")
-      (apply
-       action
-       (map-merge
-        'plist action-args
-        `(:arg ,arg :text ,grounded-text :beg ,beg :end ,end :prompt ,basic-prompt :chars-processed ,chars-processed :completep ,completep))))
+      (when (or completep (> (length grounded-text) 0))
+        (apply
+         action
+         (map-merge
+          'plist action-args
+          `(:arg ,arg :text ,grounded-text :beg ,beg :end ,end :prompt ,basic-prompt :chars-processed ,chars-processed :completep ,completep)))))
     (when completep
         (run-hooks 'robby-command-complete-hook))))
 
@@ -250,7 +251,6 @@ value overrides the `robby-stream' customization variable."
       (with-current-buffer response-buffer
         (robby-kill-last-process t)
         (robby--spinner-start)
-        ;; TODO can't kill url-retrieve process
         (setq robby--last-process
               (condition-case curl-err
                   (robby--request

@@ -90,13 +90,11 @@
   "Mode for viewing read-only OpenAI robby responses. Press `q` to quit.")
 
 (defmacro robby--with-robby-view (&rest body)
-  ;; TODO handle case when view buffer has no window
   `(let ((buf (get-buffer-create robby--view-buffer)))
      (with-current-buffer buf
        (if (not (window-live-p (get-buffer-window buf)))
            (display-buffer buf))
        (when (eq (point-max) 1)
-         ;; (display-buffer buf 'display-buffer-reuse-window)
          (robby-view-mode))
        (let ((inhibit-read-only t))
          ,@body))))
