@@ -1,5 +1,7 @@
 ;;; robby-actions-test.el  --- unit test for robby response handlers  -*- lexical-binding:t -*-
 
+(require 'ert)
+
 (require 'robby-actions)
 
 ;;; Code:

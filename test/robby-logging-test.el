@@ -1,5 +1,7 @@
 ;;; robby-logging-test.el  --- unit tests for robby logging functions  -*- lexical-binding:t -*-
 
+(require 'ert)
+
 (require 'robby-logging)
 
 ;;; Code:

@@ -1,5 +1,7 @@
 ;;; robby-utils-test.el  --- tests for robby utility functions -*- lexical-binding:t -*-
 
+(require 'ert)
+
 (require 'robby-utils)
 
 ;;; Code:

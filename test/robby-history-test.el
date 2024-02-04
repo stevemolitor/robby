@@ -2,6 +2,8 @@
 
 (require 'robby-history)
 
+(require 'robby-history)
+
 ;;; Code:
 
 (ert-deftest robby--history-push ()

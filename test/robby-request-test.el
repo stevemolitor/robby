@@ -1,5 +1,11 @@
+;;; robby-request-test.el  --- test robby request functions  -*- lexical-binding:t -*-
+
+(require 'ert)
+
 (require 'robby-request)
 (require 'robby-test-utils)
+
+;;; Code:
 
 (ert-deftest robby--curl-parse-response--streaming-response ()
   (let ((parsed (robby--curl-parse-response (robby--read-file-into-string "./fixtures/streaming-response-complete.txt") "" t)))
@@ -17,4 +23,4 @@
 
 (provide 'robby-request-test)
 
-
+;; robby-request-test.el ends here

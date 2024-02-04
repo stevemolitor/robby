@@ -1,5 +1,7 @@
 ;;; robby-test-env.el  --- setup Robby test environment for batch mode testing  -*- lexical-binding:t -*-
 
+(require 'ert)
+
 ;;; Code:
 
 (defconst robby--test-deps '(ert-async markdown-mode spinner))
