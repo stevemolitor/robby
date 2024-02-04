@@ -5,7 +5,7 @@
 ;;;###autoload
 (defvar robby-command-map
   (let ((map (make-sparse-keymap)))
-    (define-key map "r" 'robby)
+    (define-key map "b" 'robby-builder)
     (define-key map "a" 'robby-append-region)
     (define-key map "c" 'robby-save-command)
     (define-key map "d" 'robby-describe-code)

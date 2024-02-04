@@ -35,8 +35,6 @@
 (require 'robby-spinner)
 (require 'robby-transients)
 
-;;; keymap
-
 (provide 'robby)
 
 ;;; robby.el ends here
