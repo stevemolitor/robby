@@ -1,4 +1,4 @@
-;;; robby-history.el  --- robby OpenAI prompt / response history  -*- lexical-binding:t -*-
+;;; robby-history.el  --- robby OpenAI prompt/response history  -*- lexical-binding:t -*-
 
 ;;; Commentary:
 

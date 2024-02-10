@@ -21,7 +21,7 @@
 
 ;;; region actions
 (cl-defun robby-prepend-response-to-region (&key text beg chars-processed &allow-other-keys)
-  "Prepend AI response to region, or buffer if no selected region."
+  "Prepend AI response to region, or insert at point if no selected region."
   (when (eq chars-processed 0)
     (goto-char beg)
     (insert "\n"))
@@ -29,7 +29,7 @@
   (insert (format "%s" text)))
 
 (cl-defun robby-append-response-to-region (&key text end chars-processed completep &allow-other-keys)
-  "Append AI response to region, or buffer if no selected region."
+  "Append AI response to region, or insert at point if no selected region."
   (when (eq chars-processed 0)
     (goto-char end)
     (insert "\n"))
@@ -40,11 +40,11 @@
 (defvar-local robby--new-temp-buffer nil)
 
 (cl-defun robby-replace-region-with-response (&key arg text beg end chars-processed completep &allow-other-keys)
-  "Replace region with AI response, or buffer if no selected region."
+  "Replace region with AI response, or insert at point no selected region."
   
   ;; confirm before replacing
   (when arg
-    ;; first time:  capture current region text in old temp buffer
+    ;; first time: capture current region text in old temp buffer
     (when (eq chars-processed 0)
       (setq robby--old-temp-buffer (generate-new-buffer (format "*robby-old-temp-buffer--%s*" (buffer-name))))
       (setq robby--new-temp-buffer (generate-new-buffer (format "*robby-new-temp-buffer--%s*" (buffer-name))))

@@ -117,7 +117,7 @@ Emacs Lisp, do not print messages if SILENTP is t."
     (with-current-buffer response-buffer
       (if (use-region-p)
           (cons (region-beginning) (region-end))
-        (cons (point-min) (point-max))))))
+        (cons (point) (point))))))
 
 (defun robby--cleanup-process (err)
   (robby--log (format "# unexpected error in robby process: %S" err))
@@ -169,14 +169,6 @@ Emacs Lisp, do not print messages if SILENTP is t."
   (or (cdr (assoc 'message (assoc 'error data))) "unknown error"))
 
 (cl-defun robby--validate-args (&key arg action never-stream-p no-op-pattern grounding-fns)
-  ;; confirm before replacing entire buffer
-  (when (and (eq action 'robby-replace-region-with-response)
-             robby-confirm-whole-buffer-p
-             (not (use-region-p)))
-    (let ((proceedp (and robby-confirm-whole-buffer-p (yes-or-no-p "Overwrite entire buffer contents with response?"))))
-      (when (not proceedp)
-        (user-error "Select a region and then re-run robby command."))))
-
   (let ((streaming-on-p (not (or never-stream-p (not robby-stream-p)))))
     ;; no-op-pattern can only be used when streaming is off
     (when (and no-op-pattern streaming-on-p)

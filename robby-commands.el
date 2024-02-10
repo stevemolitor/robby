@@ -25,7 +25,7 @@
 ;;;###autoload (autoload 'robby-view-from-region "robby-commands" "Query AI from minibuffer, respond in robby-view-mode buffer." t)
 (robby-define-command
  robby-view-from-region
- "Query AI from minibuffer, respond in robby-view-mode buffer."
+ "Query AI from region, respond in robby-view-mode buffer."
  :prompt #'robby-get-prompt-from-region
  :action #'robby-respond-with-robby-view
  :action-args `(:response-buffer ,robby--view-buffer)

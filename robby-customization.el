@@ -29,7 +29,7 @@ A string, or a function that returns the API key."
   :group 'robby)
 
 (defcustom robby-max-history 2
-  "The maximum number of previous prompt / response pairs to keep in
+  "The maximum number of previous prompt/response pairs to keep in
 the conversation history."
   :type 'integer
   :group 'robby)
