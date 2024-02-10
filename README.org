@@ -8,18 +8,21 @@ Robby provides an extensible Emacs interface to OpenAI. It provides basic comman
 - Emacs 28.1 or higher
 - [[https://github.com/tkf/emacs-request][emacs-request]] version 0.0.1 or higher
 - [[https://github.com/Malabarba/spinner.el][spinner.el]] version 1.7.2 or higher
-- [[https://github.com/magit/transient][transient]] version 0.4.1 or higher.
+- [[https://github.com/magit/transient][transient]] version 0.5.3 or higher.
 
-  Note that the required transient version is more recent that the version included in Emacs 29 (0.4.0 vs 0.4.1). Robby requires a bug fix included in the 0.4.1 version of transient. 
+  Note that the required transient version is more recent than the version included in Emacs 29.
 * Installation
 ** API Key
 You need an [[https://platform.openai.com/account/api-keys][OpenAI API key]] to use ~robby~.  You can set ~robby-openai-api-key~ to the key, or set it to a function that returns the key. By default ~robby-openai-api-key~ is set to the function ~robby-get-api-key-from-auth-source~ which reads from =~/.authinfo=. You need to add a line to that file that looks like this:
 
 #+begin_src sh
-machine api.openai.com login apikey password OPENAI_API_KEY
+machine api.openai.com login API key password OPENAI_API_KEY
 #+end_src
 
-For instructions on using keys securely within Emacs using GPG see the "Mastering Emacs" article  [[https://www.masteringemacs.org/article/keeping-secrets-in-emacs-gnupg-auth-sources][Keeping Secrets in Emacs with GnuPG and Auth Sources]]. Robby will alternately decrypt and read the API key from the encrypted =~/.authinfo.gpg= if you have set that up. This is what I do.
+For instructions on using keys securely within Emacs using GPG see the
+"Mastering Emacs" article [[https://www.masteringemacs.org/article/keeping-secrets-in-emacs-gnupg-auth-sources][Keeping Secrets in Emacs with GnuPG and Auth Sources]].
+Robby will decrypt and read the API key from the encrypted =~/.authinfo.gpg= if
+you have set that up. This is what I do.
 ** Straight.el
 To install using ~straight.el~ add code like this to your Emacs initialization file:
 
@@ -27,7 +30,7 @@ To install using ~straight.el~ add code like this to your Emacs initialization f
 (use-package robby 
  :straight (:type git :host github :repo "stevemolitor/robby" :branch "main")
   :bind-keymap
-  ;; optionally bin a prefix key to the robby-command-map,
+  ;; optionally bind a prefix key to the robby-command-map,
   ;; default is "C-c C-r":
   ("s-r" . robby-command-map))
 #+end_src
@@ -36,70 +39,127 @@ To install using ~straight.el~ add code like this to your Emacs initialization f
 First install these packages via ~package-install~:
 - =emacs-request=
 - =spinner=
-- =transient= version =0.4.1= or higher
+- =transient= version =0.5.3= or higher
 *** Install
-Next, clone the ~robby~ repo and put its root diretory in your load path, set your api key, and optionally custom the keymap prefix key:
+Next, clone the ~robby~ repo and put its root directory in your load path, set your API key, and optionally custom the keymap prefix key:
 
 #+begin_src emacs-lisp
   (add-to-list 'load-path "~/path-to-robby")
   (require 'robby)
     (require 'robby)
   ;; optional, default is "C-c C-r":
-  (global-set-key (kbd "s-r") robby-command-map)
+(global-set-key (kbd "s-r") robby-command-map)
 #+end_src
 * Usage
-** Built In Commands
-robby comes with the following built-in commands:
+** Built-In Commands
+Robby comes with the following built-in commands:
 *** ~robby-message~
-Ask for a prompt in the minibuffer, send the prompt to OpenAI, display response in minibuffer. Maintain conversational history of previous prompts and responses, up to ~robby-max-history~ prompt / response pairs. 
-*** ~robby-prepend-region~
-Query AI from region, prefix region with response.
-If no selected region read prompt from buffer content.
-*** ~robby-append-region~
-Query AI from region, prefix region with response.
-If no selected region read prompt from buffer content.
-*** ~robby-replace-region~
-Query AI from region, prefix region with response.
-If no selected region read prompt from buffer content.
+Ask for a prompt in the minibuffer, send the prompt to OpenAI, and display the response in the minibuffer. Maintain conversational history of previous prompts and responses, up to ~robby-max-history~ prompt/response pairs.
+
+./images/message-response.png
+./images/message-prompt.png
+
 *** ~robby-view~
-Query AI from region, respond in read-only markdown view window. If no selected region
-read prompt from buffer content. Maintain conversational history of previous prompts and
-responses, up to ~robby-max-history~ prompt / response pairs.
+Query AI from region, respond in read-only markdown view window. If no selected region read prompt from buffer content. Maintain conversational history of previous prompts and responses, up to ~robby-max-history~ prompt/response pairs.
+
+./images/view-prompt.png
+
+./images/view-response.png
+
+You can refine the response by repeating the command:
+
+./view-prompt-2.png
+
+./view-response-2.png
+
+*** ~robby-view-from-region~
+Like ~robby-view~, but reads prompt from the current region, or the entire buffer if no active region. You can supply an optional prompt prefix from the minibuffer, to provide extra context or instructions.
+*** ~robby-prepend-region~
+Query AI from region, prefix selection region with response, or insert at point
+if no selected region. If no selected region read prompt from current buffer.
+You can supply an optional prompt prefix from the minibuffer, to provide extra
+context or instructions.
+*** ~robby-append-region~
+Query AI from region, prefix region with response, or insert at point if no
+selected region. If no selected region read prompt from current buffer. You can
+supply an optional prompt prefix from the minibuffer.
+*** ~robby-replace-region~
+Query AI from region, prefix region with response. If no selected region read
+prompt from current buffer. You can supply an optional prompt prefix from the minibuffer, to provide extra context or instructions.
+
+If prefix argument is supplied, robby will display the changes in a diff buffer
+and ask for confirmation before applying.
 ** Defining Custom Commands
-The interactive command ~robby-insert-last-command~ will prompt for a command name and doc string, and then insert Emacs lisp code that defines the command permanently. You can run commands like ~robby-replace-region~ repeatedly, experimenting with different prompts until you get one that works, and then save the results permanently for use as custom command. Here are some examples:
+Use the ~robby-define-command~ macro to define custom robby commands. Here is a simple example:
 
 #+begin_src emacs-lisp
-(robby-define-command
- robby-write-tests
- "Write some tests for the code in the region, append to region."
- :historyp nil
- :prompt "Write some unit tests for this code: "
- :action robby--append-response-after-region)
+(require 'cl-macs)
 
 (robby-define-command
- robby-add-comment
- "Write a documentation comment for the code in the selected region, prepending comment to the region."
- :historyp nil
- :prompt "Write a documentation comment for this code: "
- :action robby--prepend-response-to-region)
-
-(robby-define-command
- robby-fix-code
- "Fix the code in the selected region, replace region with fixed code."
- :historyp nil
- :prompt "Fix this code: "
- :action robby--replace-region-with-response)
-
-(robby-define-command
- robby-describe-code
- "Describe code in the selected region, show description in help window."
- :historyp nil
- :prompt "Describe the following code: "
- :action robby--show-response-in-help-window)
+ what-is-emacs
+ "Tell me what emacs is. Print response in minbuffer"
+ :prompt "What is emacs?"
+ :action (cl-function (lambda (&key text &allow-other-keys)
+                        (message text)))
+ :never-stream-p t)
 #+end_src
 
-You can then bind these commands to custom keys or add to the ~robby-keymap~.
-*** Custom Command Options
+The first argument is the name of the interactive command, the second is the docstring.
+
+The ~:prompt~ can either be a string or a function. If it's a string, that string
+is sent to OpenAI as the prompt. If it's a function, the result of calling that
+function is used as the prompt. The ~:action~ function does something with the
+response. We turn off streaming with ~:never-stream-p t~. (We'll talk about
+streaming responses below.)
+
+Here's a command that reads the prompt from the minibuffer, and responds in the minibuffer. It's a slightly simplified version of ~robby-message~:
+
+#+begin_src emacs-lisp
+(cl-defun get-prompt-from-minibuffer (&rest)
+  "Get Robby prompt from minibuffer."
+  (read-string "Request for AI overlords: "))
+
+(cl-defun respond-with-message (&key text &allow-other-keys)
+  "Print TEXT in minibuffer."
+  (message text))
+
+(robby-define-command
+ ask-ai
+ "Read prompt from minibuffer, print response to minibuffer "
+ :prompt #'get-prompt-from-minibuffer
+ :action #'respond-with-message
+ :never-stream-p t)
+#+end_src
+
+To handle streaming responses our action function needs to handle receiving the
+response in chunks. Here is an example of a command that streams the response
+after the selected region, or at the point if no region is selected:
+
+#+begin_src emacs-lisp
+(cl-defun stream-after-region (&key text beg end chars-processed &allow-other-keys)
+  "Stream response after region."
+  (goto-char (+ end chars-processed))
+  (insert text))
+
+(robby-define-command
+ append-response
+ "Read prompt from minibuffer, append response to selected region, or point if no region."
+ :prompt #'get-prompt-from-minibuffer
+ :action #'stream-after-region
+ :never-stream-p t)
+#+end_src
+
+With streaming responses, ~text~ is the current chunk. The action will be called
+repeatedly for each chunk received.
+
+The ~beg~ and ~end~ arguments are the start and end of the region when the command
+was invoked, or the point if no selected region. Note that robby commands are
+asynchronous, so the region or point may have changed by the time the response
+comes back.
+
+The ~:chars-processed~ argument records the number of characters previously
+received and processed, so you can calculate where to put the next chunk.
+** Custom Command Options
 You pass custom OpenAI API options in the ~:options~ property list when defining a custom command. For example this command sets the OpenAI  ~max_tokens~ property to ~2000~, just for this command:
 
 #+begin_src emacs-lisp
@@ -112,20 +172,53 @@ You pass custom OpenAI API options in the ~:options~ property list when defining
  :options '(:max-tokens 2000))
 #+end_src
 
+Here is the complete list of command options:
+**** Keyword Options
+***** PROMPT
+- Type: Function or string.
+- Description: If a function, the command will call it with the interactive prefix argument to obtain the prompt. If a string, it grabs the prompt from the region or the entire buffer context if no region, and prefixes the region text with the PROMPT string to build the prompt.
+***** ACTION
+- Type: Function.
+- Description: The function to invoke when the request is complete. The function is passed the response text and the selected region. Must be of the form ‘(TEXT BEG END)’.
+
+***** API-OPTIONS
+- Type: Property list.
+- Description: Options to pass to the OpenAI API. These options are merged with the customization options specified in either the ‘robby-chat-api’ or ‘robby-completions-api’ customization group.
+
+***** GROUNDING-FNS
+- Type: Not specified.
+- Description: Used to format the response from OpenAI before returning it. Only used if ‘NEVER-STREAM-P’ is true.
+
+***** NO-OP-PATTERN
+- Type: Regular expression.
+- Description: If the response matches this pattern, do not perform the action. Useful with prompts that instruct OpenAI to respond with a certain message if there is nothing to do.
+
+***** NO-OP-MESSAGE
+- Type: String (Optional).
+- Description: The message to display when NO-OP-PATTERN matches.
+
+***** HISTORYP
+- Type: Boolean.
+- Description: Include conversation history in the OpenAI request if true.
+
+***** NEVER-STREAM-P
+- Type: Boolean.
+- Description: Stream response if true. Overrides the ‘robby-stream’ customization variable if present.
+** Building Custom Commands with Robby Builder
+Running ~robby-builder~ (=C-c C-r b=)will bring up a transient menu to build and execute robby commands interactively. You can use this to tune your prompt, API options, and such. When you are satisfied with the result you can save the command via ~robby-insert-last-command~:
+
+./builder.png
+
+To see advanced options run ~transient-toggle-level-limit~ (=C-x a=), or [[https://magit.vc/manual/transient/Enabling-and-Disabling-Suffixes.html][set the transient level]]:
+
+./advanced-builder-options.png
+
+Press =A= in the builder to see a menu of chat api options. For example, you can select which chat model to use. The first time you customize the model from the builder robby will fetch the list of models available to your account:
+
+./builder-api-options.png
+
 * Customization
 Use ~customize-group~ | ~robby~ to see the various customization options. Here are a few important ones:
-- ~robby-api~ :: Which OpenAI api to use. "chat" and "completions" are supported.
 - ~robby-chat-api~ :: customization group with options to pass to the Chat API.
 - ~robby-chat-model~ :: the model to use with the Chat API, for example "gpt-4" or "gpt-3.5-turbo". 
-- ~robby-completions-api~ :: customization group with options to pass to the Chat API.
-- ~robby-completions-model~ :: the model to use with the Chat API, for example "text-davinci-003".
 - ~robby-chat-max-tokens~, ~robby-completions-max-tokens~ ::  The maximum number of tokens to return in the response. The Robby default is ~300~, but you may want to increase this for longer responses.
-* Demos
-** ~robby-prepend-region~
-[[./images/robby-prepend-region.gif]]
-** ~robby-replace-region~
- [[./images/robby-replace-region.gif]]
-** ~robby-append-region~
-[[./images/robby-append-region.gif]]
-** ~robby-message~ with Conversation History
-[[./images/robby-message.gif]]
