@@ -159,6 +159,22 @@ comes back.
 
 The ~:chars-processed~ argument records the number of characters previously
 received and processed, so you can calculate where to put the next chunk.
+
+You can use a grounding function to process the text response after receiving it from OpenAI, but before sending it to the action. This can help clean up responses before displaying them to the user. For example, robby provides a ~format-message-text~ grounding function to escape any =%= characters to avoid messing up the ~message~ function:
+
+#+begin_src emacs-lisp
+(defun robby-format-message-text (response)
+  "Replace % with %% in TEXT to avoid format string errors calling `message."
+  (replace-regexp-in-string "%" "%%" response))
+
+(robby-define-command
+ ask-ai
+ "Read prompt from minibuffer, print response to minibuffer "
+ :prompt #'get-prompt-from-minibuffer
+ :action #'respond-with-message
+ :never-stream-p t
+ :grounding-fns #'robby-format-message-text)
+#+end_src
 ** Custom Command Options
 You pass custom OpenAI API options in the ~:options~ property list when defining a custom command. For example this command sets the OpenAI  ~max_tokens~ property to ~2000~, just for this command:
 
