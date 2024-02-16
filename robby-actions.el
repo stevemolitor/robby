@@ -104,8 +104,8 @@
 (cl-defun robby-respond-with-robby-view (&key chars-processed prompt text completep &allow-other-keys)
   "Show TEXT in robby-view-mode buffer."
   (robby--with-robby-view
+   (goto-char (point-max))
    (when (zerop chars-processed)
-     (goto-char (point-max))
      (insert "> " prompt "\n\n"))
    (insert text)
    (when (eq completep t)
