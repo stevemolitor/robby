@@ -10,16 +10,10 @@
   "Get Robby prompt from minibuffer."
   (read-string "Request for AI overlords: "))
 
-(cl-defun robby-get-prompt-from-minibuffer-with-stop-message (&rest)
-  "Get Robby prompt from minibuffer, with instructions on how to quit."
-  (interactive)
-  (read-from-minibuffer
-   (concat "Request for AI overloards (" (propertize (substitute-command-keys "\\<global-map>\\[keyboard-quit]" t) 'face '(help-key-binding default)) " to stop): ")))
-
 (cl-defun robby--get-region-or-buffer-text (&optional buffer)
   "Get Robby prompt from buffer region.
 
-If no region return all text in buffer."
+If no selected region return all text in buffer."
   (with-current-buffer (or buffer (current-buffer))
     (if (use-region-p)
         (buffer-substring-no-properties (region-beginning) (region-end))

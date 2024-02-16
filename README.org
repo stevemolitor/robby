@@ -13,8 +13,15 @@ Robby provides an extensible Emacs interface to OpenAI. It provides basic comman
 - [[#usage][Usage]]
       - [[#built-in-commands][Built-In Commands]]
       - [[#building-custom-commands-with-robby-builder][Building Custom Commands with Robby Builder]]
-      - [[#defining-custom-commands][Defining Custom Commands]]
+- [[#defining-custom-commands][Defining Custom Commands]]
+      - [[#defining-simple-commands][Defining Simple Commands]]
+      - [[#handing-streaming-responses-in-custom-commands][Handing Streaming Responses in Custom Commands]]
+      - [[#grounding-functions][Grounding Functions]]
+      - [[#a-more-involved-example][A More Involved Example]]
       - [[#custom-command-options][Custom Command Options]]
+      - [[#built-in-prompt-functions][Built-in Prompt Functions]]
+      - [[#built-in-action-functions][Built-in Action Functions]]
+      - [[#built-in-grounding-functions][Built-in Grounding Functions]]
       - [[#example-custom-commands][Example Custom Commands]]
 - [[#customization][Customization]]
 
@@ -67,14 +74,14 @@ Next, clone the ~robby~ repo and put its root directory in your load path, set y
 * Usage
 ** Built-In Commands
 Robby comes with the following built-in commands:
-*** ~robby-message~
+*** robby-message
 Ask for a prompt in the minibuffer, send the prompt to OpenAI, and display the response in the minibuffer. Maintain conversational history of previous prompts and responses, up to ~robby-max-history~ prompt/response pairs.
 
 [[./images/message-prompt.png]]
 
 [[./images/message-response.png]]
 
-*** ~robby-view~
+*** robby-view
 Query AI from region, respond in read-only markdown view window. If no selected region read prompt from buffer content. Maintain conversational history of previous prompts and responses, up to ~robby-max-history~ prompt/response pairs.
 
 [[./images/view-prompt.png]]
@@ -87,18 +94,18 @@ You can refine the response by repeating the command:
 
 [[./images/view-response-2.png]]
 
-*** ~robby-view-from-region~
+*** robby-view-from-region
 Like ~robby-view~, but reads prompt from the current region, or the entire buffer if no active region. You can supply an optional prompt prefix from the minibuffer, to provide extra context or instructions.
-*** ~robby-prepend-region~
+*** robby-prepend-region
 Query AI from region, prefix selection region with response, or insert at point
 if no selected region. If no selected region read prompt from current buffer.
 You can supply an optional prompt prefix from the minibuffer, to provide extra
 context or instructions.
-*** ~robby-append-region~
+*** robby-append-region
 Query AI from region, prefix region with response, or insert at point if no
 selected region. If no selected region read prompt from current buffer. You can
 supply an optional prompt prefix from the minibuffer.
-*** ~robby-replace-region~
+*** robby-replace-region
 Query AI from region, prefix region with response. If no selected region read
 prompt from current buffer. You can supply an optional prompt prefix from the minibuffer, to provide extra context or instructions.
 
@@ -117,8 +124,8 @@ Press =A= in the builder to see a menu of chat api options. For example, you can
 
 [[./images/builder-api-options.png]]
 
-** Defining Custom Commands
-*** Defining Simple Commands
+* Defining Custom Commands
+** Defining Simple Commands
 Use the ~robby-define-command~ macro to define custom robby commands. Here is a simple example:
 
 #+begin_src emacs-lisp
@@ -160,7 +167,7 @@ Here's a command that reads the prompt from the minibuffer, and responds in the 
  :never-stream-p t)
 #+end_src
 
-*** Handing Streaming Responses in Custom Commands
+** Handing Streaming Responses in Custom Commands
 To handle streaming responses our action function needs to handle receiving the
 response in chunks. Here is an example of a command that streams the response
 after the selected region, or at the point if no region is selected:
@@ -190,7 +197,7 @@ comes back.
 The ~:chars-processed~ argument records the number of characters previously
 received and processed, so you can calculate where to put the next chunk.
 
-*** Grounding Functions
+** Grounding Functions
 You can use a grounding function to process the text response after receiving it from OpenAI, but before sending it to the action. This can help clean up responses before displaying them to the user. For example, robby provides a ~format-message-text~ grounding function to escape any =%= characters to avoid messing up the ~message~ function:
 
 #+begin_src emacs-lisp
@@ -210,7 +217,7 @@ You can use a grounding function to process the text response after receiving it
 The ~:grounding-fns~ option takes either a list of grounding functions which will
 be executed in order, or a single grounding function as shown above.
 
-*** A More Involved Example
+** A More Involved Example
 The prompt or action options can do more than just operate on the selected region. For example the ~robby-git-commit-message~ function invokes a shell command to get the list of staged changes in a git repository and generates a one line git commit message:
 
 #+begin_src emacs-lisp
@@ -231,7 +238,6 @@ The prompt or action options can do more than just operate on the selected regio
  :grounding-fns #'robby-remove-quotes
  :never-stream-p t)
 #+end_src
-
 ** Custom Command Options
 You pass custom OpenAI API options in the ~:options~ property list when defining a custom command. For example this command sets the OpenAI  ~max_tokens~ property to ~2000~, just for this command:
 
@@ -246,37 +252,89 @@ You pass custom OpenAI API options in the ~:options~ property list when defining
 #+end_src
 
 Here is the complete list of command options:
-**** Keyword Options
-***** PROMPT
-- Type: Function or string.
-- Description: If a function, the command will call it with the interactive prefix argument to obtain the prompt. If a string, it grabs the prompt from the region or the entire buffer context if no region, and prefixes the region text with the PROMPT string to build the prompt.
-***** ACTION
+*** prompt
+If a function, the command will call it with the interactive prefix argument to
+obtain the prompt. If a string, it grabs the prompt from the region or the
+entire buffer context if no region, and prefixes the region text with the PROMPT
+string to build the prompt.
+
+Prompt functions take the following keyword arguments:
+
+- ~arg~ - The prefix arg, if any, for the invoked command. 
+- ~prompt-prefix~ - String to prepend to the prompt.
+- ~prompt-suffix~ - String to append to the prompt.
+- ~prompt-buffer~ - The buffer to get prompt from. Usually this is the current buffer, but commands can specify other buffers.
+- ~never-ask-p~ - Prefix functions like ~robby-get-prompt-from-region~ ask the user for a prompt prefix before executing the command. Pass ~never-ask-p t~ to turn that behavior off.
+*** action
 - Type: Function.
 - Description: The function to invoke when the request is complete. The function is passed the response text and the selected region. Must be of the form ‘(TEXT BEG END)’.
 
-***** API-OPTIONS
-- Type: Property list.
+  Action function take the following keyword options:
+
+  - ~arg~ - The prefix arg, if any, for the invoked command. 
+  - ~text~ - The response text received from OpenAI. For streaming responses this will be the current chunk.
+  - ~beg~ - The beginning of the response region, an integer. This tells action functions where to start inserting or replacing text.
+  - ~end~ - The end position of the response region, an integer.
+  - ~chars-processed~ - For streaming responses, the number of characters already processed. Actions can use ~chars-processed~ + ~beg~ to calculate where to insert the next chunk.
+  - ~completep~ - For streaming responses, indicates if the response is complete. On the last chunk ~completep~ will be ~t~. 
+*** api-options
+- type: Property list.
 - Description: Options to pass to the OpenAI API. These options are merged with the customization options specified in either the ‘robby-chat-api’ or ‘robby-completions-api’ customization group.
 
-***** GROUNDING-FNS
+*** grounding-fns
 - Type: Not specified.
 - Description: Used to format the response from OpenAI before returning it. Only used if ‘NEVER-STREAM-P’ is true.
 
-***** NO-OP-PATTERN
+*** no-op-pattern
 - Type: Regular expression.
 - Description: If the response matches this pattern, do not perform the action. Useful with prompts that instruct OpenAI to respond with a certain message if there is nothing to do.
 
-***** NO-OP-MESSAGE
+*** no-op-message
 - Type: String (Optional).
 - Description: The message to display when NO-OP-PATTERN matches.
 
-***** HISTORYP
+*** historyp
 - Type: Boolean.
 - Description: Include conversation history in the OpenAI request if true.
 
-***** NEVER-STREAM-P
+*** never-stream-p
 - Type: Boolean.
 - Description: Stream response if true. Overrides the ‘robby-stream’ customization variable if present.
+** Built-in Prompt Functions
+*** ~robby-get-prompt-from-minibuffer~
+Get Robby prompt from minibuffer.
+*** ~robby--get-region-or-buffer-text~
+"Get robby prompt from buffer region. If no selected region return all text in buffer."
+*** ~robby-get-prompt-from-region~
+Get prompt from region, or entire buffer if no selected
+ region.
+
+If supplied PROMPT-PREFIX and/or PROMPT-PREFIX are prepended or
+appended to the buffer or region text to make the complete
+prompt.
+
+If there both PROMPT-PREFIX and PROMPT-SUFFIX are nil or not
+specified, prompt the user for a prompt prefix in the minibuffer.
+** Built-in Action Functions
+*** ~robby-respond-with-message~
+Show TEXT in minibuffer message.
+*** ~robby-prepend-response-to-region~
+Prepend AI response to region, or insert at point if no selected region.
+*** ~robby-append-response-to-region~
+Append AI response to region, or insert at point if no selected region.
+*** ~robby-replace-region-with-response~
+Replace region with AI response, or insert at point no selected region.
+*** ~robby-respond-with-robby-view~
+Show TEXT in robby-view-mode buffer.
+** Built-in Grounding Functions
+*** ~robby-extract-fenced-text~
+Extract the text between the first pair of fenced code blocks in RESPONSE.
+*** ~robby-extract-fenced-text-in-prog-modes~
+Extract the text between the first pair of fenced code blocks in RESPONSE if in a programming mode, else return RESPONSE.
+*** ~robby-format-message-text~
+Replace =%= with =%%= in TEXT to avoid format string errors calling ~message~.
+*** ~robby-remove-trailing-end-of-line~
+Remove the end of line character at the very end of a string if present.
 ** Example Custom Commands
 Robby includes a handful of example commands you can use as inspiration when creating your own commands. ~M-x robby-example-commands~ will display a transient menu for executing these commands:
 

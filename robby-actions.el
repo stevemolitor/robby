@@ -112,17 +112,6 @@
      (insert robby--end-view-message)
      (message "%s" (substitute-command-keys "Type \\<markdown-view-mode-map>\\[kill-this-buffer] to delete robby view")))))
 
-(cl-defun robby-respond-in-conversation (&key text prompt chars-processed completep &allow-other-keys)
-  "Show TEXT in help window, keep minibuffer open."
-  (robby--with-robby-view
-   (when (zerop chars-processed)
-     (goto-char (point-max))
-     (insert "> " prompt "\n\n"))
-   (insert text)
-   (when completep
-     (insert robby--end-view-message)
-     (setq unread-command-events (listify-key-sequence (kbd "M-x robby-conversation RET"))))))
-
 (provide 'robby-actions)
 
 ;;; robby-actions.el ends here

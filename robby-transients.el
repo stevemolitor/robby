@@ -215,6 +215,7 @@ customization values."
   ["Robby Example Commands"
    ("d" "describe code" robby-describe-code)
    ("f" "fix code" robby-fix-code)
+   ("g" "generate commit message from staged changes" robby-git-commit-message)
    ("o" "add comments" robby-add-comment)
    ("t" "write tests" robby-write-tests)
    ("s" "summarize text" robby-summarize)

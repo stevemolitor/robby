@@ -111,7 +111,7 @@ selected region, show description in robby view window."
 
 (robby-define-command
  robby-git-commit-message
- "Generate git commit message title."
+ "Generate git commit message title from staged changes."
  :prompt
  #'robby-get-prompt-from-git-diff
  :action

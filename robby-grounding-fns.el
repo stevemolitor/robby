@@ -9,6 +9,7 @@
 ;;; Code:
 
 (defun robby-extract-fenced-text (response)
+  "Extract the text between the first pair of fenced code blocks in RESPONSE."
   (with-temp-buffer
     (insert response)
     (goto-char (point-min))
@@ -19,6 +20,7 @@
         response))))
 
 (defun robby-extract-fenced-text-in-prog-modes (response)
+  "Extract the text between the first pair of fenced code blocks in RESPONSE if in a programming mode, else return RESPONSE."
   (if (derived-mode-p 'prog-mode)
       (robby-extract-fenced-text response)
     response))
