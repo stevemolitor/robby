@@ -209,23 +209,15 @@ customization values."
   [[("a" "apply options" robby--apply-api-options)]
    [("z" "reset to customization values" robby--reset-api-options)]])
 
-;;; Canned commands transient
-(transient-define-suffix
-  robby--canned-commands ()
-  :transient 'transient--do-exit
-  (interactive)
-  (transient-setup 'robby nil nil
-                   :scope new-scope
-                   :value robby-value))
-
 ;;;###autoload (autoload 'robby-commands "robby-transients" "Display menu of custom robby commands." t)
-(transient-define-prefix robby-commands ()
-  "Display menu of custom robby commands."
-  ["Robby Commands"
+(transient-define-prefix robby-example-commands ()
+  "Display menu for executing example robby commands."
+  ["Robby Example Commands"
    ("d" "describe code" robby-describe-code)
    ("f" "fix code" robby-fix-code)
    ("o" "add comments" robby-add-comment)
    ("t" "write tests" robby-write-tests)
+   ("s" "summarize text" robby-summarize)
    ("x" "proof read text" robby-proof-read)])
 
 ;;; Robby transient
@@ -254,8 +246,7 @@ customization values."
    ("d" "show diff preview before replacing region" "diff-preview" :reader robby--read-buffer :level 5)]
   ["Commands"
    ("u" "re-run last command" robby-run-last-command :level 4)
-   ("c" "insert last command" robby-insert-last-command :level 4)
-   ("m" "canned commands" robby-commands :level 6)]
+   ("c" "insert last command" robby-insert-last-command :level 4)]
   ["History" :description (lambda () (concat (propertize "History " 'face 'transient-heading) (propertize (format "(%d)" (length robby--history)) 'face 'transient-inactive-value)))
    ("h" "use history" "historyp" :level 5)
    ("l" "clear history" robby--clear-history-suffix :transient t :level 5)]

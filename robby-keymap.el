@@ -7,6 +7,7 @@
   (let ((map (make-sparse-keymap)))
     (define-key map "a" 'robby-append-region)
     (define-key map "b" 'robby-builder)
+    (define-key map "e" 'robby-example-commands)
     (define-key map "i" 'robby-insert-last-command)
     (define-key map "k" 'robby-kill-last-process)
     (define-key map "l" 'robby-clear-history)
@@ -18,12 +19,6 @@
     (define-key map "v" 'robby-view)
     (define-key map "w" 'robby-view-from-region)
 
-    (define-key map "d" 'robby-describe-code)
-    (define-key map "f" 'robby-fix-code)
-    (define-key map "j" 'robby-proof-read) 
-    (define-key map "o" 'robby-add-comment)
-    (define-key map "s" 'robby-summarize)
-    (define-key map "t" 'robby-write-tests)
     map)
   "Robby command map.")
 

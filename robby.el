@@ -31,6 +31,7 @@
 ;;; require files with exported / autoloaded commands or functions
 (require 'robby-commands)
 (require 'robby-customization)
+(require 'robby-example-commands)
 (require 'robby-keymap)
 (require 'robby-spinner)
 (require 'robby-transients)

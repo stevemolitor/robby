@@ -234,6 +234,30 @@ Here is the complete list of command options:
 ***** NEVER-STREAM-P
 - Type: Boolean.
 - Description: Stream response if true. Overrides the ‘robby-stream’ customization variable if present.
+** Example Custom Commands
+Robby includes a handful of example commands you can use as inspiration when creating your own commands. ~M-x robby-example-commands~ will display a transient menu for executing these commands:
+
+[[./images/example-commands-transient.png]]
+
+See [[https://github.com/stevemolitor/robby/blob/main/robby-example-commands.el][robby-example-commands.el]] for their definitions. You may want to copy and paste and then adjust the prompts to suite your needs, or use as inspiration for your own commands.
+
+Here is the list of example commands:
+*** ~robby-write-tests~
+Write some tests for the code in the region, append to region.
+*** ~robby-add-comment~
+Add a comment for the code in the selected region or buffer. Preview changes in
+a diff buffer when invoked with a prefix argument.
+*** ~robby-fix-code~
+Fix the code in the selected region. Preview changes in a diff buffer when
+invoked with a prefix argument.
+*** ~robby-proof-read-text~
+Proof read the text in the selected region. Preview changes in a diff buffer
+when invoked with a prefix argument.
+*** ~robby-describe-code~
+Describe code in the selected region, show description in robby view window.
+*** ~robby-summarize~
+Summarize the text in the selected region or entire buffer if no
+selected region, show description in robby view window.
 * Customization
 Use ~customize-group~ | ~robby~ to see the various customization options. Here are a few important ones:
 - ~robby-chat-api~ :: customization group with options to pass to the Chat API.
