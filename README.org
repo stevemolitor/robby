@@ -1,9 +1,23 @@
 #+TITLE:Robby: Extensible Emacs Interface to OpenAI
 
 [[./images/robby.png]]
-
-* Overview
+* About
 Robby provides an extensible Emacs interface to OpenAI. It provides basic commands to use OpenAI with regions, the minibuffer, and help windows. It also provides a mechanism for defining your own interactive AI commands, and to save the last executed command as a reusable custom AI command. 
+* Table of Contents :TOC:
+- [[#about][About]]
+- [[#requirements][Requirements]]
+- [[#installation][Installation]]
+      - [[#api-key][API Key]]
+      - [[#straightel][Straight.el]]
+      - [[#manual-installation][Manual Installation]]
+- [[#usage][Usage]]
+      - [[#built-in-commands][Built-In Commands]]
+      - [[#building-custom-commands-with-robby-builder][Building Custom Commands with Robby Builder]]
+      - [[#defining-custom-commands][Defining Custom Commands]]
+      - [[#custom-command-options][Custom Command Options]]
+      - [[#example-custom-commands][Example Custom Commands]]
+- [[#customization][Customization]]
+
 * Requirements
 - Emacs 28.1 or higher
 - [[https://github.com/tkf/emacs-request][emacs-request]] version 0.0.1 or higher
