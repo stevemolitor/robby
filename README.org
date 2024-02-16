@@ -118,6 +118,7 @@ Press =A= in the builder to see a menu of chat api options. For example, you can
 [[./images/builder-api-options.png]]
 
 ** Defining Custom Commands
+*** Defining Simple Commands
 Use the ~robby-define-command~ macro to define custom robby commands. Here is a simple example:
 
 #+begin_src emacs-lisp
@@ -159,6 +160,7 @@ Here's a command that reads the prompt from the minibuffer, and responds in the 
  :never-stream-p t)
 #+end_src
 
+*** Handing Streaming Responses in Custom Commands
 To handle streaming responses our action function needs to handle receiving the
 response in chunks. Here is an example of a command that streams the response
 after the selected region, or at the point if no region is selected:
@@ -188,6 +190,7 @@ comes back.
 The ~:chars-processed~ argument records the number of characters previously
 received and processed, so you can calculate where to put the next chunk.
 
+*** Grounding Functions
 You can use a grounding function to process the text response after receiving it from OpenAI, but before sending it to the action. This can help clean up responses before displaying them to the user. For example, robby provides a ~format-message-text~ grounding function to escape any =%= characters to avoid messing up the ~message~ function:
 
 #+begin_src emacs-lisp
@@ -203,6 +206,32 @@ You can use a grounding function to process the text response after receiving it
  :never-stream-p t
  :grounding-fns #'robby-format-message-text)
 #+end_src
+
+The ~:grounding-fns~ option takes either a list of grounding functions which will
+be executed in order, or a single grounding function as shown above.
+
+*** A More Involved Example
+The prompt or action options can do more than just operate on the selected region. For example the ~robby-git-commit-message~ function invokes a shell command to get the list of staged changes in a git repository and generates a one line git commit message:
+
+#+begin_src emacs-lisp
+(cl-defun robby-get-prompt-from-git-diff (&key prompt-prefix &allow-other-keys)
+  (let* ((dir (locate-dominating-file default-directory ".git"))
+         (diff (shell-command-to-string (format "cd %s && git diff --staged" dir))))
+    (format "%s\n%s" prompt-prefix diff)))
+
+(robby-define-command
+ robby-git-commit-message
+ "Generate git commit message title."
+ :prompt
+ #'robby-get-prompt-from-git-diff
+ :action
+ #'robby-prepend-response-to-region
+ :prompt-args
+ '(:prompt-prefix "For the following git diff, provide a concise and precise commit title capturing the essence of the changes in less than 50 characters.\n")
+ :grounding-fns #'robby-remove-quotes
+ :never-stream-p t)
+#+end_src
+
 ** Custom Command Options
 You pass custom OpenAI API options in the ~:options~ property list when defining a custom command. For example this command sets the OpenAI  ~max_tokens~ property to ~2000~, just for this command:
 
@@ -264,6 +293,8 @@ a diff buffer when invoked with a prefix argument.
 *** ~robby-fix-code~
 Fix the code in the selected region. Preview changes in a diff buffer when
 invoked with a prefix argument.
+*** ~robby-git-commit-message~
+Generate git commit message title from staged changes.
 *** ~robby-proof-read-text~
 Proof read the text in the selected region. Preview changes in a diff buffer
 when invoked with a prefix argument.

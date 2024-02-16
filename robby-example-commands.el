@@ -104,6 +104,23 @@ selected region, show description in robby view window."
  :api-options '(:max-tokens 2000)
  :grounding-fns #'robby-extract-fenced-text)
 
+(cl-defun robby-get-prompt-from-git-diff (&key prompt-prefix &allow-other-keys)
+  (let* ((dir (locate-dominating-file default-directory ".git"))
+         (diff (shell-command-to-string (format "cd %s && git diff --staged" dir))))
+    (format "%s\n%s" prompt-prefix diff)))
+
+(robby-define-command
+ robby-git-commit-message
+ "Generate git commit message title."
+ :prompt
+ #'robby-get-prompt-from-git-diff
+ :action
+ #'robby-prepend-response-to-region
+ :prompt-args
+ '(:prompt-prefix "For the following git diff, provide a concise and precise commit title capturing the essence of the changes in less than 50 characters.\n")
+ :grounding-fns #'robby-remove-quotes
+ :never-stream-p t)
+
 (provide 'robby-example-commands)
 
 ;; example-commands.el ends here

@@ -49,6 +49,11 @@
   (should (equal (robby-remove-trailing-end-of-line "No end of line character") "No end of line character"))
   (should (equal (robby-remove-trailing-end-of-line "") "")))
 
+(ert-deftest robby-remove-quotes ()
+  (should (equal (robby-remove-quotes "\"hi") "hi"))
+  (should (equal (robby-remove-quotes "hi\"") "hi"))
+  (should (equal (robby-remove-quotes "\"hi\"") "hi")))
+
 (provide 'robby-grounding-fns-test)
 
 ;; robby-grounding-fns-test.el ends here

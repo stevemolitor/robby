@@ -4,6 +4,8 @@
 
 ;; A robby grounding filters the response from AI before presenting it to the user.
 
+(require 'rx)
+
 ;;; Code:
 
 (defun robby-extract-fenced-text (response)
@@ -29,6 +31,11 @@
   "Remove the end of line character at the very end of a string if present."
   (replace-regexp-in-string "
 $" "" string))
+
+;;; use cl-defun to define a function that removes leading and trailing double quotes from a string, using rx
+(defun robby-remove-quotes (string)
+  "Remove leading and trailing double quotes from STRING."
+  (replace-regexp-in-string (rx "\"" eol) "" (replace-regexp-in-string (rx bol "\"") "" string)))
 
 (provide 'robby-grounding-fns)
 
