@@ -83,8 +83,6 @@
     (insert text)))
 
 ;;; robby-view
-(defvar robby--view-buffer "*robby*" "Buffer to view robby OpenAI responses.")
-
 (define-derived-mode robby-view-mode markdown-view-mode
   "robby"
   "Mode for viewing read-only OpenAI robby responses. Press `q` to quit.")
@@ -101,16 +99,22 @@
 
 (defconst robby--end-view-message "\n___\n")
 
-(cl-defun robby-respond-with-robby-view (&key chars-processed prompt text completep &allow-other-keys)
+(cl-defun robby-respond-with-robby-view (&key chars-processed prompt text completep response-buffer &allow-other-keys)
   "Show TEXT in robby-view-mode buffer."
-  (robby--with-robby-view
-   (goto-char (point-max))
-   (when (zerop chars-processed)
-     (insert "> " prompt "\n\n"))
-   (insert text)
-   (when (eq completep t)
-     (insert robby--end-view-message)
-     (message "%s" (substitute-command-keys "Type \\<markdown-view-mode-map>\\[kill-this-buffer] to delete robby view")))))
+  (display-buffer (get-buffer-create response-buffer) '(display-buffer-pop-up-window (dedicated . t)))
+  (if (not (window-live-p (get-buffer-window response-buffer)))
+      (display-buffer response-buffer '(display-buffer-pop-up-window (dedicated . t))))
+  (with-current-buffer response-buffer
+    (when (eq (point-max) 1)
+      (robby-view-mode))
+    (goto-char (point-max))
+    (let ((inhibit-read-only t))
+      (when (zerop chars-processed)
+        (insert "> " prompt "\n\n"))
+      (insert text)
+      (when (eq completep t)
+        (insert robby--end-view-message)
+        (message "%s" (substitute-command-keys "Type \\<markdown-view-mode-map>\\[kill-this-buffer] to delete robby view"))))))
 
 (provide 'robby-actions)
 

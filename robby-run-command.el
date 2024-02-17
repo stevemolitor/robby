@@ -135,15 +135,16 @@ Emacs Lisp, do not print messages if SILENTP is t."
                               no-op-pattern
                               no-op-message
                               text
+                              response-buffer
                               response-region)
   (when completep
-      (robby--spinner-stop))
+    (robby--spinner-stop))
   (robby--log (format "# robby--handle-text, text:\n%S\ncompletep: %S, chars-processed %d" text completep chars-processed))
   (let ((beg (car response-region))
         (end (cdr response-region))
         (grounded-text (robby--ground-response text grounding-fns)))
     (when completep
-        (robby--history-push basic-prompt text))
+      (robby--history-push basic-prompt text))
     (if (and no-op-pattern (string-match-p no-op-pattern text))
         (message (or no-op-message) "no action to perform")
       (when (or completep (> (length grounded-text) 0))
@@ -151,9 +152,9 @@ Emacs Lisp, do not print messages if SILENTP is t."
          action
          (map-merge
           'plist action-args
-          `(:arg ,arg :text ,grounded-text :beg ,beg :end ,end :prompt ,basic-prompt :chars-processed ,chars-processed :completep ,completep)))))
+          `(:arg ,arg :text ,grounded-text :response-buffer ,response-buffer :beg ,beg :end ,end :prompt ,basic-prompt :chars-processed ,chars-processed :completep ,completep)))))
     (when completep
-        (run-hooks 'robby-command-complete-hook))))
+      (run-hooks 'robby-command-complete-hook))))
 
 (defun robby--handle-error (err)
   (robby--spinner-stop)
@@ -236,8 +237,8 @@ value overrides the `robby-stream' customization variable."
 
     (robby--log (format "# Request body:\n%s\n" payload))
 
-    (if (not (window-live-p (get-buffer-window response-buffer)))
-        (display-buffer response-buffer))
+    ;; (if (not (window-live-p (get-buffer-window response-buffer)))
+    ;;     (display-buffer response-buffer))
 
     (with-undo-amalgamate
       (with-current-buffer response-buffer
@@ -264,6 +265,7 @@ value overrides the `robby-stream' customization variable."
                                :grounding-fns grounding-fns
                                :no-op-pattern no-op-pattern
                                :no-op-message no-op-message
+                               :response-buffer response-buffer
                                :response-region response-region
                                :text text))
                           (error (robby--handle-error err))))
