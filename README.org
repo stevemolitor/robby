@@ -61,8 +61,7 @@ To install using ~straight.el~ add code like this to your Emacs initialization f
   (robby-spinner-mode)
 
   ;; if you have defined custom robby commands:
-  ;; (eval-after-load "robby"
-  ;;   (load "path-to-my-custom-robby-commands.el"))
+  ;; (load "path-to-my-custom-robby-commands.el")
   )
 #+end_src
 ** Manual Installation
@@ -86,8 +85,7 @@ Next, clone the ~robby~ repo and put its root directory in your load path, set y
 (robby-spinner-mode)
 
 ;; if you have defined custom robby commands:
-;; (eval-after-load "robby"
-;;   (load "path-to-my-custom-robby-commands.el"))
+;; (load "path-to-my-custom-robby-commands.el")
 #+end_src
 * Usage
 ** Built-In Commands
@@ -130,8 +128,18 @@ prompt from current buffer. You can supply an optional prompt prefix from the mi
 If prefix argument is supplied, robby will display the changes in a diff buffer
 and ask for confirmation before applying.
 ** Conversation History
-Robby passes the conversation history of previous message to OpenAI. The ~robby-max-history~ customization variable specifices the maximum number of previous prompt/response pairs to keep in
-the conversation history. Its default is 2. Increasing this value will pass more history context to OpenAI, at the cost of using more tokens. Setting it to 0 to turn conversation history off.
+Robby passes the conversation history of previous message to OpenAI.
+Conversation history is local to the output buffer of the command. For most
+commands this is the current buffer, but for ~robby-view~ and
+~robby-view-from-region~ it is the ~*robby*~ robby view output buffer.
+
+Note that commands can opt out of conversation history by setting the ~historyp~
+option to ~nil~; See [[*Defining Custom Commands][Defining Custom Commands]] below.
+
+The ~robby-max-history~ customization variable specifices the maximum number of
+previous prompt/response pairs to keep in the conversation history. Its default
+is 2. Increasing this value will pass more history context to OpenAI, at the
+cost of using more tokens. Setting it to 0 to turn conversation history off.
 * Building Custom Commands with Robby Builder
 Running ~robby-builder~ (=C-c C-r b=)will bring up a transient menu to build and execute robby commands interactively. You can use this to tune your prompt, API options, and such. When you are satisfied with the result you can save the command via ~robby-insert-last-command~:
 
