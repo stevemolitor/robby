@@ -8,7 +8,7 @@
 
 ;;; Code:
 
-(defvar robby--history nil "AI Conversation history.")
+(defvar-local robby--history nil "AI Conversation history.")
 
 (defun robby-clear-history ()
   "Clear robby conversation history."
