@@ -24,6 +24,7 @@ Robby provides an extensible Emacs interface to OpenAI. It provides basic comman
       - [[#built-in-grounding-functions][Built-in Grounding Functions]]
       - [[#example-custom-commands][Example Custom Commands]]
 - [[#customization][Customization]]
+- [[#animated-gifs][Animated Gifs]]
 
 * Requirements
 - Emacs 28.1 or higher
@@ -366,3 +367,6 @@ Use ~customize-group~ | ~robby~ to see the various customization options. Here a
 - ~robby-chat-api~ :: customization group with options to pass to the Chat API.
 - ~robby-chat-model~ :: the model to use with the Chat API, for example "gpt-4" or "gpt-3.5-turbo". 
 - ~robby-chat-max-tokens~, ~robby-completions-max-tokens~ ::  The maximum number of tokens to return in the response. The Robby default is ~300~, but you may want to increase this for longer responses.
+* Animated Gifs
+Using ~robby-view~ with conversation history:
+[[./images/robby-view-video.mp4]]
