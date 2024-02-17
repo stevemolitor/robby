@@ -373,4 +373,4 @@ Use ~customize-group~ | ~robby~ to see the various customization options. Here a
 - ~robby-chat-max-tokens~, ~robby-completions-max-tokens~ ::  The maximum number of tokens to return in the response. The Robby default is ~300~, but you may want to increase this for longer responses.
 * Animated Gifs
 Using ~robby-view~ with conversation history:
-[[./images/robby-view-video.mp4]]
+[[./images/robby-view-video.gif]]
