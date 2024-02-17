@@ -34,7 +34,7 @@
   :global t
   :lighter robby-spinner-lighter
   :keymap robby-spinner-mode-map
-  ;; autoload built in command, robby transient when entering robby-spinner-mode
+  ;; autoload built in commands, robby transient when entering robby-spinner-mode
   (require 'robby-commands)
   (require 'robby-transients))
 
