@@ -101,10 +101,9 @@
 
 (cl-defun robby-respond-with-robby-view (&key chars-processed prompt text completep response-buffer &allow-other-keys)
   "Show TEXT in robby-view-mode buffer."
-  (display-buffer (get-buffer-create response-buffer) '(display-buffer-pop-up-window (dedicated . t)))
-  (if (not (window-live-p (get-buffer-window response-buffer)))
-      (display-buffer response-buffer '(display-buffer-pop-up-window (dedicated . t))))
   (with-current-buffer response-buffer
+    (when (not (window-live-p (get-buffer-window)))
+      (display-buffer (current-buffer) '(display-buffer-reuse-window . ((dedicated . t) (body-function . select-window)))))
     (when (eq (point-max) 1)
       (robby-view-mode))
     (goto-char (point-max))

@@ -12,7 +12,8 @@ Robby provides an extensible Emacs interface to OpenAI. It provides basic comman
       - [[#manual-installation][Manual Installation]]
 - [[#usage][Usage]]
       - [[#built-in-commands][Built-In Commands]]
-      - [[#building-custom-commands-with-robby-builder][Building Custom Commands with Robby Builder]]
+      - [[#conversation-history][Conversation History]]
+- [[#building-custom-commands-with-robby-builder][Building Custom Commands with Robby Builder]]
 - [[#defining-custom-commands][Defining Custom Commands]]
       - [[#defining-simple-commands][Defining Simple Commands]]
       - [[#handing-streaming-responses-in-custom-commands][Handing Streaming Responses in Custom Commands]]
@@ -112,7 +113,10 @@ prompt from current buffer. You can supply an optional prompt prefix from the mi
 
 If prefix argument is supplied, robby will display the changes in a diff buffer
 and ask for confirmation before applying.
-** Building Custom Commands with Robby Builder
+** Conversation History
+Robby passes the conversation history of previous message to OpenAI. The ~robby-max-history~ customization variable specifices the maximum number of previous prompt/response pairs to keep in
+the conversation history. Its default is 2. Increasing this value will pass more history context to OpenAI, at the cost of using more tokens. Setting it to 0 to turn conversation history off.
+* Building Custom Commands with Robby Builder
 Running ~robby-builder~ (=C-c C-r b=)will bring up a transient menu to build and execute robby commands interactively. You can use this to tune your prompt, API options, and such. When you are satisfied with the result you can save the command via ~robby-insert-last-command~:
 
 [[./images/builder.png]]

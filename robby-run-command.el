@@ -112,12 +112,11 @@ Emacs Lisp, do not print messages if SILENTP is t."
     (if (not silentp)
         (message "no robby process associated with current buffer"))))
 
-(defun robby--get-response-region (action-args)
-  (let ((response-buffer (or (plist-get action-args :response-buffer) (current-buffer))))
-    (with-current-buffer response-buffer
-      (if (use-region-p)
-          (cons (region-beginning) (region-end))
-        (cons (point) (point))))))
+(defun robby--get-response-region (response-buffer action-args)
+  (with-current-buffer response-buffer
+    (if (use-region-p)
+        (cons (region-beginning) (region-end))
+      (cons (point) (point)))))
 
 (defun robby--cleanup-process (err)
   (robby--log (format "# unexpected error in robby process: %S" err))
@@ -231,15 +230,12 @@ value overrides the `robby-stream' customization variable."
          (request-input (robby--request-input basic-prompt historyp))
          (payload (append request-input (robby--options api-options)))
          (response-buffer (get-buffer-create (or (plist-get action-args :response-buffer) (current-buffer))))
-         (response-region (robby--get-response-region action-args))
+         (response-region (robby--get-response-region response-buffer action-args))
          (streamp (and (not never-stream-p) robby-stream-p))
          (chars-processed 0))
 
     (robby--log (format "# Request body:\n%s\n" payload))
-
-    ;; (if (not (window-live-p (get-buffer-window response-buffer)))
-    ;;     (display-buffer response-buffer))
-
+    
     (with-undo-amalgamate
       (with-current-buffer response-buffer
         (robby-kill-last-process t)
