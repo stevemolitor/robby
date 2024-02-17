@@ -29,9 +29,8 @@ Robby provides an extensible Emacs interface to OpenAI. It provides basic comman
 
 * Requirements
 - Emacs 28.1 or higher
-- [[https://github.com/tkf/emacs-request][emacs-request]] version 0.0.1 or higher
-- [[https://github.com/Malabarba/spinner.el][spinner.el]] version 1.7.2 or higher
 - [[https://github.com/magit/transient][transient]] version 0.5.3 or higher.
+- [[https://github.com/Malabarba/spinner.el][spinner.el]] (optional) version 1.7.2 or higher
 
   Note that the required transient version is more recent than the version included in Emacs 29.
 * Installation
@@ -51,27 +50,44 @@ To install using ~straight.el~ add code like this to your Emacs initialization f
 
 #+begin_src emacs-lisp
 (use-package robby 
- :straight (:type git :host github :repo "stevemolitor/robby" :branch "main")
+  :straight (:type git :host github :repo "stevemolitor/robby" :branch "main")
   :bind-keymap
   ;; optionally bind a prefix key to the robby-command-map,
   ;; default is "C-c C-r":
-  ("s-r" . robby-command-map))
+  ("s-r" . robby-command-map)
+  
+  :config
+  ;; show a spinner in the modeline when waiting, requires spinner.el
+  (robby-spinner-mode)
+
+  ;; if you have defined custom robby commands:
+  ;; (eval-after-load "robby"
+  ;;   (load "path-to-my-custom-robby-commands.el"))
+  )
 #+end_src
 ** Manual Installation
 *** Prerequisites
 First install these packages via ~package-install~:
-- =emacs-request=
-- =spinner=
+- =spinner= (optional)
 - =transient= version =0.5.3= or higher
 *** Install
 Next, clone the ~robby~ repo and put its root directory in your load path, set your API key, and optionally custom the keymap prefix key:
 
 #+begin_src emacs-lisp
-  (add-to-list 'load-path "~/path-to-robby")
-  (require 'robby)
-    (require 'robby)
-  ;; optional, default is "C-c C-r":
+(add-to-list 'load-path "~/path-to-robby")
+(require 'robby)
+(require 'robby)
+
+;; optionally bind a prefix key to the robby-command-map,
+;; default is "C-c C-r":
 (global-set-key (kbd "s-r") robby-command-map)
+
+;; show a spinner in the modeline when waiting, requires spinner.el
+(robby-spinner-mode)
+
+;; if you have defined custom robby commands:
+;; (eval-after-load "robby"
+;;   (load "path-to-my-custom-robby-commands.el"))
 #+end_src
 * Usage
 ** Built-In Commands
