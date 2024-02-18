@@ -168,15 +168,26 @@ Emacs Lisp, do not print messages if SILENTP is t."
   "Parse raw error response from DATA and try to return descriptive message."
   (or (cdr (assoc 'message (assoc 'error data))) "unknown error"))
 
-(cl-defun robby--validate-args (&key arg action never-stream-p no-op-pattern grounding-fns)
+(cl-defun robby--get-stream-p (&key never-stream-p no-op-pattern grounding-fns)
   (let ((streaming-on-p (not (or never-stream-p (not robby-stream-p)))))
-    ;; no-op-pattern can only be used when streaming is off
-    (when (and no-op-pattern streaming-on-p)
-      (user-error "NO-OP-PATTERN can only be when streaming is off. Add `:never-stream-p t` to your command definition."))
+    (cond
+     ;; no-op-pattern can only be used when streaming is off
+     ((and no-op-pattern streaming-on-p) nil)
 
-    ;; grounding-fns only make sense when streaming is off
-    (when (and grounding-fns streaming-on-p)
-      (user-error "GROUNDING-FNS can only be when streaming is off. Add `:never-stream-p t` to your command definition."))))
+     ;; grounding-fns only make sense when streaming is off
+     ((and grounding-fns streaming-on-p) nil)
+
+     ;; otherwise, use the what is specified by never-stream-p or the robby-stream-p customization variable
+     (t streaming-on-p))))
+
+(defun robby--get-response-buffer (action action-args)
+  (or
+   ;; use the response buffer specified in the action-args if supplied 
+   (plist-get action-args :response-buffer)
+   ;; make sure robby views use the robby view buffer unless otherwise specified:
+   (and (eq action 'robby-respond-with-robby-view) "*robby*")
+   ;; default to current buffer
+   (current-buffer)))
 
 (cl-defun robby-run-command (&key arg prompt prompt-args action action-args api-options grounding-fns no-op-pattern no-op-message historyp never-stream-p)
   "Run a command using OpenAI.
@@ -218,8 +229,6 @@ HISTORYP indicates whether or not to use conversation history.
 
 NEVER-STREAM-P - Never stream response if t. if present this
 value overrides the `robby-stream' customization variable."
-  (robby--validate-args :arg arg :action action :never-stream-p never-stream-p :no-op-pattern no-op-pattern :grounding-fns grounding-fns)
-  
   ;; save command history
   (robby--save-last-command-options
    :arg arg :prompt prompt :prompt-args prompt-args :action action :action-args action-args :historyp historyp :api-options api-options :never-stream-p never-stream-p)
@@ -229,9 +238,9 @@ value overrides the `robby-stream' customization variable."
          (basic-prompt (robby--format-prompt prompt-result))
          (request-input (robby--request-input basic-prompt historyp))
          (payload (append request-input (robby--options api-options)))
-         (response-buffer (get-buffer-create (or (plist-get action-args :response-buffer) (current-buffer))))
+         (response-buffer (get-buffer-create (robby--get-response-buffer action action-args)))
          (response-region (robby--get-response-region response-buffer action-args))
-         (streamp (and (not never-stream-p) robby-stream-p))
+         (streamp (robby--get-stream-p :never-stream-p never-stream-p :no-op-pattern no-op-pattern :grounding-fns grounding-fns))
          (chars-processed 0))
 
     (robby--log (format "# Request body:\n%s\n" payload))
