@@ -4,7 +4,7 @@
 
 ;; Example Robby commands defined using `define-robby-command'.
 
-(require 'robby-run-command)
+(require 'robby-define-command)
 (require 'robby-prompts)
 (require 'robby-actions)
 (require 'robby-grounding-fns)
