@@ -181,13 +181,20 @@ Emacs Lisp, do not print messages if SILENTP is t."
      (t streaming-on-p))))
 
 (defun robby--get-response-buffer (action action-args)
-  (or
-   ;; use the response buffer specified in the action-args if supplied 
-   (plist-get action-args :response-buffer)
-   ;; make sure robby views use the robby view buffer unless otherwise specified:
-   (and (eq action 'robby-respond-with-robby-view) "*robby*")
-   ;; default to current buffer
-   (current-buffer)))
+  (let ((response-buffer (plist-get action-args :response-buffer)))
+    (cond
+     ;; use the response buffer specified in the action-args if supplied
+     (response-buffer
+      response-buffer)
+
+     ;; make sure robby views use the robby view buffer unless otherwise specified:
+     ((or (eq action 'robby-respond-with-robby-view)
+          (eq action 'robby-respond-with-robby-view-without-prompt))
+      "*robby*")
+
+     ;; default to current buffer
+     (t
+      (current-buffer)))))
 
 (cl-defun robby-run-command (&key arg prompt prompt-args action action-args api-options grounding-fns no-op-pattern no-op-message historyp never-stream-p)
   "Run a command using OpenAI.
