@@ -57,8 +57,13 @@ To install using ~straight.el~ add code like this to your Emacs initialization f
   ("s-r" . robby-command-map)
   
   :config
+  ;; optional configuration:
+  
   ;; show a spinner in the modeline when waiting, requires spinner.el
-  (robby-spinner-mode)
+  (robby-spinner-mode) 
+
+  ;; shorten the robby-spinner-mode modeline lighter to just the spinner
+  (setq robby-spinner-lighter '((:eval (spinner-print robby--spinner))))
 
   ;; if you have defined custom robby commands:
   ;; (load "path-to-my-custom-robby-commands.el")
@@ -83,6 +88,9 @@ Next, clone the ~robby~ repo and put its root directory in your load path, set y
 
 ;; show a spinner in the modeline when waiting, requires spinner.el
 (robby-spinner-mode)
+
+;; shorten the robby-spinner-mode modeline lighter to just the spinner
+(setq robby-spinner-lighter '((:eval (spinner-print robby--spinner))))
 
 ;; if you have defined custom robby commands:
 ;; (load "path-to-my-custom-robby-commands.el")
