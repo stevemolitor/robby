@@ -66,7 +66,7 @@ Preview changes in a diff buffer when invoked with a prefix argument."
  :historyp nil
  :prompt #'robby-get-prompt-from-region
  :prompt-args '(:prompt-prefix
-                "Please proof read the text delimited by triple backticks. Preserve the original formatting including line breaks or end of line characters.\n```"
+                "Please proof read the text delimited by triple backticks. Preserve the original formatting including line breaks or end of line characters Just respond with the corrected text only, nothing else.\n```"
                 :prompt-suffix
                 "```")
  :action #'robby-replace-region-with-response
