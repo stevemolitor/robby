@@ -28,10 +28,9 @@ Robby provides an extensible Emacs interface to OpenAI. It provides basic comman
 - [[#animated-gifs][Animated Gifs]]
 
 * Requirements
-- Emacs 28.1 or higher
+- Emacs 29.1 or higher
 - [[https://github.com/magit/transient][transient]] version 0.5.3 or higher.
-- [[https://github.com/Malabarba/spinner.el][spinner.el]] (optional) version 1.7.2 or higher
-
+- [[https://github.com/Malabarba/spinner.el][spinner.el]]  version 1.7.2 or higher
   Note that the required transient version is more recent than the version included in Emacs 29.
 * Installation
 ** API Key
@@ -59,7 +58,7 @@ To install using ~straight.el~ add code like this to your Emacs initialization f
   :config
   ;; optional configuration examples:
   
-  ;; show a spinner in the modeline when waiting, requires spinner.el
+  ;; show a spinner in the modeline when waiting
   (robby-spinner-mode) 
 
   ;; shorten the robby-spinner-mode modeline lighter to just the spinner
@@ -78,7 +77,7 @@ To install using ~straight.el~ add code like this to your Emacs initialization f
 ** Manual Installation
 *** Prerequisites
 First install these packages via ~package-install~:
-- =spinner= (optional)
+- =spinner=
 - =transient= version =0.5.3= or higher
 *** Install
 Next, clone the ~robby~ repo and put its root directory in your load path, set your API key, and optionally custom the keymap prefix key:
@@ -94,7 +93,7 @@ Next, clone the ~robby~ repo and put its root directory in your load path, set y
 
 ;;; optional configuration examples:
 
-;; show a spinner in the modeline when waiting, requires spinner.el
+;; show a spinner in the modeline when waiting
 (robby-spinner-mode)
 
 ;; shorten the robby-spinner-mode modeline lighter to just the spinner
