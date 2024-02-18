@@ -80,7 +80,7 @@ Preview changes in a diff buffer when invoked with a prefix argument."
  :prompt #'robby-get-prompt-from-region
  :prompt-args '(:prompt-prefix
                 "Describe this code:\n")
- :action #'robby-respond-with-robby-view
+ :action #'robby-respond-with-robby-view-without-prompt
  :action-args `(:response-buffer "*robby*")
  :api-options '(:max-tokens 2000))
 
@@ -90,15 +90,13 @@ Preview changes in a diff buffer when invoked with a prefix argument."
  "Summarize the text in the selected region or entire buffer if no
 selected region, show description in robby view window."
  :historyp nil
- :never-stream-p t
  :prompt #'robby-get-prompt-from-region
  :prompt-args '(:prompt-prefix
                 "Briefly summarize the text delimited by triple backticks.\n```"
                 :prompt-suffix
                 "```")
- :action #'robby-respond-with-robby-view
- :api-options '(:max-tokens 2000)
- :grounding-fns #'robby-extract-fenced-text)
+ :action #'robby-respond-with-robby-view-without-prompt
+ :api-options '(:max-tokens 2000))
 
 (cl-defun robby-get-prompt-from-git-diff (&key prompt-prefix &allow-other-keys)
   (let* ((dir (locate-dominating-file default-directory ".git"))
