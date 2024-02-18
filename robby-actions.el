@@ -89,21 +89,29 @@
 
 (defconst robby--end-view-message "\n___\n")
 
-(cl-defun robby-respond-with-robby-view (&key chars-processed prompt text completep response-buffer &allow-other-keys)
-  "Show TEXT in robby-view-mode buffer."
+(cl-defun robby--show-robby-view (&key show-prompt-p chars-processed prompt text completep response-buffer &allow-other-keys)
+  "Show PROMPT and TEXT in robby-view-mode buffer."
   (with-current-buffer response-buffer
-    (when (not (window-live-p (get-buffer-window)))
+    (when (and (eq chars-processed 0) (not (window-live-p (get-buffer-window))))
       (display-buffer (current-buffer) '(display-buffer-reuse-window . ((dedicated . t) (body-function . select-window)))))
     (when (eq (point-max) 1)
       (robby-view-mode))
     (goto-char (point-max))
     (let ((inhibit-read-only t))
-      (when (zerop chars-processed)
+      (when (and show-prompt-p (zerop chars-processed))
         (insert "> " prompt "\n\n"))
       (insert text)
       (when (eq completep t)
         (insert robby--end-view-message)
         (message "%s" (substitute-command-keys "Type \\<markdown-view-mode-map>\\[kill-this-buffer] to delete robby view"))))))
+
+(cl-defun robby-respond-with-robby-view (&key chars-processed prompt text completep response-buffer &allow-other-keys)
+  "Show PROMPT and TEXT in robby-view-mode buffer."
+  (robby--show-robby-view :show-prompt-p t :chars-processed chars-processed :prompt prompt :text text :completep completep :response-buffer response-buffer))
+
+(cl-defun robby-respond-with-robby-view-without-prompt (&key chars-processed prompt text completep response-buffer &allow-other-keys)
+  "Show PROMPT and TEXT in robby-view-mode buffer."
+  (robby--show-robby-view :show-prompt-p nil :chars-processed chars-processed :prompt prompt :text text :completep completep :response-buffer response-buffer))
 
 (provide 'robby-actions)
 
