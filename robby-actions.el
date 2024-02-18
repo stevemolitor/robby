@@ -87,16 +87,6 @@
   "robby"
   "Mode for viewing read-only OpenAI robby responses. Press `q` to quit.")
 
-(defmacro robby--with-robby-view (&rest body)
-  `(let ((buf (get-buffer-create robby--view-buffer)))
-     (with-current-buffer buf
-       (if (not (window-live-p (get-buffer-window buf)))
-           (display-buffer buf))
-       (when (eq (point-max) 1)
-         (robby-view-mode))
-       (let ((inhibit-read-only t))
-         ,@body))))
-
 (defconst robby--end-view-message "\n___\n")
 
 (cl-defun robby-respond-with-robby-view (&key chars-processed prompt text completep response-buffer &allow-other-keys)
