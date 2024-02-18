@@ -34,8 +34,7 @@
  :prompt-args '(:prompt-prefix
                 "The file extension for this code is \"%e\". First, determine the programming language based on the file extension. Then, write a documentation comment for the code delimted by triple backticks, formatted with the appropriate comment delimeters for the programming language, and based on the type of thing it is - code block, function definition, class definition, etc. Return the entire comment inside a markdown code fence, delimited by triple backticks. Here is the code: ```"
                 :prompt-suffix "```")
- :action #'robby-prepend-response-to-region
- :grounding-fns #'(robby-extract-fenced-text robby-remove-trailing-end-of-line))
+ :action #'robby-prepend-response-to-region)
 
 ;;;###autoload (autoload 'robby-fix-code "robby-commands" "Fix code in region." t)
 (robby-define-command
@@ -78,15 +77,12 @@ Preview changes in a diff buffer when invoked with a prefix argument."
  robby-describe-code
  "Describe code in the selected region, show description in robby view window."
  :historyp nil
- :never-stream-p t
  :prompt #'robby-get-prompt-from-region
  :prompt-args '(:prompt-prefix
-                "Describe the code delimited by triple backticks.\n```"
-                :prompt-suffix
-                "```")
+                "Describe this code:\n")
  :action #'robby-respond-with-robby-view
- :api-options '(:max-tokens 2000)
- :grounding-fns #'robby-extract-fenced-text)
+ :action-args `(:response-buffer "*robby*")
+ :api-options '(:max-tokens 2000))
 
 ;;;###autoload (autoload 'robby-summarize "robby-commands" "Summarize text." t)
 (robby-define-command
