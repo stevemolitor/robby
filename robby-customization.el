@@ -8,8 +8,11 @@
 
 (require 'spinner)
 
+(declare-function robby--get-api-key-from-auth-source "robby-request" ())
+(declare-function robby-make-prompt-spec "robby-utils" (file-name file-ext))
+
 ;;; general settings
-(defcustom robby-openai-api-key #'robby--get-api-key-from-auth-source
+(defcustom robby-openai-api-key #'robby--get-api-key-from-auth-source 
   "OpenAI API key.
 
 A string, or a function that returns the API key."

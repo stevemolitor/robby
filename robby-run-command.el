@@ -238,7 +238,7 @@ NEVER-STREAM-P - Never stream response if t. If present this
 value overrides the `robby-stream' customization variable."
   ;; save command history
   (robby--save-last-command-options
-   :arg arg :prompt prompt :prompt-args prompt-args :action action :action-args action-args :historyp historyp :api-options api-options :never-stream-p never-stream-p)
+   :prompt prompt :prompt-args prompt-args :action action :action-args action-args :historyp historyp :api-options api-options :never-stream-p never-stream-p)
 
   (let* ((prompt-args-with-arg (map-merge 'plist prompt-args `(:arg ,arg)))
          (prompt-result (if (functionp prompt) (apply prompt prompt-args-with-arg) (format "%s" prompt)))
