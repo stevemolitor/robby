@@ -7,7 +7,6 @@
 (require 'spinner)
 
 (require 'robby-customization)
-(require 'robby-keymap)
 
 ;;; Code:
 
@@ -20,7 +19,7 @@
 
 (defun robby--spinner-start ()
   "Start spinner for current buffer."
-  (when (bound-and-true-p robby-spinner-mode)
+  (when (bound-and-true-p robby-mode)
     (setq robby--spinner (robby--create-spinner))
     (spinner-start robby--spinner)))
 
@@ -42,16 +41,6 @@ Use in a custom modeline format like this:
           (if robby--spinner
               (spinner-print robby--spinner)
             "")))
-
-;;;###autoload
-(define-minor-mode robby-spinner-mode
-  "Minor mode for robby commands."
-  :global t
-  :lighter (:eval (robby-spinner-modeline))
-  :keymap robby-spinner-mode-map
-  ;; autoload built in commands, robby transient when entering robby-spinner-mode
-  (require 'robby-commands)
-  (require 'robby-transients))
 
 (provide 'robby-spinner)
 

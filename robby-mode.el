@@ -1,4 +1,11 @@
-;;; robby-keymap.el  --- robby keymaps  -*- lexical-binding:t -*-
+;;; robby-mode.el  --- robby-mode minor mode  -*- lexical-binding:t -*-
+
+;;; Commentary:
+
+;; Provides robby-minor-mode. This mode binds the default robby keybindings,
+;; and adds a robby spinner lighter.
+
+(require 'robby-spinner)
 
 ;;; Code:
 
@@ -33,11 +40,21 @@
 (defvar robby-keymap-prefix (kbd "C-c C-r"))
 
 ;;;###autoload
-(defvar robby-spinner-mode-map
+(defvar robby-mode-map
   (let ((map (make-sparse-keymap)))
     (define-key map robby-keymap-prefix robby-command-map)
     map))
 
-(provide 'robby-keymap)
+;;;###autoload
+(define-minor-mode robby-mode
+  "Minor mode for running robby commands."
+  :global t
+  :lighter (:eval (robby-spinner-modeline))
+  :keymap robby-mode-map
+  ;; autoload built in commands, robby transient when entering robby-mode
+  (require 'robby-commands)
+  (require 'robby-transients))
 
-;; robby-keymap.el ends here
+(provide 'robby-mode)
+
+;; robby-mode.el ends here

@@ -28,7 +28,7 @@ Robby provides an extensible Emacs interface to OpenAI. It provides basic comman
 - [[#animated-gifs][Animated Gifs]]
 
 * Requirements
-- Emacs 29.1 or higher
+- Emacs 29.1 or higherh
 - [[https://github.com/magit/transient][transient]] version 0.5.3 or higher.
 - [[https://github.com/Malabarba/spinner.el][spinner.el]]  version 1.7.2 or higher
   Note that the required transient version is more recent than the version included in Emacs 29.
@@ -56,14 +56,11 @@ To install using ~straight.el~ add code like this to your Emacs initialization f
   ("s-r" . robby-command-map)
   
   :config
+  ;; add default keybindings, show a spinner in the modeline when waiting:
+  (robby-mode) 
+
   ;; optional configuration examples:
   
-  ;; show a spinner in the modeline when waiting:
-  (robby-spinner-mode) 
-
-  ;; shorten the robby-spinner-mode modeline lighter to just the spinner:
-  (setq robby-spinner-lighter '((:eval (spinner-print robby--spinner))))
-
   ;; show robby view window in a side window on the right side:
   (add-to-list 'display-buffer-alist
    '("\\*robby\\*"
@@ -91,15 +88,15 @@ Next, clone the ~robby~ repo and put its root directory in your load path, set y
 ;; default is "C-c C-r":
 (global-set-key (kbd "s-r") robby-command-map)
 
+;; add default keybindings, show a spinner in the modeline when waiting:
+(robby-mode)
+
 ;;; optional configuration examples:
 
-;; show a spinner in the modeline when waiting:
-(robby-spinner-mode)
-
-;; shorten the robby-spinner-mode modeline lighter to just the spinner:
+;; shorten the robby-mode modeline lighter to just the spinner:
 (setq robby-spinner-lighter '((:eval (spinner-print robby--spinner))))
 
-  ;; show robby view window in a side window on the right side:
+;; show robby view window in a side window on the right side:
 (add-to-list 'display-buffer-alist
  '("\\*robby\\*"
    (display-buffer-in-side-window)
