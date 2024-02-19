@@ -29,21 +29,32 @@ Robby provides an extensible Emacs interface to OpenAI. It provides basic comman
 
 * Requirements
 - Emacs 29.1 or higher
-- [[https://github.com/magit/transient][transient]] version 0.5.3 or higher.
 - [[https://github.com/Malabarba/spinner.el][spinner.el]]  version 1.7.2 or higher
-  Note that the required transient version is more recent than the version included in Emacs 29.
+- [[https://github.com/magit/transient][transient]] version 0.5.3 or higher.
+
+Note that the required transient version is more recent than the version included in Emacs 29.
 * Installation
 ** API Key
-You need an [[https://platform.openai.com/account/api-keys][OpenAI API key]] to use ~robby~.  You can set ~robby-openai-api-key~ to the key, or set it to a function that returns the key. By default ~robby-openai-api-key~ is set to the function ~robby-get-api-key-from-auth-source~ which reads from =~/.authinfo=. You need to add a line to that file that looks like this:
+You need an [[https://platform.openai.com/account/api-keys][OpenAI API key]] to use ~robby~. You can set the variable
+~robby-openai-api-key~ to the key, or set it to a function that returns the key.
+
+#+begin_src emacs-lisp
+;; not very secure, see below re using auth sources for a better approach:
+(setq robby-openai-api-key "my-key")
+#+end_src
+
+By default ~robby-openai-api-key~ is set to the function
+~robby-get-api-key-from-auth-source~ which reads from your Auth Source file,
+=~/.authinfo= or =~/.netrc=. You need to add a line to that file that looks like this:
 
 #+begin_src sh
 machine api.openai.com login API key password OPENAI_API_KEY
 #+end_src
 
-For instructions on using keys securely within Emacs using GPG see the
-"Mastering Emacs" article [[https://www.masteringemacs.org/article/keeping-secrets-in-emacs-gnupg-auth-sources][Keeping Secrets in Emacs with GnuPG and Auth Sources]].
-Robby will decrypt and read the API key from the encrypted =~/.authinfo.gpg= if
-you have set that up. This is what I do.
+For instructions on using keys securely within Emacs using GPG and Auth Sources see
+the "Mastering Emacs" article [[https://www.masteringemacs.org/article/keeping-secrets-in-emacs-gnupg-auth-sources][Keeping Secrets in Emacs with GnuPG and Auth
+Sources]]. Robby will decrypt and read the API key from the encrypted
+=~/.authinfo.gpg= if you have set that up. This is what I do.
 ** Straight.el
 To install using ~straight.el~ add code like this to your Emacs initialization file:
 
