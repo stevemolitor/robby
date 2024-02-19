@@ -1,6 +1,6 @@
 ;;; robby-integration-test.el  --- integration test for robby commands  -*- lexical-binding:t -*-
 
-(require 'cl)
+(require 'cl-macs)
 (require 'ert)
 (require 'ert-async)
 (require 'seq)
