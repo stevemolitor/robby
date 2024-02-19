@@ -4,23 +4,14 @@
 
 ;; Robby customization variables and groups.
 
-;;; Code:
-
 (require 'spinner)
 
-(declare-function robby--get-api-key-from-auth-source "robby-request" ())
+(require 'robby-api-key)
+
+;;; Code:
 (declare-function robby-make-prompt-spec "robby-utils" (file-name file-ext))
 
 ;;; general settings
-(defcustom robby-openai-api-key #'robby--get-api-key-from-auth-source 
-  "OpenAI API key.
-
-A string, or a function that returns the API key."
-  :group 'robby
-  :type '(choice
-          (string :tag "OpenAI API key")
-          (function :tag "Function that returns the OpenAI API key")))
-
 (defgroup robby nil
   "Simple AI Integration for Emacs."
   :group 'tools

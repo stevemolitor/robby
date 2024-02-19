@@ -1,39 +1,17 @@
 ;;; robby-request.el  --- Make robby requests via curl or url-retrieve  -*- lexical-binding:t -*-
 
-(require 'auth-source)
 (require 'cl-macs)
 (require 'files)
 (require 'json)
 (require 'seq)
 (require 'url-vars)
 
+(require 'robby-api-key)
 (require 'robby-logging)
 (require 'robby-utils)
 
-;;; constants, declarations
+;;; constants
 (defconst robby--request-url "https://api.openai.com/v1/chat/completions")
-
-(declare-function robby-openai-api-key "robby-customization" ())
-
-;;; API key
-(defun robby--get-api-key-from-auth-source ()
-  "Get api key from auth source."
-  (if-let ((secret (plist-get (car (auth-source-search
-                                    :host "api.openai.com"
-                                    :user "apikey"
-                                    :require '(:secret)))
-                              :secret)))
-      (if (functionp secret)
-          (encode-coding-string (funcall secret) 'utf-8)
-        secret)
-    (user-error "No `robby-api-key' found in auth source")))
-
-(defun robby--get-api-key ()
-  "Get api key from `robby-api-key'."
-  (cond
-   ((stringp robby-openai-api-key) robby-openai-api-key)
-   ((functionp robby-openai-api-key) (funcall robby-openai-api-key))
-   (t (error "`robby-openai-api-key` not set"))))
 
 ;;; util functions
 (defun robby--request-parse-error-data (data)

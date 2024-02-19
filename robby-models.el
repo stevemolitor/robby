@@ -1,10 +1,11 @@
 ;;; robby-models.el  --- Update available models from OpenAI   -*- lexical-binding:t -*-
 
+
+(require 'robby-api-key)
 (require 'robby-request)
 (require 'robby-customization)
 
 ;;; Code:
-(declare-function robby-openai-api-key "robby-customization" ())
 
 (defun robby--get-models (on-success on-error)
   (let* ((inhibit-message t)
