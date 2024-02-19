@@ -12,7 +12,7 @@
 ;; interactive AI commands, and to save the last executed command as a
 ;; reusable custom AI command. See the README for more details.
 
-check for missing requires on compilation
+;; check for missing requires on compilation
 (eval-when-compile
   (require 'cl-generic)
   (require 'cl-lib)
