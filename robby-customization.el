@@ -75,7 +75,9 @@ The function return an association list suitable for use with
 
 (defcustom robby-spinner-lighter-format
   " robby %s"
-  "Mode line lighter format for robby-spinner-mode. It should include a `%s' placeholder for the spinner."
+  "Mode line lighter format for robby-spinner-mode.
+
+It should include a `%s' placeholder for the spinner."
   :type 'string
   :group 'robby)
 

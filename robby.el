@@ -32,7 +32,6 @@
 (require 'robby-commands)
 (require 'robby-customization)
 (require 'robby-example-commands)
-(require 'robby-keymap)
 (require 'robby-mode)
 (require 'robby-spinner)
 (require 'robby-transients)

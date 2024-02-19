@@ -26,7 +26,7 @@
 (defvar robby--last-command-options nil
   "Last robby command.")
 
-(cl-defun robby--save-last-command-options (&key arg prompt prompt-args action action-args historyp api-options never-stream-p)
+(cl-defun robby--save-last-command-options (&key prompt prompt-args action action-args historyp api-options never-stream-p)
   (setq robby--last-command-options
         `(:prompt
           ,prompt
@@ -112,7 +112,7 @@ Emacs Lisp, do not print messages if SILENTP is t."
     (if (not silentp)
         (message "no robby process associated with current buffer"))))
 
-(defun robby--get-response-region (response-buffer action-args)
+(defun robby--get-response-region (response-buffer)
   (with-current-buffer response-buffer
     (if (use-region-p)
         (cons (region-beginning) (region-end))
@@ -199,7 +199,7 @@ Emacs Lisp, do not print messages if SILENTP is t."
 (cl-defun robby-run-command (&key arg prompt prompt-args action action-args api-options grounding-fns no-op-pattern no-op-message historyp never-stream-p)
   "Run a command using OpenAI.
 
-ARG is the interactive prefix arg, if any. It is pass to the
+ARG is the interactive prefix arg, if any. It is passed to the
 PROMPT and ACTION functions.
 
 PROMPT is a string or a function. If a string it used as is as
@@ -208,15 +208,15 @@ called with PROMPT-ARGS to produce the prompt. PROMPT-ARGS is a
 key / value style property list.
 
 When the response text is received from OpenAI, ACTION is called
-with the property list ACTION-ARGS and `:text text`, where text
+with the property list ACTION-ARGS and `:text', where text
 is the text response from OpenAI.
 
 API-OPTIONS is an optional property list of options to pass to
 the OpenAI API. Kebab case keys are converted to snake case JSON
-keys. For example `'max-tokens' becomes \"max_tokens\". The
+keys. For example `max-tokens' becomes \"max_tokens\". The
 values in API-OPTIONS are merged with and overwrite equivalent
 values in the customization options specified in for example
-`'robby-chat-options' or `'robby-completion-options'.
+`robby-chat-options' or `robby-completion-options'.
 
 GROUNDING-FNS - Format the response from OpenAI before returning
 it. Only used if `NEVER-STREAM-P' is t.
@@ -224,8 +224,8 @@ it. Only used if `NEVER-STREAM-P' is t.
 NO-OP-PATTERN - If the response matches this regular expression,
 do not perform the action. Useful with a prompt that tells OpenAI
 to respond with a certain response if there is nothing to do. For
-example with a prompt of \"Fix this code. Respond with 'the code
-is correct' if the code is correct\", then a NO-OP-PATTERN of
+example with a prompt of \"Fix this code. Respond with \\='the code
+is correct\\=' if the code is correct\", then a NO-OP-PATTERN of
 \"code is correct\" will tell robby to not replace the region
 when the pattern matches. Only use NO-OP-PATTERN when
 NEVER-STREAM-P is t.
@@ -234,7 +234,7 @@ NO-OP-MESSAGE - Message to display when NO-OP-PATTERN matches. Optional.
 
 HISTORYP indicates whether or not to use conversation history.
 
-NEVER-STREAM-P - Never stream response if t. if present this
+NEVER-STREAM-P - Never stream response if t. If present this
 value overrides the `robby-stream' customization variable."
   ;; save command history
   (robby--save-last-command-options
@@ -246,7 +246,7 @@ value overrides the `robby-stream' customization variable."
          (request-input (robby--request-input basic-prompt historyp))
          (payload (append request-input (robby--options api-options)))
          (response-buffer (get-buffer-create (robby--get-response-buffer action action-args)))
-         (response-region (robby--get-response-region response-buffer action-args))
+         (response-region (robby--get-response-region response-buffer))
          (streamp (robby--get-stream-p :never-stream-p never-stream-p :no-op-pattern no-op-pattern :grounding-fns grounding-fns))
          (chars-processed 0))
 

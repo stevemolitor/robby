@@ -35,7 +35,7 @@ and prefix region text with PROMPT string to build prompt.
 
 ACTION - function to invoke when request is complete.  The
 function is passed the response text and the selected region, and
-must be of the form `(TEXT BEG END)'.
+must be of the form (TEXT BEG END).
 
 API-OPTIONS - property list of options to pass to the OpenAI
 API. These options are merged in with the customization options
@@ -48,8 +48,8 @@ it. Only used if `NEVER-STREAM-P' is t.
 NO-OP-PATTERN - If the response matches this regular expression,
 do not perform the action. Useful with a prompt that tells OpenAI
 to respond with a certain response if there is nothing to do. For
-example with a prompt of \"Fix this code. Respond with 'the code
-is correct' if the code is correct\", then a NO-OP-PATTERN of
+example with a prompt of \"Fix this code. Respond with \\='the code
+is correct\\=' if the code is correct\", then a NO-OP-PATTERN of
 \"code is correct\" will tell robby to not replace the region
 when the pattern matches. Only use NO-OP-PATTERN when
 NEVER-STREAM-P is t.

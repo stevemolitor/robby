@@ -5,20 +5,9 @@
 (require 'robby-request)
 (require 'robby-customization)
 
-;;; robby--get-models
-(defun robby--get-models-callback (status on-success on-error)
-  (goto-char (point-min))
-  (let* ((json-object-type 'alist)
-         (resp (json-read))
-         (err (robby--request-parse-error-string resp)))
-    (if err
-        (funcall on-error err)
-      (funcall on-success (assoc 'data resp)))))
-
 (defun robby--get-models (on-success on-error)
   (let* ((inhibit-message t)
          (message-log-max nil)
-         (original-buffer (current-buffer))
          (url "https://api.openai.com/v1/models")
          (url-request-method "GET")
          (url-request-extra-headers
@@ -28,7 +17,7 @@
          (message-log-max nil))
     (url-retrieve
      url
-     (lambda (status)
+     (lambda (_status)
        (goto-char (point-min))
        (re-search-forward "^{")
        (backward-char 1)

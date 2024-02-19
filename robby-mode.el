@@ -51,6 +51,7 @@
   :global t
   :lighter (:eval (robby-spinner-modeline))
   :keymap robby-mode-map
+  :group 'robby
   ;; autoload built in commands, robby transient when entering robby-mode
   (require 'robby-commands)
   (require 'robby-transients))

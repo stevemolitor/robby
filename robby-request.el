@@ -54,10 +54,13 @@
 Prepend REMAINING text incomplete JSON in last chunk Return
 remaining incomplete text in this document.
 
-Ignores `\"[DONE]\".
+Ignores \"[DONE]\".
 
 Returns a plist with remaining un-parsed text (if any) and a list
-of parsed JSON objects: `(:remaining \"text\" :parsed '())'"
+of parsed JSON objects:
+
+    (:remaining \"text\" :parsed \\='())
+"
   (with-temp-buffer
     (let ((new-remaining "")
           (parsed '())
@@ -67,7 +70,7 @@ of parsed JSON objects: `(:remaining \"text\" :parsed '())'"
       (insert data)
       (goto-char pos)
       (while (and (not done) (not (looking-at " *\\[DONE\\]")))
-        (condition-case err
+        (condition-case _err
             (progn
               (setq pos (point))
               (let* ((json-object-type 'alist)
@@ -136,7 +139,6 @@ of parsed JSON objects: `(:remaining \"text\" :parsed '())'"
 (cl-defun robby--url-retrieve (&key payload on-text on-error &allow-other-keys)
   (let* ((inhibit-message t)
          (message-log-max nil)
-         (original-buffer (current-buffer))
          (url-request-method "POST")
          (url-request-data
           (encode-coding-string (json-encode payload) 'utf-8))
@@ -155,7 +157,7 @@ of parsed JSON objects: `(:remaining \"text\" :parsed '())'"
               (resp (json-read))
               (err (robby--request-parse-error-data resp)))
          (if err
-             (funcall on-error error-msg)
+             (funcall on-error err)
            (let ((text (robby--chunk-content resp nil)))
              (funcall on-text :text text :completep t))))))))
 

@@ -47,8 +47,7 @@
 (defun robby--transient-args-to-options (args)
   (seq-reduce
    (lambda (plist arg)
-     (let* ((scope (oref transient-current-prefix scope))
-            (parts (split-string arg "="))
+     (let* ((parts (split-string arg "="))
             (key-str (car parts)) (key-sym (intern (format ":%s" key-str)))
             (raw-value (cadr parts))
             (custom-var (intern (format "robby-chat-%s" key-str)))
@@ -85,8 +84,7 @@ values."
                           '()
                         `(:prompt-prefix ,prompt-prefix :prompt-suffix ,prompt-suffix :buffer ,prompt-buffer :never-ask-p t)))
          (response-buffer (transient-arg-value "response-buffer=" args))
-         (action-args `(:response-buffer ,response-buffer))
-         (historyp (transient-arg-value "historyp" args)))
+         (action-args `(:response-buffer ,response-buffer)))
     (robby-run-command
      :arg arg
      :prompt prompt
@@ -96,12 +94,12 @@ values."
      :api-options api-options)))
 
 ;;; Readers
-(defun robby--read-buffer (prompt initial-input history)
+(defun robby--read-buffer (_prompt _initial-input _history)
   "Select a buffer."
   (interactive)
   (read-buffer "Select buffer: "))
 
-(defun robby--read-decimal (prompt initial-input history)
+(defun robby--read-decimal (prompt _initial-input _history)
   "Read a decimal number."
   (interactive)
   (format "%s" (read-number prompt)))
@@ -116,11 +114,6 @@ values."
   robby--respond-with-robby-view-suffix ()
   (interactive)
   (robby--run-transient-command #'robby-respond-with-robby-view))
-
-(transient-define-suffix
-  robby--respond-in-conversation-suffix ()
-  (interactive)
-  (robby--run-transient-command #'robby-respond-in-conversation))
 
 (transient-define-suffix
   robby--prefix-region-with-response-suffix ()

@@ -35,7 +35,7 @@
 
 Use in a custom modeline format like this:
 
-    '(:eval (robby-spinner-modeline))
+    (:eval (robby-spinner-modeline))
 ."
   (format robby-spinner-lighter-format
           (if robby--spinner
