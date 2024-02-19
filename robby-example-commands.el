@@ -53,7 +53,7 @@ Preview changes in a diff buffer when invoked with a prefix argument."
 However if the code is NOT correct, respond with the fixed code and do NOT use the word \"correct\" in your response if the code is not correct. Never use the word \"correct\" unless the original code was correct. Here is the code to correct:\n```"
                 :prompt-suffix "```")
  :action #'robby-replace-region-with-response
- :grounding-fns #'(robby-extract-fenced-text robby-remove-trailing-end-of-line)
+ :grounding-fns #'robby-extract-fenced-text
  :no-op-pattern (rx (or "the code is correct" "the original code is correct")))
 
 ;;;###autoload (autoload 'robby-proof-read "robby-commands" "Proof read text." t)

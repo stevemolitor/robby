@@ -28,7 +28,7 @@ Robby provides an extensible Emacs interface to OpenAI. It provides basic comman
 - [[#animated-gifs][Animated Gifs]]
 
 * Requirements
-- Emacs 29.1 or higherh
+- Emacs 29.1 or higher
 - [[https://github.com/magit/transient][transient]] version 0.5.3 or higher.
 - [[https://github.com/Malabarba/spinner.el][spinner.el]]  version 1.7.2 or higher
   Note that the required transient version is more recent than the version included in Emacs 29.
@@ -59,17 +59,12 @@ To install using ~straight.el~ add code like this to your Emacs initialization f
   ;; add default keybindings, show a spinner in the modeline when waiting:
   (robby-mode) 
 
-  ;; optional configuration examples:
-  
-  ;; show robby view window in a side window on the right side:
+  ;; (optional) show robby view window in a side window on the right side:
   (add-to-list 'display-buffer-alist
    '("\\*robby\\*"
      (display-buffer-in-side-window)
      (side . right)
-     (window-width . 0.4)))
-
-  ;; if you have defined custom robby commands:
-  ;; (load "path-to-my-custom-robby-commands.el"))
+     (window-width . 0.4))))
 #+end_src
 ** Manual Installation
 *** Prerequisites
@@ -91,20 +86,12 @@ Next, clone the ~robby~ repo and put its root directory in your load path, set y
 ;; add default keybindings, show a spinner in the modeline when waiting:
 (robby-mode)
 
-;;; optional configuration examples:
-
-;; shorten the robby-mode modeline lighter to just the spinner:
-(setq robby-spinner-lighter '((:eval (spinner-print robby--spinner))))
-
-;; show robby view window in a side window on the right side:
+;; (optional) show robby view window in a side window on the right side:
 (add-to-list 'display-buffer-alist
  '("\\*robby\\*"
    (display-buffer-in-side-window)
    (side . right)
    (window-width . 0.4)))
-
-;; if you have defined custom robby commands:
-;; (load "path-to-my-custom-robby-commands.el")
 #+end_src
 * Usage
 ** Built-In Commands
@@ -117,7 +104,7 @@ Ask for a prompt in the minibuffer, send the prompt to OpenAI, and display the r
 [[./images/message-response.png]]
 
 *** robby-view
-Query AI from region, respond in read-only markdown view window. If no selected region read prompt from buffer content. Maintain conversational history of previous prompts and responses, up to ~robby-max-history~ prompt/response pairs.
+Query AI from the region, and respond in a read-only markdown view window. If no selected region read prompt from buffer content. Maintain conversational history of previous prompts and responses, up to ~robby-max-history~ prompt/response pairs.
 
 [[./images/view-prompt.png]]
 
@@ -132,22 +119,22 @@ You can refine the response by repeating the command:
 *** robby-view-from-region
 Like ~robby-view~, but reads prompt from the current region, or the entire buffer if no active region. You can supply an optional prompt prefix from the minibuffer, to provide extra context or instructions.
 *** robby-prepend-region
-Query AI from region, prefix selection region with response, or insert at point
-if no selected region. If no selected region read prompt from current buffer.
-You can supply an optional prompt prefix from the minibuffer, to provide extra
-context or instructions.
+Query AI from the region, prefix the selection region with the response or
+insert at point if no selected region. If no selected region read prompt from
+current buffer. You can supply an optional prompt prefix from the minibuffer, to
+provide extra context or instructions.
 *** robby-append-region
-Query AI from region, prefix region with response, or insert at point if no
-selected region. If no selected region read prompt from current buffer. You can
-supply an optional prompt prefix from the minibuffer.
+Query AI from the region, prefix region with the response, or insert at point if no selected region. If no selected region read prompt from current
+buffer. You can supply an optional prompt prefix from the minibuffer.
 *** robby-replace-region
-Query AI from region, prefix region with response. If no selected region read
-prompt from current buffer. You can supply an optional prompt prefix from the minibuffer, to provide extra context or instructions.
+Query AI from region, prefix region with the response. If no selected region
+read prompt from current buffer. You can supply an optional prompt prefix from
+the minibuffer, to provide extra context or instructions.
 
-If prefix argument is supplied, robby will display the changes in a diff buffer
-and ask for confirmation before applying.
+If a prefix argument is supplied, robby will display the changes in a diff
+buffer and ask for confirmation before applying.
 ** Conversation History
-Robby passes the conversation history of previous message to OpenAI.
+Robby passes the conversation history of previous messages to OpenAI.
 Conversation history is local to the output buffer of the command. For most
 commands this is the current buffer, but for ~robby-view~ and
 ~robby-view-from-region~ it is the ~*robby*~ robby view output buffer.
@@ -155,7 +142,7 @@ commands this is the current buffer, but for ~robby-view~ and
 Note that commands can opt out of conversation history by setting the ~historyp~
 option to ~nil~; See [[*Defining Custom Commands][Defining Custom Commands]] below.
 
-The ~robby-max-history~ customization variable specifices the maximum number of
+The ~robby-max-history~ customization variable specifies the maximum number of
 previous prompt/response pairs to keep in the conversation history. Its default
 is 2. Increasing this value will pass more history context to OpenAI, at the
 cost of using more tokens. Setting it to 0 to turn conversation history off.
@@ -168,7 +155,7 @@ To see advanced options run ~transient-toggle-level-limit~ (=C-x a=), or [[https
 
 [[./images/advanced-builder-options.png]]
 
-Press =A= in the builder to see a menu of chat api options. For example, you can select which chat model to use. The first time you customize the model from the builder robby will fetch the list of models available to your account:
+Press =A= in the builder to see a menu of chat API options. For example, you can select which chat model to use. The first time you customize the model from the builder robby will fetch the list of models available to your account:
 
 [[./images/builder-api-options.png]]
 
@@ -262,11 +249,11 @@ You can use a grounding function to process the text response after receiving it
  :grounding-fns #'robby-format-message-text)
 #+end_src
 
-The ~:grounding-fns~ option takes either a list of grounding functions which will
+The ~:grounding-fns~ option takes either a list of grounding functions that will
 be executed in order, or a single grounding function as shown above.
 
 ** A More Involved Example
-The prompt or action options can do more than just operate on the selected region. For example the ~robby-git-commit-message~ function invokes a shell command to get the list of staged changes in a git repository and generates a one line git commit message:
+The prompt or action options can do more than just operate on the selected region. For example the ~robby-git-commit-message~ function invokes a shell command to get the list of staged changes in a git repository and generates a one-line git commit message:
 
 #+begin_src emacs-lisp
 (cl-defun robby-get-prompt-from-git-diff (&key prompt-prefix &allow-other-keys)
@@ -311,16 +298,16 @@ Prompt functions take the following keyword arguments:
 - ~arg~ - The prefix arg, if any, for the invoked command. 
 - ~prompt-prefix~ - String to prepend to the prompt.
 - ~prompt-suffix~ - String to append to the prompt.
-- ~prompt-buffer~ - The buffer to get prompt from. Usually this is the current buffer, but commands can specify other buffers.
+- ~prompt-buffer~ - The buffer to get prompt from. Usually, this is the current buffer, but commands can specify other buffers.
 - ~never-ask-p~ - Prefix functions like ~robby-get-prompt-from-region~ ask the user for a prompt prefix before executing the command. Pass ~never-ask-p t~ to turn that behavior off.
 *** action
 - Type: Function.
 - Description: The function to invoke when the request is complete. The function is passed the response text and the selected region. Must be of the form ‘(TEXT BEG END)’.
 
-  Action function take the following keyword options:
+  Action functions take the following keyword options:
 
   - ~arg~ - The prefix arg, if any, for the invoked command. 
-  - ~text~ - The response text received from OpenAI. For streaming responses this will be the current chunk.
+  - ~text~ - The response text received from OpenAI. For streaming responses, this will be the current chunk.
   - ~beg~ - The beginning of the response region, an integer. This tells action functions where to start inserting or replacing text.
   - ~end~ - The end position of the response region, an integer.
   - ~chars-processed~ - For streaming responses, the number of characters already processed. Actions can use ~chars-processed~ + ~beg~ to calculate where to insert the next chunk.
@@ -361,8 +348,8 @@ If supplied PROMPT-PREFIX and/or PROMPT-PREFIX are prepended or
 appended to the buffer or region text to make the complete
 prompt.
 
-If there both PROMPT-PREFIX and PROMPT-SUFFIX are nil or not
-specified, prompt the user for a prompt prefix in the minibuffer.
+If both PROMPT-PREFIX and PROMPT-SUFFIX are nil or not specified, prompt the
+user for a prompt prefix in the minibuffer.
 ** Built-in Action Functions
 *** ~robby-respond-with-message~
 Show TEXT in minibuffer message.
@@ -373,7 +360,7 @@ Append AI response to region, or insert at point if no selected region.
 *** ~robby-replace-region-with-response~
 Replace region with AI response, or insert at point no selected region.
 *** ~robby-respond-with-robby-view~
-Show TEXT in robby-view-mode buffer.
+Show TEXT in ~robby-view-mode~ buffer.
 ** Built-in Grounding Functions
 *** ~robby-extract-fenced-text~
 Extract the text between the first pair of fenced code blocks in RESPONSE.
@@ -384,15 +371,15 @@ Replace =%= with =%%= in TEXT to avoid format string errors calling ~message~.
 *** ~robby-remove-trailing-end-of-line~
 Remove the end of line character at the very end of a string if present.
 ** Example Custom Commands
-Robby includes a handful of example commands you can use as inspiration when creating your own commands. ~M-x robby-example-commands~ will display a transient menu for executing these commands:
+Robby includes a handful of example commands you can use as inspiration when creating your commands. ~M-x robby-example-commands~ will display a transient menu for executing these commands:
 
 [[./images/example-commands-transient.png]]
 
-See [[https://github.com/stevemolitor/robby/blob/main/robby-example-commands.el][robby-example-commands.el]] for their definitions. You may want to copy and paste and then adjust the prompts to suite your needs, or use as inspiration for your own commands.
+See [[https://github.com/stevemolitor/robby/blob/main/robby-example-commands.el][robby-example-commands.el]] for their definitions. You may want to copy and paste and then adjust the prompts to suit your needs or use them as inspiration for your commands.
 
 Here is the list of example commands:
 *** ~robby-write-tests~
-Write some tests for the code in the region, append to region.
+Write some tests for the code in the region, and append them to the region.
 *** ~robby-add-comment~
 Add a comment for the code in the selected region or buffer. Preview changes in
 a diff buffer when invoked with a prefix argument.
@@ -402,18 +389,24 @@ invoked with a prefix argument.
 *** ~robby-git-commit-message~
 Generate git commit message title from staged changes.
 *** ~robby-proof-read-text~
-Proof read the text in the selected region. Preview changes in a diff buffer
+Proofread the text in the selected region. Preview changes in a diff buffer
 when invoked with a prefix argument.
 *** ~robby-describe-code~
-Describe code in the selected region, show description in robby view window.
+Describe the code in the selected region, and show a description in a robby view
+window.
 *** ~robby-summarize~
-Summarize the text in the selected region or entire buffer if no
-selected region, show description in robby view window.
+Summarize the text in the selected region or entire buffer if no the selected
+region, show a description in a robby view window.
 * Customization
 Use ~customize-group~ | ~robby~ to see the various customization options. Here are a few important ones:
 - ~robby-chat-api~ :: customization group with options to pass to the Chat API.
-- ~robby-chat-model~ :: the model to use with the Chat API, for example "gpt-4" or "gpt-3.5-turbo". 
+- ~robby-chat-model~ :: the model to use with the Chat API, for example, "gpt-4" or "gpt-3.5-turbo". 
 - ~robby-chat-max-tokens~, ~robby-completions-max-tokens~ ::  The maximum number of tokens to return in the response. The Robby default is ~300~, but you may want to increase this for longer responses.
 * Animated Gifs
 Using ~robby-view~ with conversation history:
+
 [[./images/robby-view-video.gif]]
+
+Using ~robby-fix-code~ with prefix arg to show diff preview before applying fix:
+
+[[./images/fix-code.gif]]

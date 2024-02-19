@@ -63,7 +63,7 @@
         (unwind-protect
             (progn
               (display-buffer
-               (diff-no-select robby--old-temp-buffer robby--new-temp-buffer nil t diff-buf))
+               (diff-no-select robby--old-temp-buffer robby--new-temp-buffer "" t diff-buf))
               (let ((apply-changes-p (y-or-n-p "Apply changes?")))
                 (when apply-changes-p
                   (delete-region beg end)
