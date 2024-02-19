@@ -106,11 +106,6 @@ values."
 
 ;;; Action Suffixes
 (transient-define-suffix
-  robby--respond-with-message-suffix ()
-  (interactive)
-  (robby--run-transient-command #'robby-respond-with-message t))
-
-(transient-define-suffix
   robby--respond-with-robby-view-suffix ()
   (interactive)
   (robby--run-transient-command #'robby-respond-with-robby-view))
