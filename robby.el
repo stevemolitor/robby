@@ -1,7 +1,7 @@
 ;;; robby --- Extensible OpenAI Integration for Emacs  -*- lexical-binding:t -*-
 
 ;; Version: 0.0.1
-;; Package-Requires: ((emacs "29.1") (ert-async "0.1.2") (spinner "1.7.2") (transient "0.4.0") (markdown-mode "2.5")
+;; Package-Requires: ((emacs "29.1") (ert-async "0.1.2") (spinner "1.7.2") (transient "0.4.0") (markdown-mode "2.5"))
 ;; Homepage: https://github.com/stevemolitor/robby
 
 ;;; Commentary:
@@ -12,9 +12,8 @@
 ;; interactive AI commands, and to save the last executed command as a
 ;; reusable custom AI command. See the README for more details.
 
-;;; check for missing requires on compilation
+check for missing requires on compilation
 (eval-when-compile
-  (require 'cl)
   (require 'cl-generic)
   (require 'cl-lib)
   (require 'cl-macs)
@@ -24,6 +23,7 @@
   (require 'json)
   (require 'markdown-mode)
   (require 'map)
+  (require 'rx)
   (require 'seq)
   (require 'spinner)
   (require 'transient))
