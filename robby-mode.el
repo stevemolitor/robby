@@ -46,6 +46,13 @@
     map))
 
 ;;;###autoload
+(defun robby--kill-robby-process ()
+  "Silently kill any robby process associated with the current
+buffer."
+  (when robby-mode
+    (robby-kill-last-process t)))
+
+;;;###autoload
 (define-minor-mode robby-mode
   "Minor mode for running robby commands."
   :global t
@@ -53,8 +60,14 @@
   :keymap robby-mode-map
   :group 'robby
   ;; autoload built in commands, robby transient when entering robby-mode
-  (require 'robby-commands)
-  (require 'robby-transients))
+  (when robby-mode
+    (require 'robby-commands)
+    (require 'robby-transients))
+
+  ;; add robby--kill-robby-process to kill-buffer-hook when entering robby-mode, remove when leaving
+  (if robby-mode
+      (add-hook 'kill-buffer-hook #'robby--kill-robby-process)
+    (remove-hook 'kill-buffer-hook #'robby--kill-robby-process)))
 
 (provide 'robby-mode)
 

@@ -101,13 +101,11 @@ Return t if there is a last command."
 Do nothing if no process is currently running. If called from
 Emacs Lisp, do not print messages if SILENTP is t."
   (interactive)
-  ;; stop the spinner no matter what - it's harmless if already stopped
-  (robby--spinner-stop)
-
   (if (robby--process-running-p)
-      (progn
-        (kill-process robby--last-process)
-        (if (not silentp)
+    (progn
+      (robby--spinner-stop)
+      (kill-process robby--last-process)
+        (when (not silentp)
             (message "robby process killed")))
     (if (not silentp)
         (message "no robby process associated with current buffer"))))
