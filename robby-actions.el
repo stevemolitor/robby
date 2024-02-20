@@ -83,9 +83,16 @@
     (insert text)))
 
 ;;; robby-view
-(define-derived-mode robby-view-mode markdown-view-mode
-  "robby"
-  "Mode for viewing read-only OpenAI robby responses. Press `q` to quit.")
+
+(defvar robby-view-mode-map
+  (let ((map (make-sparse-keymap)))
+    (define-key map "q" 'kill-this-buffer)
+    (define-key map "v" 'robby-view)
+    map))
+
+(define-derived-mode robby-view-mode markdown-view-mode "robby"
+  "Mode for viewing read-only OpenAI robby responses."
+  (use-local-map robby-view-mode-map))
 
 (defconst robby--end-view-message "\n___\n")
 
@@ -103,7 +110,7 @@
       (insert text)
       (when (eq completep t)
         (insert robby--end-view-message)
-        (message "%s" (substitute-command-keys "Type \\<markdown-view-mode-map>\\[kill-this-buffer] to delete robby view"))))))
+        (message "%s" (substitute-command-keys "Type \\<robby-view-mode-map>\\[robby-view] to continue the conversation, or \\<robby-view-mode-map>\\[kill-this-buffer] to stop and kill this buffer."))))))
 
 (cl-defun robby-respond-with-robby-view (&key chars-processed prompt text completep response-buffer &allow-other-keys)
   "Show PROMPT and TEXT in robby-view-mode buffer."

@@ -115,13 +115,13 @@ Ask for a prompt in the minibuffer, send the prompt to OpenAI, and display the r
 [[./images/message-response.png]]
 
 *** robby-view
-Query AI from the region, and respond in a read-only markdown view window. If no selected region read prompt from buffer content. Maintain conversational history of previous prompts and responses, up to ~robby-max-history~ prompt/response pairs.
-
+Query AI from the region, and respond in a read-only markdown view window.
+Maintain conversational history of previous prompts and responses.
 [[./images/view-prompt.png]]
 
 [[./images/view-response.png]]
 
-You can refine the response by repeating the command:
+You can refine the response by typing =v=:
 
 [[./images/view-prompt-2.png]]
 
