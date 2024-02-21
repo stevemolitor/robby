@@ -161,7 +161,7 @@ OpenAI to monitor and detect abuse."
   :type '(choice string (const nil))
   :group 'robby-chat-api)
 
-(defcustom robby-chat-system-message "You are a large language model living in Emacs and a helpful assistant. Respond concisely."
+(defcustom robby-chat-system-message "You are an AI tool embedded within Emacs. Assist users with their tasks and provide information as needed. Do not engage in harmful or malicious behavior. Please provide helpful information. Answer concisely."
   "System message used with Chat API"
   :type 'string
   :group 'robby)
