@@ -4,7 +4,7 @@
 
 ;;; Code:
 
-(defconst robby--test-deps '(ert-async markdown-mode spinner))
+(defconst robby--test-deps '(markdown-mode spinner))
 
 (defconst robby--test-dir (file-name-directory (or load-file-name ".")))
 
