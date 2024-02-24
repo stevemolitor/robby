@@ -3,9 +3,14 @@
 (require 'ert)
 
 (require 'robby-request)
-(require 'robby-test-utils)
 
 ;;; Code:
+
+(defun robby--read-file-into-string (filepath)
+  "Return filepath's file content."
+  (with-temp-buffer
+    (insert-file-contents filepath)
+    (buffer-string))) 
 
 (ert-deftest robby--curl-parse-response--streaming-response ()
   (let ((parsed (robby--curl-parse-response (robby--read-file-into-string "./fixtures/streaming-response-complete.txt") "" t)))
@@ -23,4 +28,4 @@
 
 (provide 'robby-request-test)
 
-;; robby-request-test.el ends here
+;;; robby-request-test.el ends here

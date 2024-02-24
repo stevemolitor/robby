@@ -6,6 +6,11 @@
 
 ;;; Code:
 
+(defmacro robby--with-history (history &rest body)
+  "Execute BODY with history set to HISTORY."
+  `(let ((robby--history ,history))
+     ,@body))
+
 ;;; string utils tests
 (ert-deftest robby--kebab-to-snake-case ()
   (should (equal (robby--kebab-to-snake-case "a-b-c") "a_b_c")))

@@ -13,7 +13,6 @@
 (require 'robby-history-test)
 (require 'robby-logging-test)
 (require 'robby-request-test)
-(require 'robby-utils-test)
 
 (provide 'robby-tests)
 
