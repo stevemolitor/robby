@@ -230,8 +230,7 @@ after the selected region, or at the point if no region is selected:
  append-response
  "Read prompt from minibuffer, append response to selected region, or point if no region."
  :prompt #'get-prompt-from-minibuffer
- :action #'stream-after-region
- :never-stream-p t)
+ :action #'stream-after-region)
 #+end_src
 
 With streaming responses, ~text~ is the current chunk. The action will be called
@@ -286,6 +285,10 @@ The prompt or action options can do more than just operate on the selected regio
  :grounding-fns #'robby-remove-quotes
  :never-stream-p t)
 #+end_src
+
+#+RESULTS:
+: robby-git-commit-message
+
 ** Custom Command Options
 You pass custom OpenAI API options in the ~:options~ property list when defining a custom command. For example this command sets the OpenAI  ~max_tokens~ property to ~2000~, just for this command:
 
@@ -294,9 +297,10 @@ You pass custom OpenAI API options in the ~:options~ property list when defining
  robby-describe-code
  "Describe code in the selected region, show description in help window."
  :historyp nil
- :prompt "Describe the following code: "
- :action robby--show-response-in-help-window
- :options '(:max-tokens 2000))
+ :prompt #'robby-get-prompt-from-region
+ :prompt-args '(:prompt-prefix "Describe the following code: ")
+ :action #'robby-respond-with-robby-view
+ :api-options '(:max-tokens 2000))
 #+end_src
 
 Here is the complete list of command options:
