@@ -162,6 +162,8 @@ Conversation history is local to the output buffer of the command. For most
 commands this is the current buffer, but for ~robby-view~ and
 ~robby-view-from-region~ it is the ~*robby*~ robby view output buffer.
 
+You can clear the history for a buffer with the ~robby-clear-history~ command.
+
 Note that commands can opt out of conversation history by setting the ~historyp~
 option to ~nil~; See [[*Defining Custom Commands][Defining Custom Commands]] below.
 
