@@ -44,8 +44,7 @@
 (ert-deftest robby--request-input--no-history ()
   (robby--with-history
    nil
-   (let ((expected-json "{\"messages\":[{\"role\":\"user\",\"content\":\"hello\"}]}")
-         (input (robby--request-input "hello" nil)))
+   (let ((input (robby--request-input "hello" nil)))
      (should (equal input `((messages . [((role . "system") (content . ,robby-chat-system-message))
                                          ((role . "user") (content . "hello"))])))))))
 
@@ -110,7 +109,7 @@
 
 (ert-deftest robby--ground-response--single-fn ()
   (cl-letf (((symbol-function 'upper) (lambda (resp) (upcase resp))))
-    (should (equal (robby--ground-response "response" #'upper)
+    (should (equal (robby--ground-response "response" #'upcase)
                    "RESPONSE"))))
 
 (provide 'robby-utils-test)
