@@ -87,12 +87,6 @@ Return t if there is a last command."
     (robby--pp-cmd `(robby-define-command ,name ,docstring ,@quoted-options))))
 
 ;;; run command 
-(defun robby--process-running-p ()
-  "Return non-nil if robby process is currently running."
-  (and
-   (not (null robby--last-process))
-   (process-live-p robby--last-process)))
-
 (defun robby--get-response-region (response-buffer)
   (with-current-buffer response-buffer
     (if (use-region-p)
