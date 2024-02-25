@@ -66,8 +66,8 @@ For example \"a_b_c\" becomes \"a b c\""
 (defun robby--options-from-group ()
   "Get list of options from a Robby `robby-chat-api' customization group.
 
-API specifies the customization group, for example `\"chat\"' or
-`\"completions\"'.  Returns an association list of options."
+API specifies the customization group, for example \"chat\" or
+\"completions\".  Returns an association list of options."
   (seq-map
    (lambda (sym)
      (cons
