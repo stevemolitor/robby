@@ -12,12 +12,6 @@
 
 ;;; Code:
 
-(defun robby--kill-robby-process ()
-  "Silently kill any robby process associated with the current
-buffer."
-  (when (and (boundp robby-mode) robby-mode))
-  (robby-kill-last-process t))
-
 ;;;###autoload
 (defvar robby-command-map
   (let ((map (make-sparse-keymap)))
@@ -35,12 +29,12 @@ buffer."
     (define-key map "w" 'robby-view-from-region)
 
     (define-key map "fd" 'robby-describe-code)
-    (define-key map "xf" 'robby-fix-code)
-    (define-key map "xg" 'robby-git-commit-message)
-    (define-key map "xo" 'robby-add-comment)
-    (define-key map "xt" 'robby-write-tests)
-    (define-key map "xs" 'robby-summarize)
-    (define-key map "xx" 'robby-proof-read)
+    (define-key map "ff" 'robby-fix-code)
+    (define-key map "fg" 'robby-git-commit-message)
+    (define-key map "fo" 'robby-add-comment)
+    (define-key map "ft" 'robby-write-tests)
+    (define-key map "fs" 'robby-summarize)
+    (define-key map "fx" 'robby-proof-read)
 
     map)
   "Robby command map.")
@@ -54,6 +48,8 @@ buffer."
     (define-key map robby-keymap-prefix robby-command-map)
     map))
 
+(declare-function robby--kill-robby-process "robby-mode" ())
+
 ;;;###autoload
 (define-minor-mode robby-mode
   "Minor mode for running robby commands."
@@ -65,6 +61,12 @@ buffer."
   (if robby-mode
       (add-hook 'kill-buffer-hook #'robby--kill-robby-process)
     (remove-hook 'kill-buffer-hook #'robby--kill-robby-process)))
+
+(defun robby--kill-robby-process ()
+  "Silently kill any robby process associated with the current
+buffer."
+  (when (and (boundp robby-mode) robby-mode))
+  (robby-kill-last-process t))
 
 (provide 'robby-mode)
 
