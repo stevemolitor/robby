@@ -33,7 +33,8 @@ Robby will use =curl= to make HTTP requests if available, otherwise, it will fal
 * Installation
 ** Install Robby Package
 #+begin_src emacs-lisp
-(package-vc-install "https://github.com/stevemolitor/robby")
+(when (not (package-installed-p 'robby))
+  (package-vc-install "https://github.com/stevemolitor/robby"))
 (robby-mode 1)
 
 ;; (optional) bind a prefix key to the robby-command-map,
@@ -46,8 +47,6 @@ Robby will use =curl= to make HTTP requests if available, otherwise, it will fal
                (display-buffer-in-side-window)
                (side . right)
                (window-width . 0.4)))
-#+end_src
-
 #+end_src
 ** Set API Key
 You need an [[https://platform.openai.com/account/api-keys][OpenAI API key]] to use ~robby~. You can set the variable
