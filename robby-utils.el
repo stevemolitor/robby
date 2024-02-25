@@ -23,7 +23,7 @@
 
 (defun robby--kebab-to-snake-case (string)
   "Transform STRING from kebab to snake case.
-For example \"a-b-c\" becomes a_b_c."
+For example \"a-b-c\" becomes \"a_b_c\"."
   (replace-regexp-in-string "-" "_" string))
 
 (defun robby--snake-to-space-case (string)
