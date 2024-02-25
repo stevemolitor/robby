@@ -9,8 +9,6 @@ Robby provides an extensible Emacs interface to OpenAI. It provides basic comman
 - [[#installation][Installation]]
       - [[#set-api-key][Set API Key]]
       - [[#package-vc-install][package-vc-install]]
-      - [[#straightel][Straight.el]]
-      - [[#manual-installation][Manual Installation]]
 - [[#usage][Usage]]
       - [[#built-in-commands][Built-In Commands]]
       - [[#conversation-history][Conversation History]]
@@ -29,11 +27,7 @@ Robby provides an extensible Emacs interface to OpenAI. It provides basic comman
 - [[#animated-gifs][Animated Gifs]]
 
 * Requirements
-- Emacs 29.1 or higher
-- [[https://github.com/Malabarba/spinner.el][spinner.el]]  version 1.7.2 or higher
-- [[https://github.com/magit/transient][transient]] version 0.5.3 or higher.
-
-Note that the required transient version is more recent than the version included in Emacs 29.
+Emacs 29.1 or higher.
 
 Robby will use =curl= to make HTTP requests if available, otherwise, it will fall back to ~url-retrieve~. Streaming is only supported with =curl=. 
 * Installation
@@ -66,55 +60,6 @@ Sources]]. Robby will decrypt and read the API key from the encrypted
 ;; optionally bind a prefix key to the robby-command-map,
 ;; default is "C-c C-r":
 (global-set-key (kbd "s-r") robby-command-map)
-#+end_src
-** Straight.el
-To install using ~straight.el~ add code like this to your Emacs initialization file:
-
-#+begin_src emacs-lisp
-(use-package robby 
-  :straight (:type git :host github :repo "stevemolitor/robby" :branch "main")
-  :bind-keymap
-  ;; optionally bind a prefix key to the robby-command-map,
-  ;; default is "C-c C-r":
-  ("s-r" . robby-command-map)
-  
-  :config
-  ;; add default keybindings, show a spinner in the modeline when waiting:
-  (robby-mode) 
-
-  ;; (optional) show robby view window in a side window on the right side:
-  (add-to-list 'display-buffer-alist
-   '("\\*robby\\*"
-     (display-buffer-in-side-window)
-     (side . right)
-     (window-width . 0.4))))
-#+end_src
-** Manual Installation
-*** Prerequisites
-First install these packages via ~package-install~:
-- =spinner=
-- =transient= version =0.5.3= or higher
-*** Install
-Next, clone the ~robby~ repo and put its root directory in your load path, set your API key, and optionally custom the keymap prefix key:
-
-#+begin_src emacs-lisp
-(add-to-list 'load-path "~/path-to-robby")
-(require 'robby)
-(require 'robby)
-
-;; optionally bind a prefix key to the robby-command-map,
-;; default is "C-c C-r":
-(global-set-key (kbd "s-r") robby-command-map)
-
-;; add default keybindings, show a spinner in the modeline when waiting:
-(robby-mode)
-
-;; (optional) show robby view window in a side window on the right side:
-(add-to-list 'display-buffer-alist
- '("\\*robby\\*"
-   (display-buffer-in-side-window)
-   (side . right)
-   (window-width . 0.4)))
 #+end_src
 * Usage
 ** Built-In Commands
