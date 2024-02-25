@@ -47,7 +47,7 @@ prepend results to region or buffer."
  :grounding-fns #'robby-extract-fenced-text-in-prog-modes
  :never-stream-p t)
 
-;;;###autoload (autoload 'robby-prepend-region "robby-commands" "Query AI from region or entire buffer if no selected region, append results to region or buffer." t)
+;;;###autoload (autoload 'robby-append-region "robby-commands" "Query AI from region or entire buffer if no selected region, append results to region or buffer." t)
 (robby-define-command
  robby-append-region
  "Query AI from region or entire buffer if no selected region,
@@ -57,7 +57,7 @@ append results to region or buffer."
  :grounding-fns #'robby-extract-fenced-text-in-prog-modes
  :never-stream-p t)
 
-;;;###autoload (autoload 'robby-prepend-region "robby-commands" "Query AI from region or entire buffer if no selected region, replace regoin with response." t)
+;;;###autoload (autoload 'robby-replace-region "robby-commands" "Query AI from region or entire buffer if no selected region, replace region with response." t)
 (robby-define-command
  robby-replace-region
  "Query AI from region or entire buffer if no selected region,
