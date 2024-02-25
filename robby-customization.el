@@ -36,7 +36,7 @@ the conversation history."
 (defcustom robby-use-curl t
   "If curl if availble to make HTTP requests to OpenAI.
 
-Set to nil to always use Emacs' built-in url.el library instead
+Set to nil to always use Emacs\\=' built-in url.el library instead
 of curl. If curl is not available robby will still fallback to
 url.el even if `robby-use-curl' is t. Note that url.el does not
 support streaming."
@@ -137,14 +137,14 @@ tokens. The returned text will not contain the stop sequence."
 (defcustom robby-chat-presence-penalty nil
   "Number between -2.0 and 2.0. Positive values penalize new tokens
 based on whether they appear in the text so far, increasing the
-model's likelihood to talk about new topics."
+model\\='s likelihood to talk about new topics."
   :type '(choice number (const nil))
   :group 'robby-chat-api)
 
 (defcustom robby-chat-frequency-penalty nil
   "Number between -2.0 and 2.0. Positive values penalize new tokens
 based on their existing frequency in the text so far, decreasing
-the model's likelihood to repeat the same line verbatim."
+the model\\='s likelihood to repeat the same line verbatim."
   :type '(choice number (const nil))
   :group 'robby-chat-api)
 
