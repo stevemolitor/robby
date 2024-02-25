@@ -5,42 +5,18 @@
 ;; Provides robby-minor-mode. This mode binds the default robby keybindings,
 ;; and adds a robby spinner lighter.
 
+(require 'robby-commands)
+(require 'robby-example-commands)
+(require 'robby-process)
 (require 'robby-spinner)
 
 ;;; Code:
 
-;;;###autoload
-(defvar robby-keymap-prefix (kbd "C-c C-r"))
-
-;;;###autoload
-(defvar robby-mode-map
-  (let ((map (make-sparse-keymap)))
-    (define-key map robby-keymap-prefix robby-command-map)
-    map))
-
-;;;###autoload
 (defun robby--kill-robby-process ()
   "Silently kill any robby process associated with the current
 buffer."
   (when (and (boundp robby-mode) robby-mode))
-    (robby-kill-last-process t))
-
-;;;###autoload
-(define-minor-mode robby-mode
-  "Minor mode for running robby commands."
-  :global t
-  :lighter (:eval (robby-spinner-modeline))
-  :keymap robby-mode-map
-  :group 'robby
-  ;; autoload built in commands, robby transient when entering robby-mode
-  (when robby-mode
-    (require 'robby-commands)
-    (require 'robby-transients))
-
-  ;; add robby--kill-robby-process to kill-buffer-hook when entering robby-mode, remove when leaving
-  (if robby-mode
-      (add-hook 'kill-buffer-hook #'robby--kill-robby-process)
-    (remove-hook 'kill-buffer-hook #'robby--kill-robby-process)))
+  (robby-kill-last-process t))
 
 ;;;###autoload
 (defvar robby-command-map
@@ -59,15 +35,36 @@ buffer."
     (define-key map "w" 'robby-view-from-region)
 
     (define-key map "fd" 'robby-describe-code)
-    (define-key map "ff" 'robby-fix-code)
-    (define-key map "fg" 'robby-git-commit-message)
-    (define-key map "fo" 'robby-add-comment)
-    (define-key map "ft" 'robby-write-tests)
-    (define-key map "fs" 'robby-summarize)
-    (define-key map "fx" 'robby-proof-read)
+    (define-key map "xf" 'robby-fix-code)
+    (define-key map "xg" 'robby-git-commit-message)
+    (define-key map "xo" 'robby-add-comment)
+    (define-key map "xt" 'robby-write-tests)
+    (define-key map "xs" 'robby-summarize)
+    (define-key map "xx" 'robby-proof-read)
 
     map)
   "Robby command map.")
+
+;;;###autoload
+(defvar robby-keymap-prefix (kbd "C-c C-r"))
+
+;;;###autoload
+(defvar robby-mode-map
+  (let ((map (make-sparse-keymap)))
+    (define-key map robby-keymap-prefix robby-command-map)
+    map))
+
+;;;###autoload
+(define-minor-mode robby-mode
+  "Minor mode for running robby commands."
+  :global t
+  :lighter (:eval (robby-spinner-modeline))
+  :keymap robby-mode-map
+  :group 'robby
+  ;; add robby-kill-robby-process to kill-buffer-hook when entering robby-mode, remove when leaving
+  (if robby-mode
+      (add-hook 'kill-buffer-hook #'robby--kill-robby-process)
+    (remove-hook 'kill-buffer-hook #'robby--kill-robby-process)))
 
 (provide 'robby-mode)
 

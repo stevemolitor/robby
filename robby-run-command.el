@@ -13,14 +13,12 @@
 (require 'robby-customization)
 (require 'robby-history)
 (require 'robby-logging)
+(require 'robby-process)
 (require 'robby-spinner)
 
 ;;; variables
 (defvar robby-command-complete-hook nil
   "Hook called when a robby OpenAI command completes successfully.")
-
-(defvar-local robby--last-process nil)
-(put 'robby--last-process 'permanent-local t)
 
 ;;; save last command
 (defvar robby--last-command-options nil
@@ -94,21 +92,6 @@ Return t if there is a last command."
   (and
    (not (null robby--last-process))
    (process-live-p robby--last-process)))
-
-(defun robby-kill-last-process (&optional silentp)
-  "If a robby process is currently running, kill it.
-
-Do nothing if no process is currently running. If called from
-Emacs Lisp, do not print messages if SILENTP is t."
-  (interactive)
-  (if (robby--process-running-p)
-    (progn
-      (robby--spinner-stop)
-      (kill-process robby--last-process)
-        (when (not silentp)
-            (message "robby process killed")))
-    (if (not silentp)
-        (message "no robby process associated with current buffer"))))
 
 (defun robby--get-response-region (response-buffer)
   (with-current-buffer response-buffer
