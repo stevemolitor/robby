@@ -210,7 +210,7 @@ customization values."
    ("x" "proof read text" robby-proof-read)])
 
 ;;; Robby transient
-;;;###autoload (autoload 'robby "robby-transients" nil t)
+;;;###autoload (autoload 'robby-builder "robby-transients" "Build a robby AI command." t)
 (transient-define-prefix robby-builder ()
   "Build a robby AI command."
   :incompatible '(("prompt=" "prompt-prefix=")
