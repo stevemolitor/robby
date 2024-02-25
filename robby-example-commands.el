@@ -34,7 +34,8 @@
  :prompt-args '(:prompt-prefix
                 "The file extension for this code is \"%e\". First, determine the programming language based on the file extension. Then, write a documentation comment for the code delimted by triple backticks, formatted with the appropriate comment delimeters for the programming language, and based on the type of thing it is - code block, function definition, class definition, etc. Return the entire comment inside a markdown code fence, delimited by triple backticks. Here is the code: ```"
                 :prompt-suffix "```")
- :action #'robby-prepend-response-to-region)
+ :action #'robby-prepend-response-to-region
+ :grounding-fns #'robby-extract-fenced-text)
 
 ;;;###autoload (autoload 'robby-fix-code "robby-commands" "Fix code in region." t)
 (robby-define-command
