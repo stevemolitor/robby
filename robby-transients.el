@@ -137,7 +137,7 @@ values."
          (args (transient-args transient-current-command))
          (api-options (robby--transient-args-to-options args))
          (new-scope (robby--scope-set-api-options :scope scope :options api-options)))
-    (transient-set)
+    ;; (transient-set)
     (transient-setup 'robby-builder nil nil
                      :scope new-scope
                      :value robby-value)))
@@ -157,19 +157,26 @@ The initial transient value comes from either any previously
 edited options for the API, or default API options from
 customization values."
   (interactive)
-  (let* ((scope (robby--get-scope))
+  (let* ((args (transient-args transient-current-command))
+         (scope (robby--get-scope))
+         (scope-with-value (robby--scope-set-robby-value :scope scope :value args))
          (api-options (robby--scope-api-options scope))
          (value (robby--get-api-options-transient-value api-options)))
     (robby--update-models
      (lambda ()
-       (transient-setup 'robby--chat-api-options nil nil :scope scope :value value)))))
+       (transient-setup 'robby--chat-api-options nil nil :scope scope-with-value :value value)))))
 
 (transient-define-suffix
   robby--reset-api-options ()
-  "Reset current API options to their customization values."
+  "Reset current API options to their previous values."
   :transient 'transient--do-call
   (interactive)
-  (transient-reset))
+  (transient-reset)
+  (let* ((scope (oref transient-current-prefix scope))
+         (value (robby--scope-robby-value scope)))
+    (transient-setup 'robby-builder nil nil
+                     :scope scope
+                     :value value)))
 
 ;;; Misc Suffixes
 (transient-define-suffix
@@ -195,7 +202,7 @@ customization values."
    ("b" "best of" "best-of=" :reader transient-read-number-N+ :always-read t)
    ("u" "user" "user=" :always-read t)]
   [[("a" "apply options" robby--apply-api-options)]
-   [("z" "reset to customization values" robby--reset-api-options)]])
+   [("x" "exit without applying options" robby--reset-api-options)]])
 
 ;;;###autoload (autoload 'robby-commands "robby-transients" "Display menu of custom robby commands." t)
 (transient-define-prefix robby-example-commands ()

@@ -69,7 +69,6 @@ Next, clone the ~robby~ repo and put its root directory in your load path, set y
 #+begin_src emacs-lisp
 (add-to-list 'load-path "~/path-to-robby")
 (require 'robby)
-(require 'robby)
 
 ;; (optional) bind a prefix key to the robby-command-map, default is "C-c C-r":
 (global-set-key (kbd "s-r") robby-command-map)
@@ -170,10 +169,11 @@ To see advanced options run ~transient-toggle-level-limit~ (=C-x a=), or [[https
 
 [[./images/advanced-builder-options.png]]
 
-Press =A= in the builder to see a menu of chat API options. For example, you can select which chat model to use. The first time you customize the model from the builder robby will fetch the list of models available to your account:
+Press =A= in the builder to see a menu of chat API options. For example, you can select which chat model to use. The first time you customize the model from the builder robby will fetch the list of models available to your account. Press =m= to pick a different model:
 
 [[./images/builder-api-options.png]]
 
+See the [[https://platform.openai.com/docs/api-reference/chat/create][OpenAI Chat API Documentation]] for details on the various options.
 * Defining Custom Commands
 ** Defining Simple Commands
 Use the ~robby-define-command~ macro to define custom robby commands. Here is a simple example:
