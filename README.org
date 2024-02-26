@@ -173,7 +173,13 @@ Press =A= in the builder to see a menu of chat API options. For example, you can
 
 [[./images/builder-api-options.png]]
 
-See the [[https://platform.openai.com/docs/api-reference/chat/create][OpenAI Chat API Documentation]] for details on the various options.
+You can experiment with the various options to tune a particular command. For
+example for certain commands you may want to set the =robby-chat-tempature= to =0=
+to produce more deterministic results. For other commands you may want to choose
+a different model, higher max tokens ec. See the [[https://platform.openai.com/docs/api-reference/chat/create][OpenAI Chat API Documentation]]
+for details on the various options. When you save a command via
+~robby-insert-last-command~ the API options you used will be persisted with the
+command definition.
 * Defining Custom Commands
 ** Defining Simple Commands
 Use the ~robby-define-command~ macro to define custom robby commands. Here is a simple example:
@@ -417,10 +423,12 @@ window.
 Summarize the text in the selected region or entire buffer if no the selected
 region, show a description in a robby view window.
 * Customization
-Use ~customize-group~ | ~robby~ to see the various customization options. Here are a few important ones:
+Use ~customize-group~ | ~robby~ to see the various customization options.
+
+The ~robby-chat-api~ group species the OpenAI API options. Here are a few important ones:
 - ~robby-chat-api~ :: customization group with options to pass to the Chat API.
 - ~robby-chat-model~ :: the model to use with the Chat API, for example, "gpt-4" or "gpt-3.5-turbo". 
-- ~robby-chat-max-tokens~, ~robby-completions-max-tokens~ ::  The maximum number of tokens to return in the response. The Robby default is ~300~, but you may want to increase this for longer responses.
+- ~robby-chat-max-tokens~ ::  The maximum number of tokens to return in the response. The Robby default is ~2000~, but you may want to increase this for longer responses, or decrease to reduce token usage.
 * Animated Gifs
 Using ~robby-view~ with conversation history:
 
