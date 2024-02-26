@@ -198,11 +198,9 @@ customization values."
    ("e" "temperature" "temperature=" :reader robby--read-decimal :always-read t)
    ("p" "top p" "top-p=" :reader robby--read-decimal :always-read t)
    ("n" "n" "n=" :reader transient-read-number-N+ :always-read t)
-   ("l" "log probabilities" "logprobs=" :reader transient-read-number-N+ :always-read t)
    ("o" "stop" "stop=" :always-read t)
    ("r" "presence penalty" "presence-penalty=" :reader robby--read-decimal :always-read t)
    ("f" "frequency penalty" "frequency-penalty=" :reader robby--read-decimal :always-read t)
-   ("b" "best of" "best-of=" :reader transient-read-number-N+ :always-read t)
    ("u" "user" "user=" :always-read t)]
   [[("a" "apply options" robby--apply-api-options)]
    [("x" "exit without applying options" robby--reset-api-options)]])

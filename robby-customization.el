@@ -119,15 +119,6 @@ comprising the top 10% probability mass are considered."
   :type '(choice number (const nil))
   :group 'robby-chat-api)
 
-(defcustom robby-chat-logprobs nil
-  "Include the log probabilities on the logprobs most likely tokens,
-as well the chosen tokens. For example, if logprobs is 5, the API
-will return a list of the 5 most likely tokens. The API will
-always return the logprob of the sampled token, so there may be
-up to logprobs+1 elements in the response."
-  :type '(choice integer (const nil))
-  :group 'robby-chat-api)
-
 (defcustom robby-chat-stop nil
   "Up to 4 sequences where the API will stop generating further
 tokens. The returned text will not contain the stop sequence."
@@ -145,13 +136,6 @@ model\\='s likelihood to talk about new topics."
   "Number between -2.0 and 2.0. Positive values penalize new tokens
 based on their existing frequency in the text so far, decreasing
 the model\\='s likelihood to repeat the same line verbatim."
-  :type '(choice number (const nil))
-  :group 'robby-chat-api)
-
-(defcustom robby-chat-best-of nil
-  "Generates best_of completions server-side and returns the
-\"best\" (the one with the highest log probability per
-token). Results cannot be streamed."
   :type '(choice number (const nil))
   :group 'robby-chat-api)
 
