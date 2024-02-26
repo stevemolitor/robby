@@ -41,7 +41,10 @@
 (defun robby--custom-type (symbol)
   (let ((type (get symbol 'custom-type)))
     (if (sequencep type)
-        (nth 1 type)
+        (let ((nested-type (nth 1 type)))
+          (if (sequencep nested-type)
+              (car nested-type)
+            nested-type))
       type)))
 
 (defun robby--transient-args-to-options (args)
