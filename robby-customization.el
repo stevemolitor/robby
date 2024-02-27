@@ -95,23 +95,26 @@ It should include a `%s' placeholder for the spinner."
   :type '(choice integer (const nil))
   :group 'robby-chat-api)
 
-(defun robby--validate-temperature (widget)
-  (let ((temp (widget-value widget)))
-    (unless (and (>= temp 0) (<= temp 1))
-      (widget-put widget :error (format "Invalid temperature %d, must be between 0 and 1 inclusive" temp))
-      widget)))
+(defun robby--validate-number-fn (name min max)
+  (lambda (widget)
+    (let ((value (widget-value widget)))
+      (unless (and (>= value min) (<= value max))
+        (widget-put widget :error (format "Invalid %s %d, must be between %d and %d inclusive" name value min max))
+        widget))))
 
 (defcustom robby-chat-temperature nil
-  "What sampling temperature to use. Defaults to 1."
-  :type '(choice (number :validate robby--validate-temperature) (const nil))
+  "What sampling temperature to use, a number between 0.0 and 2.0.
+Defaults to 1."
+  :type `(choice (number :validate ,(robby--validate-number-fn "temperature" 0.0 2.0)) (const nil))
   :group 'robby-chat-api)
 
 (defcustom robby-chat-top-p nil
   "An alternative to sampling with temperature, called nucleus
 sampling, where the model considers the results of the tokens
 with top_p probability mass. So 0.1 means only the tokens
-comprising the top 10% probability mass are considered."
-  :type '(choice number (const nil))
+comprising the top 10% probability mass are considered. Valid
+range is 0.0 to 2.0."
+  :type `(choice (number :validate ,(robby--validate-number-fn "temperature" 0.0 2.0)) (const nil))
   :group 'robby-chat-api)
 
 (defcustom robby-chat-n nil
@@ -129,7 +132,7 @@ tokens. The returned text will not contain the stop sequence."
   "Number between -2.0 and 2.0. Positive values penalize new tokens
 based on whether they appear in the text so far, increasing the
 model\\='s likelihood to talk about new topics."
-  :type '(choice number (const nil))
+  :type `(choice (number :validate ,(robby--validate-number-fn "presence-penalty" -2.0 2.0)) (const nil))
   :group 'robby-chat-api)
 
 (defcustom robby-chat-frequency-penalty nil
