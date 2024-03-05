@@ -31,6 +31,11 @@ For example \"a-b-c\" becomes \"a_b_c\"."
 For example \"a_b_c\" becomes \"a b c\""
   (replace-regexp-in-string "_" " " string))
 
+(defun robby--snake-to-kebob-case (string)
+  "Transform STRING from snake case to kebob case.
+For example \"a_b_c\" becomes \"a-b-c\""
+  (replace-regexp-in-string "_" "-" string))
+
 (defun robby--string-to-sym (string)
   (intern (format ":%s" string)))
 
@@ -80,12 +85,13 @@ API specifies the customization group, for example \"chat\" or
        (eq (nth 1 elem) 'custom-variable))
      (custom-group-members 'robby-chat-api nil)))))
 
-(defun robby--options (options)
+(defun robby--options-alist-for-api-request (options)
   "Get a list of options to pass to the OpenAI API.
 
 Grabs OpenAI customization options for the chat API as and merges
 them in with any specific options passed in OPTIONS. OPTIONS
-overrides customization options."
+overrides customization options. Return an alist of options to
+pass, where the keys are strings."
   (seq-sort-by
    #'car #'string<
    (map-merge
@@ -96,6 +102,35 @@ overrides customization options."
     (seq-map
      (lambda (assoc) (cons (robby--kebab-to-snake-case (replace-regexp-in-string "^:" "" (symbol-name (car assoc)))) (cdr assoc)))
      (robby--plist-to-alist options)))))
+
+(defun robby--current-options ()
+  "Get plist of options from current values in the `robby-chat-api' customization group."
+  (let* ((options-alist (seq-filter
+                         (lambda (elem) (not (null (cdr elem))))
+                         (robby--options-from-group)))
+         (sorted-options-alist (seq-sort-by #'car #'string< options-alist)))
+    (apply
+     #'append
+     (mapcar (lambda (elem)
+               (list
+                (robby--string-to-sym (robby--snake-to-kebob-case (car elem)))
+                (cdr elem)))
+             sorted-options-alist))))
+
+(defun robby--options-transient-value ()
+  "Get api options values for API from current customization
+values, formatted for use as the initial value of a transient
+prefix."
+  (let* ((custom-variables
+          (seq-filter
+           (lambda (var) (not (null (symbol-value var))))
+           (seq-map #'car (custom-group-members 'robby-chat-api nil))))
+         (regexp "^robby-chat-"))
+    (seq-map
+     (lambda (var)
+       (let ((key (replace-regexp-in-string regexp "" (symbol-name var))))
+         (format "%s=%s" key (symbol-value var))))
+     custom-variables)))
 
 ;;; API utils
 (defun robby--remove-api-prefix (api string)
@@ -129,7 +164,7 @@ Also include prompt history if HISTORYP is true."
   (let ((key (if streamp 'delta 'message)))
     (assoc-default 'content (assoc-default key (seq-first (assoc-default 'choices chunk))))))
 
-(defun robby--models-for-api (all-models)
+(defun robby--gpt-models (all-models)
   (seq-filter
    (lambda (name) (string-prefix-p "gpt" name))
    all-models))

@@ -219,7 +219,7 @@ value overrides the `robby-stream' customization variable."
          (prompt-result (if (functionp prompt) (apply prompt prompt-args-with-arg) (format "%s" prompt)))
          (basic-prompt (robby--format-prompt prompt-result))
          (request-input (robby--request-input basic-prompt historyp))
-         (payload (append request-input (robby--options api-options)))
+         (payload (append request-input (robby--options-alist-for-api-request api-options)))
          (response-buffer (get-buffer-create (robby--get-response-buffer action action-args)))
          (response-region (robby--get-response-region response-buffer))
          (streamp (robby--get-stream-p :never-stream-p never-stream-p :no-op-pattern no-op-pattern :grounding-fns grounding-fns))

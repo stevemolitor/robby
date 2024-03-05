@@ -22,6 +22,7 @@
     (define-key map "k" 'robby-kill-last-process)
     (define-key map "l" 'robby-clear-history)
     (define-key map "m" 'robby-message)
+    (define-key map "o" 'robby-api-options)
     (define-key map "p" 'robby-prepend-region)
     (define-key map "r" 'robby-replace-region)
     (define-key map "u" 'robby-run-last-command)

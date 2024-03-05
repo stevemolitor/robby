@@ -18,6 +18,9 @@
 (ert-deftest robby--snake-to-space-case ()
   (should (equal (robby--snake-to-space-case "a_b_c") "a b c")))
 
+(ert-deftest robby--snake-to-kebob-case ()
+  (should (equal (robby--snake-to-kebob-case "a_b_c") "a-b-c")))
+
 ;;; property list utils tests
 (ert-deftest robby--plist-to-alist ()
   (should (equal (robby--plist-to-alist '(:a 1 :b 2))
@@ -31,16 +34,24 @@
   (should (equal (robby--plist-keys '(:a 1 :b "2"))
                  '(:a :b))))
 
-;;; robby--options test
-(ert-deftest robby--options ()
+;;; robby API options tests
+(ert-deftest robby--options-alist-for-api-request ()
   (let ((robby-chat-model "gpt-4")
         (robby-chat-max-tokens 100)
         (robby-chat-temperature 1.0))
-    (should (equal (robby--options '(:max-tokens 2))
+    (should (equal (robby--options-alist-for-api-request '(:max-tokens 2))
                    '(("max_tokens" . 2)
                      ("model" . "gpt-4")
                      ("temperature" . 1.0))))))
 
+(ert-deftest robby--current-options ()
+  (let ((robby-chat-model "gpt-4")
+        (robby-chat-max-tokens 100)
+        (robby-chat-temperature 1.0))
+    (should (equal (robby--current-options)
+                   '(:max-tokens 100 :model "gpt-4" :temperature 1.0)))))
+
+;;; request input tests
 (ert-deftest robby--request-input--no-history ()
   (robby--with-history
    nil
@@ -60,6 +71,7 @@
                          ((role . "user") (content . "Where was it played?"))
                          ]))))))
 
+;;; chunk content tests
 (ert-deftest robby--chunk-content--no-streaming ()
   (let ((resp '((choices . [((index . 0)
                              (message
@@ -80,6 +92,7 @@
              (robby--chunk-content resp t)
              "Hello"))))
 
+;;; models for api tests
 (ert-deftest robby--models-for-api ()
   (let ((all-models '("gpt-3.5-turbo" "gpt-4" "text-davinci-003" "text-davinci-002" "text-davinci-edit-001")))
     (should (equal (robby--models-for-api all-models) '("gpt-3.5-turbo" "gpt-4")))))
