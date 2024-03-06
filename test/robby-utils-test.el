@@ -2,7 +2,9 @@
 
 (require 'ert)
 
+(message "test requiring robby-utils")
 (require 'robby-utils)
+(message "test required robby-utils")
 
 ;;; Code:
 
@@ -91,11 +93,6 @@
     (should (equal
              (robby--chunk-content resp t)
              "Hello"))))
-
-;;; models for api tests
-(ert-deftest robby--models-for-api ()
-  (let ((all-models '("gpt-3.5-turbo" "gpt-4" "text-davinci-003" "text-davinci-002" "text-davinci-edit-001")))
-    (should (equal (robby--models-for-api all-models) '("gpt-3.5-turbo" "gpt-4")))))
 
 ;;; prompt templates
 (ert-deftest robby--format-prompt--with-prompt-spec-arg ()

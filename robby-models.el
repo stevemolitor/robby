@@ -1,6 +1,5 @@
 ;;; robby-models.el  --- Update available models from OpenAI   -*- lexical-binding:t -*-
 
-
 (require 'robby-api-key)
 (require 'robby-request)
 (require 'robby-customization)
