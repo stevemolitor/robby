@@ -43,11 +43,6 @@ support streaming."
   :type 'boolean
   :group 'robby)
 
-(defcustom robby-confirm-whole-buffer-p t
-  "If true, confirm before sending the entire buffer as the prompt."
-  :type 'boolean
-  :group 'robby)
-
 (defcustom robby-prompt-spec-fn #'robby-make-prompt-spec
   "Function that returns a prompt format spec.
 
