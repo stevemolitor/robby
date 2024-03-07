@@ -45,6 +45,15 @@ For example \"a_b_c\" becomes \"a-b-c\""
 (defun robby--empty-p (thing)
   (or (null thing) (string= thing "")))
 
+(defun robby--decimal-p (str)
+  (string-match-p
+   (rx string-start
+       (?  (or "+" "-"))
+       (1+ digit)
+       (0+ "." (1+ digit))
+       string-end)
+   str))
+
 ;;; property list utils
 (defun robby--plist-to-alist (plist)
   "Convert PLIST to an association list (alist)."

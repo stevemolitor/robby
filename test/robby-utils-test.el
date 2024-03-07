@@ -36,6 +36,21 @@
   (should (equal (robby--plist-keys '(:a 1 :b "2"))
                  '(:a :b))))
 
+(ert-deftest robby--decimal-p ()
+  (should (not (null (robby--decimal-p "1.0"))))
+  (should (not (null (robby--decimal-p "0"))))
+  (should (not (null (robby--decimal-p "-0.1"))))
+  (should (not (null (robby--decimal-p "-0000.1"))))
+  (should (not (null (robby--decimal-p "+0.1"))))
+  (should (not (null (robby--decimal-p "+00.1"))))
+  (should (not (null (robby--decimal-p "0"))))
+  (should (not (null (robby--decimal-p "001"))))
+  (should (not (null (robby--decimal-p "001.1"))))
+  (should (null (robby--decimal-p "x")))
+  ;; (should (null (robby--decimal-p "0.")))
+  (should (null (robby--decimal-p "a0")))
+  (should (null (robby--decimal-p "0 "))))
+
 ;;; robby API options tests
 (ert-deftest robby--options-alist-for-api-request ()
   (let ((robby-chat-model "gpt-4")

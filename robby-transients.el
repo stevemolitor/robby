@@ -15,6 +15,7 @@
 (require 'robby-prompts)
 (require 'robby-run-command)
 (require 'robby-utils)
+(require 'robby-validation)
 
 ;;; Code:
 
@@ -73,6 +74,34 @@
   (interactive)
   (format "%s" (read-number prompt)))
 
+(defun robby--read-option-with-validation (option prompt initial-input history)
+  (save-match-data
+    (cl-block nil
+      (while t
+        (let* ((str (read-from-minibuffer prompt initial-input nil nil history))
+               (err-msg (robby--validate option str)))
+          (if err-msg
+              (progn
+                (message err-msg)
+                (sit-for 1))
+            (cl-return str)))))))
+
+(defun robby--read-temperature (prompt initial-input history)
+  (interactive)
+  (robby--read-option-with-validation 'chat-temperature prompt initial-input history))
+
+(defun robby--read-top-p (prompt initial-input history)
+  (interactive)
+  (robby--read-option-with-validation 'chat-top-p prompt initial-input history))
+
+(defun robby--read-presence-penalty (prompt initial-input history)
+  (interactive)
+  (robby--read-option-with-validation 'chat-presence-penalty prompt initial-input history))
+
+(defun robby--read-frequency-penalty (prompt initial-input history)
+  (interactive)
+  (robby--read-option-with-validation 'chat-frequency-penalty prompt initial-input history))
+
 ;;; Action Suffixes
 (transient-define-suffix
   robby--respond-with-robby-view-suffix ()
@@ -127,12 +156,12 @@
    ("m" "model" "model=" :always-read t :choices ,(robby--get-models))
    ("s" "suffix" "suffix=" :always-read t)
    ("t" "max tokens" "max-tokens=" :reader transient-read-number-N+ :always-read t)
-   ("e" "temperature" "temperature=" :reader robby--read-decimal :always-read t)
-   ("p" "top p" "top-p=" :reader robby--read-decimal :always-read t)
+   ("e" "temperature" "temperature=" :reader robby--read-temperature :always-read t)
+   ("p" "top p" "top-p=" :reader robby--read-top-p :always-read t)
    ("n" "n" "n=" :reader transient-read-number-N+ :always-read t)
    ("o" "stop" "stop=" :always-read t)
-   ("r" "presence penalty" "presence-penalty=" :reader robby--read-decimal :always-read t)
-   ("f" "frequency penalty" "frequency-penalty=" :reader robby--read-decimal :always-read t)
+   ("r" "presence penalty" "presence-penalty=" :reader robby--read-presence-penalty :always-read t)
+   ("f" "frequency penalty" "frequency-penalty=" :reader robby--read-frequency-penalty :always-read t)
    ("u" "user" "user=" :always-read t)]
   [[("a" "apply options" robby--apply-api-options :transient transient--do-return)]
    [("x" "exit without applying options" ignore :transient transient--do-return :if (lambda () transient-current-command))]])
