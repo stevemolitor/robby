@@ -154,7 +154,6 @@
   :init-value 'robby--init-api-options
   ["Chat API Options"
    ("m" "model" "model=" :always-read t :choices ,(robby--get-models))
-   ("s" "suffix" "suffix=" :always-read t)
    ("t" "max tokens" "max-tokens=" :reader transient-read-number-N+ :always-read t)
    ("e" "temperature" "temperature=" :reader robby--read-temperature :always-read t)
    ("p" "top p" "top-p=" :reader robby--read-top-p :always-read t)
@@ -177,7 +176,6 @@
    ("i" "simple prompt" "prompt=" :always-read t :level 3)]
   ["Prompt from Region or Buffer Options"
    ("p" "prompt prefix" "prompt-prefix=" :always-read t :level 3)
-   ("s" "prompt suffix" "prompt-suffix=" :always-read t :level 3)
    ("b" "prompt buffer" "prompt-buffer=" :reader robby--read-buffer :level 6)]
   [["Region Actions"
     ("x" "prefix region with response" robby--prefix-region-with-response-suffix :level 3)

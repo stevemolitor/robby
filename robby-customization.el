@@ -85,11 +85,6 @@ It should include a `%s' placeholder for the spinner."
   :type 'string
   :group 'robby-chat-api)
 
-(defcustom robby-chat-suffix nil
-  "The suffix that comes after a completion of inserted text."
-  :type '(choice string (const nil))
-  :group 'robby-chat-api)
-
 (defcustom robby-chat-max-tokens 2000
   "The maximum number of tokens to generate in the completion."
   :type '(choice integer (const nil))
