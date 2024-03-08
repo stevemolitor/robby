@@ -32,7 +32,7 @@ If INCLUDE-NAME is non-nil, include the option name in the error message."
       (error "No validation range for %s" name))
 
     ;; an empty string or nil is valid
-    (if (or (not value) (string= value ""))
+    (if (or (not value) (and (stringp value) (string= value "")))
         nil
       ;; value must be a number or a string that can be converted to a number
       (if (or (symbolp value)

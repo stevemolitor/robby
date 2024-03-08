@@ -11,6 +11,15 @@
 ;;; Code:
 (declare-function robby-make-prompt-spec "robby-utils" (file-name file-ext))
 
+;;; function to validate custom api options
+(defun robby--validate-custom-api-option (name)
+  (lambda (widget)
+    (let* ((value (widget-value widget))
+           (err-msg (robby--validate name value)))
+      (when err-msg
+        (widget-put widget :error (format "Invalid value for %s. %s" name err-msg))
+        widget))))
+
 ;;; general settings
 (defgroup robby nil
   "Simple AI Integration for Emacs."
@@ -85,14 +94,6 @@ It should include a `%s' placeholder for the spinner."
   :type '(choice integer (const nil))
   :group 'robby-chat-api)
 
-(defun robby--validate-custom-api-option (name)
-  (lambda (widget)
-    (let* ((value (widget-value widget))
-           (err-msg (robby--validate name value)))
-      (when err-msg
-        (widget-put widget :error (format "Invalid value for %s. %s" name err-msg))
-        widget))))
-
 (defcustom robby-chat-temperature nil
   "What sampling temperature to use, a number between 0.0 and 2.0.
 Defaults to 1."
@@ -142,7 +143,7 @@ OpenAI to monitor and detect abuse."
 (defcustom robby-chat-system-message "You are an AI tool embedded within Emacs. Assist users with their tasks and provide information as needed. Do not engage in harmful or malicious behavior. Please provide helpful information. Answer concisely."
   "System message used with Chat API"
   :type 'string
-  :group 'robby)
+  :group 'robby-chat)
 
 (provide 'robby-customization)
 
