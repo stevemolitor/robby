@@ -173,13 +173,19 @@ Press =A= in the builder to see a menu of chat API options. For example, you can
 
 [[./images/builder-api-options.png]]
 
-You can experiment with the various options to tune a particular command. For
-example for certain commands you may want to set the =robby-chat-tempature= to =0=
-to produce more deterministic results. For other commands you may want to choose
-a different model, higher max tokens ec. See the [[https://platform.openai.com/docs/api-reference/chat/create][OpenAI Chat API Documentation]]
-for details on the various options. When you save a command via
-~robby-insert-last-command~ the API options you used will be persisted with the
-command definition.
+You can experiment with the various chat API options to tune a particular
+command. For example for certain commands you may want to set the
+=robby-chat-tempature= to =0= to produce more deterministic results. For other
+commands you may want to choose a different model, higher max tokens ec. See the
+[[https://platform.openai.com/docs/api-reference/chat/create][OpenAI Chat API Documentation]] for details on the various options. When you save
+a command via ~robby-insert-last-command~ the API options you used will be
+persisted with the command definition.
+
+When you select =m= to select a model, robby will fetch the models available to you from OpenAI:
+
+[[./images/api-options-models.png]]
+
+You can also access the API options transient directly via =M-x robby-api-options=, or by customizing the ~robby-chat~ customization group.
 * Defining Custom Commands
 ** Defining Simple Commands
 Use the ~robby-define-command~ macro to define custom robby commands. Here is a simple example:
