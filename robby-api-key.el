@@ -19,7 +19,7 @@
         secret)
     (user-error "No `robby-api-key' found in auth source")))
 
-(defcustom robby-openai-api-key #'robby--get-api-key-from-auth-source 
+(defcustom robby-openai-api-key #'robby--get-api-key-from-auth-source
   "OpenAI API key.
 
 A string, or a function that returns the API key."
@@ -37,4 +37,4 @@ A string, or a function that returns the API key."
 
 (provide 'robby-api-key)
 
-;; robby-api-key.el ends here
+;;; robby-api-key.el ends here
