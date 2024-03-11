@@ -1,13 +1,16 @@
-;;; robby --- Extensible OpenAI Integration for Emacs  -*- lexical-binding:t -*-
+;;; robby.el --- Extensible OpenAI Integration -*- lexical-binding:t -*-
 
+;; Author: Steve Molitor <stevemolitor@gmail.com>
+;; Maintainer: Steve Molitor <stevemolitor@gmail.com>
+;; URL: https://github.com/stevemolitor/robby
 ;; Version: 0.0.1
 ;; Package-Requires: ((emacs "29.1") (spinner "1.7.4") (transient "0.5.3") (markdown-mode "2.5"))
 ;; Homepage: https://github.com/stevemolitor/robby
 
 ;;; Commentary:
 
-;; Robby provides an extensible Emacs interface to OpenAI. It provides
-;; basic commands to use OpenAI with regions, the minibuffer, and help
+;; Robby provides an extensible interface to OpenAI. It provides basic
+;; commands to use OpenAI with regions, the minibuffer, and help
 ;; windows. It also provides a mechanism for defining your own
 ;; interactive AI commands, and to save the last executed command as a
 ;; reusable custom AI command. See the README for more details.
@@ -16,7 +19,6 @@
 (eval-when-compile
   (require 'cl-generic)
   (require 'cl-lib)
-  (require 'cl-macs)
   (require 'cus-edit)
   (require 'diff)
   (require 'files)
@@ -37,5 +39,4 @@
 (require 'robby-transients)
 
 (provide 'robby)
-
 ;;; robby.el ends here

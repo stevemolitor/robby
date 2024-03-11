@@ -7,6 +7,7 @@
 (require 'spinner)
 
 (require 'robby-api-key)
+(require 'robby-validation)
 
 ;;; Code:
 (declare-function robby-make-prompt-spec "robby-utils" (file-name file-ext))

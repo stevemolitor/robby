@@ -49,7 +49,6 @@
     (define-key map robby-keymap-prefix robby-command-map)
     map))
 
-;;;###autoload (autoload 'robby--kill-robby-process "robby-mode" "Silently kill any robby process associated with the current buffer." t)
 (defun robby--kill-robby-process ()
   "Silently kill any robby process associated with the current
 buffer."

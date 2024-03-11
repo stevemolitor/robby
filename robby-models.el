@@ -28,11 +28,11 @@
                (resp (json-read))
                (err (robby--request-parse-error-data resp)))
           (if err
-              (funcall on-error err)
+              (error "Error fetching models: %S" err)
             (let* ((all-models (seq-map (lambda (obj) (cdr (assoc 'id obj))) (cdr (assoc 'data resp))))
                    (gpt-models (seq-filter (lambda (name) (string-prefix-p "gpt" name)) all-models)))
               (setq robby-models gpt-models))))))))
 
 (provide 'robby-models)
 
-;; robby--get-models.el ends here
+;; robby-models.el ends here

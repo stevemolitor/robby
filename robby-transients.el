@@ -138,7 +138,7 @@
     (seq-do
      (lambda (arg)
        (let* ((parts (split-string arg "="))
-              (key-str (car parts)) (key-sym (intern (format ":%s" key-str)))
+              (key-str (car parts))
               (raw-value (cadr parts))
               (custom-var (intern (format "robby-chat-%s" key-str)))
               (custom-type (robby--custom-type custom-var))

@@ -6,7 +6,7 @@
 
 ;; Robby utility functions.
 
-(require 'cl-macs)
+(require 'cl-lib)
 (require 'cus-edit)
 (require 'map)
 (require 'seq)
@@ -113,7 +113,8 @@ pass, where the keys are strings."
      (robby--plist-to-alist options)))))
 
 (defun robby--current-options ()
-  "Get plist of options from current values in the `robby-chat-api' customization group."
+  "Get plist of options from current values in the `robby-chat-api'
+customization group."
   (let* ((options-alist (seq-filter
                          (lambda (elem) (not (null (cdr elem))))
                          (robby--options-from-group)))

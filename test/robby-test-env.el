@@ -4,7 +4,9 @@
 
 ;;; Code:
 
-(defconst robby--test-deps '(markdown-mode spinner))
+(setq package-lint-main-file "/Users/stephenmolitor/repos/robby/robby.el")
+
+(defconst robby--test-deps '(markdown-mode spinner package-lint))
 
 (defconst robby--test-dir (file-name-directory (or load-file-name ".")))
 
