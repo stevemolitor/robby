@@ -8,11 +8,6 @@
 
 ;;; Code:
 
-(defmacro robby--with-history (history &rest body)
-  "Execute BODY with history set to HISTORY."
-  `(let ((robby--history ,history))
-     ,@body))
-
 ;;; string utils tests
 (ert-deftest robby--kebab-to-snake-case ()
   (should (equal (robby--kebab-to-snake-case "a-b-c") "a_b_c")))
@@ -65,28 +60,27 @@
   (let ((robby-chat-model "gpt-4")
         (robby-chat-max-tokens 100)
         (robby-chat-temperature 1.0))
-    (should (equal (robby--current-options)
+    (should (equal (robby--current-options 'robby-chat-api "chat")
                    '(:max-tokens 100 :model "gpt-4" :temperature 1.0)))))
 
 ;;; request input tests
 (ert-deftest robby--request-input--no-history ()
-  (robby--with-history
-   nil
-   (let ((input (robby--request-input "hello" nil)))
-     (should (equal input `((messages . [((role . "system") (content . ,robby-chat-system-message))
-                                         ((role . "user") (content . "hello"))])))))))
+  (let ((input (robby--request-input "hello" nil nil)))
+    (should (equal input `((messages . [((role . "system") (content . ,robby-chat-system-message))
+                                        ((role . "user") (content . "hello"))]))))))
 
 (ert-deftest robby--request-input--with-history ()
-  (robby--with-history
-   '(("Who won the world series in 2020?" . "The Los Angeles Dodgers won the World Series in 2020."))
-   (should (equal
-            (robby--request-input "Where was it played?" t)
-            `((messages .
-                        [((role . "system") (content . ,robby-chat-system-message))
-                         ((role . "user") (content . "Who won the world series in 2020?"))
-                         ((role . "assistant") (content . "The Los Angeles Dodgers won the World Series in 2020."))
-                         ((role . "user") (content . "Where was it played?"))
-                         ]))))))
+  (should (equal
+           (robby--request-input
+            "Where was it played?"
+            t
+            '(("Who won the world series in 2020?" . "The Los Angeles Dodgers won the World Series in 2020.")))
+           `((messages .
+                       [((role . "system") (content . ,robby-chat-system-message))
+                        ((role . "user") (content . "Who won the world series in 2020?"))
+                        ((role . "assistant") (content . "The Los Angeles Dodgers won the World Series in 2020."))
+                        ((role . "user") (content . "Where was it played?"))
+                        ])))))
 
 ;;; chunk content tests
 (ert-deftest robby--chunk-content--no-streaming ()

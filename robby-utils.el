@@ -11,9 +11,6 @@
 (require 'map)
 (require 'seq)
 
-(require 'robby-customization)
-(require 'robby-history)
-
 ;;; Code:
 
 ;;; string utils
@@ -77,23 +74,6 @@ For example \"a_b_c\" becomes \"a-b-c\""
            collect
            key))
 
-(defun robby--options-from-group ()
-  "Get list of options from a Robby `robby-chat-api' customization group.
-
-API specifies the customization group, for example \"chat\" or
-\"completions\".  Returns an association list of options."
-  (seq-map
-   (lambda (sym)
-     (cons
-      (robby--kebab-to-snake-case (robby--remove-api-prefix "chat" (symbol-name sym)))
-      (symbol-value sym)))
-   (seq-map
-    #'car
-    (seq-filter
-     (lambda (elem)
-       (eq (nth 1 elem) 'custom-variable))
-     (custom-group-members 'robby-chat-api nil)))))
-
 (defun robby--options-alist-for-api-request (options)
   "Get a list of options to pass to the OpenAI API.
 
@@ -107,17 +87,37 @@ pass, where the keys are strings."
     'alist
     (seq-filter
      (lambda (elem) (not (null (cdr elem))))
-     (robby--options-from-group))
+     (robby--options-from-group 'robby-chat-api "chat"))
     (seq-map
      (lambda (assoc) (cons (robby--kebab-to-snake-case (replace-regexp-in-string "^:" "" (symbol-name (car assoc)))) (cdr assoc)))
      (robby--plist-to-alist options)))))
 
-(defun robby--current-options ()
-  "Get plist of options from current values in the `robby-chat-api'
-customization group."
+(defun robby--options-from-group (group api)
+  "Get list of options from a Robby `robby-chat-api' customization group.
+
+API specifies the customization group, for example \"chat\" or
+\"completions\".  Returns an association list of options."
+  (seq-map
+   (lambda (sym)
+     (cons
+      (robby--kebab-to-snake-case (robby--remove-api-prefix api (symbol-name sym)))
+      (symbol-value sym)))
+   (seq-map
+    #'car
+    (seq-filter
+     (lambda (elem)
+       (eq (nth 1 elem) 'custom-variable))
+     (custom-group-members group nil)))))
+
+(defun robby--current-options (group api)
+  "Get plist of options from current values in customization group
+GROUP.
+
+API specifies the customization group, for example \"chat\" or
+\"completions\". Returns an association list of options."
   (let* ((options-alist (seq-filter
                          (lambda (elem) (not (null (cdr elem))))
-                         (robby--options-from-group)))
+                         (robby--options-from-group group api)))
          (sorted-options-alist (seq-sort-by #'car #'string< options-alist)))
     (apply
      #'append
@@ -149,9 +149,11 @@ For example, \"robby-chat-temperature\" becomes \"temperature\""
   (let ((regexp (format "^robby-%s-" api)))
     (replace-regexp-in-string regexp "" string)))
 
-(defun robby--request-input (prompt historyp)
+(defun robby--request-input (prompt historyp history)
   "Return OpenAI chat API input data including PROMPT.
-Also include prompt history if HISTORYP is true."
+
+Also include prompt history if HISTORYP is true. HISTORY is the
+history variable containing the conversation history list."
   (let* ((system-message `((role . "system") (content . ,robby-chat-system-message)))
          (formatted-messages
           (if historyp
@@ -163,7 +165,7 @@ Also include prompt history if HISTORYP is true."
                    vec
                    `(((role . "user") (content . ,(car history-elem)))
                      ((role . "assistant") (content . ,(cdr history-elem))))))
-                robby--history
+                history
                 '[])
                `(((role . "user") (content . ,prompt))))
             `[,system-message ((role . "user") (content . ,prompt))])))
