@@ -156,7 +156,7 @@ continue the conversation or quit.
 CHARS-PROCESSED indicates the number of characters already
 processed in a chunked response. It is used to determine if this
 is the first chunk, and if so display the RESPONSE-BUFFER."
-  (robby--show-robby-view :show-prompt-p nil :chars-processed chars-processed :prompt prompt :text text :completep completep :response-buffer response-buffer))
+  (robby--show-robby-view :show-prompt-p nil :chars-processed chars-processed :text text :completep completep :response-buffer response-buffer))
 
 (provide 'robby-actions)
 
