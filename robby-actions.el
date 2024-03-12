@@ -25,7 +25,6 @@
 
 Use to prepend possibly chunked AI response to region, or insert
 at point if no selected region."
-"
   (when (eq chars-processed 0)
     (goto-char beg)
     (insert "\n"))
