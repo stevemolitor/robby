@@ -6,22 +6,21 @@
 ;; as the `:action' parameter when defining custom robby commands via
 ;; `robby-define-command'.
 
+;;; Code:
 (require 'diff)
 (require 'markdown-mode)
 
 (require 'robby-utils)
 
-;;; Code:
-
 ;;; message actions
 (cl-defun robby-respond-with-message (&key text &allow-other-keys)
   "Show TEXT in minibuffer message."
-  (message "")                          ;; clear any end of line from a previous message
+  (message "") ;; clear any end of line from a previous message
   (message (robby--format-message-text text)))
 
 ;;; region actions
 (cl-defun robby-prepend-response-to-region (&key text beg chars-processed &allow-other-keys)
-  "Insert TEXT at point BEG + CHARS-PROCESSED.
+  "Insert TEXT before point at BEG + CHARS-PROCESSED.
 
 Use to prepend possibly chunked AI response to region, or insert
 at point if no selected region."
@@ -32,7 +31,13 @@ at point if no selected region."
   (insert (format "%s" text)))
 
 (cl-defun robby-append-response-to-region (&key text end chars-processed &allow-other-keys)
-  "Append AI response to region, or insert at point if no selected region."
+  "Insert TEXT after point at END + CHARS-PROCESSED.
+
+Use to append possibly chunked AI response to region, or insert
+at point if no selected region.
+
+Handles proper formatting by inserting a newline or extra
+character if necessary."
   (when (eq chars-processed 0)
     (goto-char end)
     (insert "\n"))
@@ -43,8 +48,14 @@ at point if no selected region."
 (defvar-local robby--new-temp-buffer nil)
 
 (cl-defun robby-replace-region-with-response (&key arg text beg end chars-processed completep &allow-other-keys)
-  "Replace region with AI response, or insert at point no selected region."
-  
+  "Replace region with AI response, or insert at point no selected region.
+
+Replaces region between BEG + CHARS-PROCESSED and END with TEXT.
+TEXT may be part of a chunked response.
+
+COMPLETEP indicates whether this is the last chunk. If COMPLETEP
+is t and ARG is not nil, show a diff buffer of the changes and
+ask the user for confirmation before applying."
   ;; confirm before replacing
   (when arg
     ;; first time: capture current region text in old temp buffer
@@ -100,7 +111,17 @@ at point if no selected region."
 (defconst robby--end-view-message "\n___\n")
 
 (cl-defun robby--show-robby-view (&key show-prompt-p chars-processed prompt text completep response-buffer &allow-other-keys)
-  "Show PROMPT and TEXT in robby-view-mode buffer."
+  "Insert PROMPT followed by TEXT in `robby-view-mode' buffer RESPONSE-BUFFER.
+
+When SHOW-PROMPT-P it t also insert PROMPT before TEXT. TEXT may
+be part of a chunked response.
+
+When COMPLETEP is t show a message to the user explaining how to
+continue the conversation or quit.
+
+CHARS-PROCESSED indicates the number of characters already
+processed in a chunked response. It is used to determine if this
+is the first chunk, and if so display the RESPONSE-BUFFER."
   (with-current-buffer response-buffer
     (when (and (eq chars-processed 0) (not (window-live-p (get-buffer-window))))
       (display-buffer (current-buffer) '(display-buffer-reuse-window . ((dedicated . t) (body-function . select-window)))))
@@ -116,11 +137,25 @@ at point if no selected region."
         (message "%s" (substitute-command-keys "Type \\<robby-view-mode-map>\\[robby-view] to continue the conversation, or \\<robby-view-mode-map>\\[kill-this-buffer] to stop and kill this buffer."))))))
 
 (cl-defun robby-respond-with-robby-view (&key chars-processed prompt text completep response-buffer &allow-other-keys)
-  "Show PROMPT and TEXT in robby-view-mode buffer."
+  "Show PROMPT and TEXT in `robby-view-mode' buffer RESPONSE-BUFFER.
+
+When COMPLETEP is t show a message to the user explaining how to
+continue the conversation or quit.
+
+CHARS-PROCESSED indicates the number of characters already
+processed in a chunked response. It is used to determine if this
+is the first chunk, and if so display the RESPONSE-BUFFER."
   (robby--show-robby-view :show-prompt-p t :chars-processed chars-processed :prompt prompt :text text :completep completep :response-buffer response-buffer))
 
-(cl-defun robby-respond-with-robby-view-without-prompt (&key chars-processed prompt text completep response-buffer &allow-other-keys)
-  "Show PROMPT and TEXT in robby-view-mode buffer."
+(cl-defun robby-respond-with-robby-view-without-prompt (&key chars-processed text completep response-buffer &allow-other-keys)
+  "Show TEXT in `robby-view-mode' buffer RESPONSE-BUFFER.
+
+When COMPLETEP is t show a message to the user explaining how to
+continue the conversation or quit.
+
+CHARS-PROCESSED indicates the number of characters already
+processed in a chunked response. It is used to determine if this
+is the first chunk, and if so display the RESPONSE-BUFFER."
   (robby--show-robby-view :show-prompt-p nil :chars-processed chars-processed :prompt prompt :text text :completep completep :response-buffer response-buffer))
 
 (provide 'robby-actions)
