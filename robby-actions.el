@@ -21,7 +21,11 @@
 
 ;;; region actions
 (cl-defun robby-prepend-response-to-region (&key text beg chars-processed &allow-other-keys)
-  "Prepend AI response to region, or insert at point if no selected region."
+  "Insert TEXT at point BEG + CHARS-PROCESSED.
+
+Use to prepend possibly chunked AI response to region, or insert
+at point if no selected region."
+"
   (when (eq chars-processed 0)
     (goto-char beg)
     (insert "\n"))
