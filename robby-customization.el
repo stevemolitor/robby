@@ -8,9 +8,9 @@
 
 (require 'robby-api-key)
 (require 'robby-validation)
+(require 'robby-utils)
 
 ;;; Code:
-(declare-function robby-make-prompt-spec "robby-utils" (file-name file-ext))
 
 ;;; function to validate custom api options
 (defun robby--validate-custom-api-option (name)
@@ -39,7 +39,7 @@ the conversation history."
   :group 'robby)
 
 (defcustom robby-stream-p t
-  "Stream responses from OpenAI if t"
+  "Stream responses from OpenAI if t."
   :type  'boolean
   :group 'robby)
 
