@@ -43,8 +43,7 @@
    '()))
 
 (defun robby--run-transient-command (action &optional arg)
-  (let* ((api-options (robby--current-options 'robby-chat-api "chat"))
-         (args (transient-args transient-current-command))
+  (let* ((args (transient-args transient-current-command))
          (simple-prompt (transient-arg-value "prompt=" args))
          (prompt-prefix (transient-arg-value "prompt-prefix=" args))
          (prompt-suffix (transient-arg-value "prompt-suffix=" args))
@@ -60,8 +59,7 @@
      :prompt prompt
      :prompt-args prompt-args
      :action action
-     :action-args action-args
-     :api-options api-options)))
+     :action-args action-args)))
 
 ;;; Readers
 (defun robby--read-buffer (_prompt _initial-input _history)
