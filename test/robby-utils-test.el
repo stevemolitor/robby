@@ -2,9 +2,7 @@
 
 (require 'ert)
 
-(message "test requiring robby-utils")
 (require 'robby-utils)
-(message "test required robby-utils")
 
 ;;; Code:
 
@@ -54,6 +52,18 @@
     (should (equal (robby--options-alist-for-api-request '(:max-tokens 2))
                    '(("max_tokens" . 2)
                      ("model" . "gpt-4")
+                     ("temperature" . 1.0))))))
+
+(ert-deftest robby--options-alist-for-api-request-returns-stop-array ()
+  ;; we only support a single "stop" string, but the API expects an array
+  (let ((robby-chat-model "gpt-4")
+        (robby-chat-max-tokens 100)
+        (robby-chat-temperature 1.0)
+        (robby-chat-stop "stop"))
+    (should (equal (robby--options-alist-for-api-request '())
+                   '(("max_tokens" . 100)
+                     ("model" . "gpt-4")
+                     ("stop" . ("stop")) 
                      ("temperature" . 1.0))))))
 
 (ert-deftest robby--current-options ()

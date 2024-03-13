@@ -74,6 +74,18 @@ For example \"a_b_c\" becomes \"a-b-c\""
            collect
            key))
 
+(defun robby--to-stop-array-vals (options)
+  "Tranform \"stop\" values in OPTIONS alist to lists.
+
+We only support a single stop string, but the OpenAI API expects
+an array."
+  (seq-map (lambda (elem)
+             (let* ((key (car elem))
+                    (val (cdr elem))
+                    (fixed-val (if (string= key "stop") `(,val) val)))
+               `(,key . ,fixed-val)))
+           options))
+
 (defun robby--options-alist-for-api-request (options)
   "Get a list of options to pass to the OpenAI API.
 
@@ -83,14 +95,15 @@ overrides customization options. Return an alist of options to
 pass, where the keys are strings."
   (seq-sort-by
    #'car #'string<
-   (map-merge
-    'alist
-    (seq-filter
-     (lambda (elem) (not (null (cdr elem))))
-     (robby--options-from-group 'robby-chat-api "chat"))
-    (seq-map
-     (lambda (assoc) (cons (robby--kebab-to-snake-case (replace-regexp-in-string "^:" "" (symbol-name (car assoc)))) (cdr assoc)))
-     (robby--plist-to-alist options)))))
+   (robby--to-stop-array-vals
+    (map-merge
+     'alist
+     (seq-filter
+      (lambda (elem) (not (null (cdr elem))))
+      (robby--options-from-group 'robby-chat-api "chat"))
+     (seq-map
+      (lambda (assoc) (cons (robby--kebab-to-snake-case (replace-regexp-in-string "^:" "" (symbol-name (car assoc)))) (cdr assoc)))
+      (robby--plist-to-alist options))))))
 
 (defun robby--options-from-group (group api)
   "Get list of options from a Robby `robby-chat-api' customization group.
