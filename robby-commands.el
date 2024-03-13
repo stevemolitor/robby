@@ -4,12 +4,12 @@
 
 ;; Built in Robby commands.
 
+;;; Code:
+
 (require 'robby-define-command)
 (require 'robby-prompts)
 (require 'robby-actions)
 (require 'robby-grounding-fns)
-
-;;; Code:
 
 ;;;###autoload (autoload 'robby-view "robby-commands" "Query AI from minibuffer, respond in robby-view-mode buffer." t)
 (robby-define-command

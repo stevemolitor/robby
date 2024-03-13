@@ -4,9 +4,9 @@
 
 ;; functions and customization variables for managing robby's OpenAI key
 
+;;; Code:
 (require 'auth-source)
 
-;;; Code:
 (defun robby--get-api-key-from-auth-source ()
   "Get api key from auth source."
   (if-let ((secret (plist-get (car (auth-source-search

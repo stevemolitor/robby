@@ -4,16 +4,19 @@
 
 ;; Robby customization variables and groups.
 
+;;; Code:
+
 (require 'spinner)
 
 (require 'robby-api-key)
 (require 'robby-validation)
 (require 'robby-utils)
 
-;;; Code:
-
 ;;; function to validate custom api options
 (defun robby--validate-custom-api-option (name)
+  "Validate that option NAME is within its allowed range of values.
+
+Return an error message if the value is invalid, or nil if it is valid."
   (lambda (widget)
     (let* ((value (widget-value widget))
            (err-msg (robby--validate name value)))
@@ -33,8 +36,7 @@
   :group 'robby)
 
 (defcustom robby-max-history 2
-  "The maximum number of previous prompt/response pairs to keep in
-the conversation history."
+  "Max number of previous prompt/response pairs in history."
   :type 'integer
   :group 'robby)
 
@@ -97,12 +99,15 @@ It should include a `%s' placeholder for the spinner."
 
 (defcustom robby-chat-temperature nil
   "What sampling temperature to use, a number between 0.0 and 2.0.
+
 Defaults to 1."
   :type `(choice (number :validate ,(robby--validate-custom-api-option 'chat-temperature)) (const nil))
   :group 'robby-chat-api)
 
 (defcustom robby-chat-top-p nil
-  "An alternative to sampling with temperature, called nucleus
+  "Chat API top-p value.
+
+An alternative to sampling with temperature, called nucleus
 sampling, where the model considers the results of the tokens
 with top_p probability mass. So 0.1 means only the tokens
 comprising the top 10% probability mass are considered. Valid
