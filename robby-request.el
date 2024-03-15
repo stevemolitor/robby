@@ -111,15 +111,19 @@ STREAMP is non-nil if the response is a stream."
       (when streamp
         (set-process-filter
          proc
-         (lambda (_proc string)
-           (let ((error-msg (robby--request-parse-error-string string)))
-             (if error-msg
-                 (progn
-                   (setq errored t)
-                   (funcall on-error error-msg))
-               (let ((resp (robby--curl-parse-response string remaining streamp)))
-                 (setq remaining (plist-get resp :remaining))
-                 (funcall on-text :text (plist-get resp :text) :completep nil)))))))
+         (lambda (proc string)
+           (condition-case err
+               (let ((error-msg (robby--request-parse-error-string string)))
+                 (if error-msg
+                     (progn
+                       (setq errored t)
+                       (funcall on-error error-msg))
+                   (let ((resp (robby--curl-parse-response string remaining streamp)))
+                     (setq remaining (plist-get resp :remaining))
+                     (funcall on-text :text (plist-get resp :text) :completep nil))))
+             (error
+              (kill-process proc)
+              (error "Robby: unexpected error processing curl response: %S" err))))))
       (set-process-sentinel
        proc
        (lambda (_proc _status)
