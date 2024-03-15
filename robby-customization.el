@@ -58,6 +58,7 @@ support streaming."
 (defcustom robby-prompt-spec-fn #'robby-make-prompt-spec
   "Function that returns a prompt format spec.
 
+The function takes two arguments, FILE-NAME and FILE-EXT.
 FILE-NAME and FILE-EXT will be set to the base file name and file
 extension of the file associated with the current buffer, or to
 nil if the buffer has no associated file.

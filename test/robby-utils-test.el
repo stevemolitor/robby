@@ -110,17 +110,17 @@
 ;;; prompt templates
 (ert-deftest robby--format-prompt--with-prompt-spec-arg ()
   (should (equal
-           (robby--format-prompt "file extension: %e" '((?e . "el")))
+           (robby--format-prompt "file extension: %e" nil '((?e . "el")))
            "file extension: el")))
 
 (ert-deftest robby--format-prompt--with-repeats ()
   (should (equal
-           (robby--format-prompt "file extension: %e %e" '((?e . "el")))
+           (robby--format-prompt "file extension: %e %e" nil '((?e . "el")))
            "file extension: el el")))
 
 (ert-deftest robby--format-prompt--with-missing-args ()
   (should (equal
-           (robby--format-prompt "file extension:" '((?e . "el")))
+           (robby--format-prompt "file extension:" nil '((?e . "el")))
            "file extension:")))
 
 ;;; grounding

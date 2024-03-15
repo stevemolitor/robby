@@ -210,16 +210,17 @@ Returns an association list suitable for use with `format-spec'."
     (?l . ,user-login-name)
     (?n . ,user-full-name)))
 
-(defun robby--format-prompt (prompt &optional spec)
+(defun robby--format-prompt (prompt prompt-spec-fn &optional spec)
   "Format PROMPT string using `format-spec'.
 
 Use the format spec returned by SPEC, or the spec returned by
-`robby-prompt-spec-fn' if SPEC is nil."
+PROMPT-SPEC-FN if SPEC is nil. See `robby-prompt-spec-fn' for
+details."
   (let* ((file-name (robby--prompt-file-name-base))
          (file-ext (robby--prompt-file-ext))
          (prompt-spec (or
                        spec
-                       (funcall robby-prompt-spec-fn file-name file-ext))))
+                       (funcall prompt-spec-fn file-name file-ext))))
     (format-spec prompt prompt-spec 'ignore)))
 
 ;;; grounding
