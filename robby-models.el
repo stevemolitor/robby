@@ -1,14 +1,21 @@
 ;;; robby-models.el  --- Update available models from OpenAI   -*- lexical-binding:t -*-
 
+;;; Commentary:
+
+;; Defines the `robby--get-models` function to fetch the list of available models from OpenAI.
+
+;;; Code:
+
 (require 'robby-api-key)
 (require 'robby-request)
 (require 'robby-customization)
 
-;;; Code:
-
 (defvar robby-models nil)
 
 (defun robby--get-models ()
+  "Get the list of available models from OpenAI.
+
+Make  request to OpenAI API to get the list of available models."
   (if robby-models
       robby-models
     (let* ((inhibit-message t)
@@ -35,4 +42,4 @@
 
 (provide 'robby-models)
 
-;; robby-models.el ends here
+;;; robby-models.el ends here

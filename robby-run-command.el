@@ -25,6 +25,11 @@
   "Last robby command.")
 
 (cl-defun robby--save-last-command-options (&key prompt prompt-args action action-args historyp api-options never-stream-p)
+  "Save the last command options in `robby--last-command-options'.
+
+PROMPT, PROMPT-ARGS, ACTION, ACTION-ARGS, HISTORYP, API-OPTIONS,
+and NEVER-STREAM-P are the options that were passed to
+`robby-run-command'."
   (setq robby--last-command-options
         `(:prompt
           ,prompt
@@ -46,7 +51,7 @@
 
 Return t if there is a last command."
   (when (not robby--last-command-options)
-    (user-error "No last robby command to run. Run at least one command first."))
+    (user-error "No last robby command to run. Run at least one command first"))
   t)
 
 (defun robby-run-last-command ()
@@ -56,14 +61,17 @@ Return t if there is a last command."
   (apply #'robby-run-command robby--last-command-options))
 
 (defun robby--pp-cmd (cmd)
-  "Insert `cmd' into current buffer."
+  "Insert CMD into current buffer."
   (if (version< emacs-version "29.0")
       (pp cmd)
     (let ((pp-max-width 70))
       (pp-emacs-lisp-code cmd))))
 
 (defun robby-insert-last-command (name docstring)
-  "Insert elisp definition of the last robby command in current buffer at point."
+  "Insert elisp definition of the last robby command in current buffer at point.
+
+NAME is the command name.
+DOCSTRING is the command's docstring."
   (interactive "Sname: \nsdocstring: ")
   (let* ((options robby--last-command-options)
          (prompt (plist-get options :prompt))
@@ -86,17 +94,16 @@ Return t if there is a last command."
       (setq quoted-options (plist-put quoted-options :historyp t)))
     (robby--pp-cmd `(robby-define-command ,name ,docstring ,@quoted-options))))
 
-;;; run command 
+;;; run command
 (defun robby--get-response-region (response-buffer)
+  "Return the region to replace in RESPONSE-BUFFER.
+
+If the region is active, return the region. Otherwise, the range
+of the entire buffer."
   (with-current-buffer response-buffer
     (if (use-region-p)
         (cons (region-beginning) (region-end))
       (cons (point) (point)))))
-
-(defun robby--cleanup-process (err)
-  (robby--log (format "# unexpected error in robby process: %S" err))
-  (robby--spinner-stop)
-  (robby-kill-last-process t))
 
 (cl-defun robby--handle-text (&key
                               arg
@@ -111,6 +118,34 @@ Return t if there is a last command."
                               text
                               response-buffer
                               response-region)
+  "Process a cunk of text received from OpenAI.
+
+ARG is the prefix arg passed to the command.
+
+ACTION is the action to perform on the text.
+
+ACTION-ARGS is a property list of arguments to pass to ACTION.
+
+BASIC-PROMPT is the prompt that was sent to OpenAI.
+
+CHARS-PROCESSED is the number of characters processed so far.
+
+COMPLETEP is t if the text is the last response from OpenAI.
+
+GROUNDING-FNS is a list of functions to apply to the response.
+
+NO-OP-PATTERN is a regular expression to match against the
+
+NO-OP-MESSAGE is the message to display when NO-OP-PATTERN
+matches.
+
+TEXT is the response from OpenAI. It may be one chunk of the
+response if streaming is on.
+
+RESPONSE-BUFFER is the buffer where the response is written to.
+
+RESPONSE-REGION is the region to prepend, append, or replace in
+RESPONSE-BUFFER."
   (when completep
     (robby--spinner-stop))
   (robby--log (format "# robby--handle-text, text:\n%S\ncompletep: %S, chars-processed %d" text completep chars-processed))
@@ -131,19 +166,30 @@ Return t if there is a last command."
       (run-hooks 'robby-command-complete-hook))))
 
 (defun robby--handle-error (err)
+  "Handle an error ERR from OpenAI."
   (robby--spinner-stop)
   (let* ((err-msg (if (stringp err) err (error-message-string err)))
          (log-msg (format "Error processing robby request: %s" err-msg)))
     (robby--log log-msg)
     (message log-msg))
   (when (process-live-p robby--last-process)
-      (robby-kill-last-process t)))
+    (robby-kill-last-process t)))
 
 (defun robby--parse-error-response (data)
   "Parse raw error response from DATA and try to return descriptive message."
   (or (cdr (assoc 'message (assoc 'error data))) "unknown error"))
 
 (cl-defun robby--get-stream-p (&key never-stream-p no-op-pattern grounding-fns)
+  "Determine the command should stream the response from OpenAI.
+
+NEVER-STREAM-P is t if the command should never stream the response.
+
+If NO-OP-PATTERN is non-nil, then streaming is off.
+
+If there are GROUNDING-FNS, then streaming is off.
+
+Otherwise, use the what is specified by NEVER-STREAM-P or the
+`robby-stream-p' customization variable."
   (let ((streaming-on-p (not (or never-stream-p (not robby-stream-p)))))
     (cond
      ;; no-op-pattern can only be used when streaming is off
@@ -156,6 +202,11 @@ Return t if there is a last command."
      (t streaming-on-p))))
 
 (defun robby--get-response-buffer (action action-args)
+  "Get the response buffer to use with ACTION.
+
+If ACTION-ARGS specifies a `:response-buffer' use that. If it's a
+robby view action, use the robby view buffer. Otherwise default
+to the current buffer."
   (let ((response-buffer (plist-get action-args :response-buffer)))
     (cond
      ;; use the response buffer specified in the action-args if supplied
@@ -265,4 +316,4 @@ value overrides the `robby-stream' customization variable."
 
 (provide 'robby-run-command)
 
-;; robby-run-command.el ends here
+;;; robby-run-command.el ends here

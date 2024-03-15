@@ -5,9 +5,9 @@
 ;; Functions to validate that Chat API values are within valid ranges.
 ;; Used in customization and `robby-api-options' transient.
 
-(require 'robby-utils)
-
 ;;; Code:
+
+(require 'robby-utils)
 
 (defvar robby--valid-ranges
   '((chat-temperature . (0.0 . 2.0))
@@ -47,4 +47,4 @@ If INCLUDE-NAME is non-nil, include the option name in the error message."
 
 (provide 'robby-validation)
 
-;; robby-validation.el ends here
+;;; robby-validation.el ends here

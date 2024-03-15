@@ -4,9 +4,9 @@
 
 ;; Robby logging function.
 
-(require 'robby-customization)
-
 ;;; Code:
+
+(require 'robby-customization)
 
 (defvar robby--log-buffer "*robby-log*")
 

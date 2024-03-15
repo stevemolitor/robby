@@ -4,9 +4,9 @@
 
 ;; A robby grounding filters the response from AI before presenting it to the user.
 
-(require 'rx)
-
 ;;; Code:
+
+(require 'rx)
 
 (defun robby-extract-fenced-text (response)
   "Extract the text between the first pair of fenced code blocks in RESPONSE."
@@ -20,18 +20,20 @@
         response))))
 
 (defun robby-extract-fenced-text-in-prog-modes (response)
-  "Extract the text between the first pair of fenced code blocks in
+  "Extract fenced text.
+
+Extract the text between the first pair of fenced code blocks in
 RESPONSE if in a programming mode, else return RESPONSE."
   (if (derived-mode-p 'prog-mode)
       (robby-extract-fenced-text response)
     response))
 
 (defun robby-format-message-text (response)
-  "Replace % with %% in TEXT to avoid format string errors calling `message."
+  "Replace % with %% in RESPONSE to avoid format string errors calling `message."
   (replace-regexp-in-string "%" "%%" response))
 
 (defun robby-remove-trailing-end-of-line (string)
-  "Remove the end of line character at the very end of a string if present."
+  "Remove the end of line character at the very end of STRING, if present."
   (replace-regexp-in-string "
 $" "" string))
 
@@ -42,4 +44,4 @@ $" "" string))
 
 (provide 'robby-grounding-fns)
 
-;; robby-grounding-fns.el ends here
+;;; robby-grounding-fns.el ends here

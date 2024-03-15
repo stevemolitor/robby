@@ -4,9 +4,9 @@
 
 ;; robby process buffer-local variable, and function to kill it.
 
+;;; Code:
 (require 'robby-spinner)
 
-;;; Code:
 (defvar-local robby--last-process nil)
 (put 'robby--last-process 'permanent-local t)
 
@@ -33,4 +33,4 @@ Emacs Lisp, do not print messages if SILENTP is t."
 
 (provide 'robby-process)
 
-;; robby-process.el ends here
+;;; robby-process.el ends here

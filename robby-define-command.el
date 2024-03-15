@@ -4,9 +4,10 @@
 
 ;; Provides the robby-define-command macro, used to define custom robby commands
 
+;;; Code:
+
 (require 'robby-run-command)
 
-;;; Code:
 
 (cl-defmacro robby-define-command (name
                                    docstring
@@ -33,9 +34,13 @@ with interactive prefix arg to obtain the prompt.  If a string,
 grab prompt from region or entire buffer context if no region,
 and prefix region text with PROMPT string to build prompt.
 
+PROMPT-ARGS - plist of arguments to pass to the prompt function.
+
 ACTION - function to invoke when request is complete.  The
 function is passed the response text and the selected region, and
 must be of the form (TEXT BEG END).
+
+ACTION-ARGS - plist of arguments to pass to the action function.
 
 API-OPTIONS - property list of options to pass to the OpenAI
 API. These options are merged in with the customization options
@@ -78,4 +83,4 @@ overrides the `robby-stream' customization variable."
 
 (provide 'robby-define-command)
 
-;; robby-define-command.el ends here
+;;; robby-define-command.el ends here

@@ -121,33 +121,41 @@ range is 0.0 to 2.0."
   :group 'robby-chat-api)
 
 (defcustom robby-chat-stop nil
-  "Up to 4 sequences where the API will stop generating further
+  "OpenAI stop sequence.
+
+Up to 4 sequences where the API will stop generating further
 tokens. The returned text will not contain the stop sequence."
   :type '(choice string (const nil)) ;; todo handle arrays of strings
   :group 'robby-chat-api)
 
 (defcustom robby-chat-presence-penalty nil
-  "Number between -2.0 and 2.0. Positive values penalize new tokens
+  "OpenAI presence penalty.
+
+Number between -2.0 and 2.0. Positive values penalize new tokens
 based on whether they appear in the text so far, increasing the
 model\\='s likelihood to talk about new topics."
   :type `(choice (number :validate ,(robby--validate-custom-api-option 'chat-presence-penalty)) (const nil))
   :group 'robby-chat-api)
 
 (defcustom robby-chat-frequency-penalty nil
-  "Number between -2.0 and 2.0. Positive values penalize new tokens
+  "OpenAI API frequency penalty.
+
+Number between -2.0 and 2.0. Positive values penalize new tokens
 based on their existing frequency in the text so far, decreasing
 the model\\='s likelihood to repeat the same line verbatim."
   :type `(choice (number :validate ,(robby--validate-custom-api-option 'chat-frequency-penalty)) (const nil))
   :group 'robby-chat-api)
 
 (defcustom robby-chat-user nil
-  "A unique identifier representing your end-user, which can help
+  "OpenAI API chat user.
+
+A unique identifier representing your end-user, which can help
 OpenAI to monitor and detect abuse."
   :type '(choice string (const nil))
   :group 'robby-chat-api)
 
 (defcustom robby-chat-system-message "You are an AI tool embedded within Emacs. Assist users with their tasks and provide information as needed. Do not engage in harmful or malicious behavior. Please provide helpful information. Answer concisely."
-  "System message used with Chat API"
+  "System message to use with OpenAI Chat API."
   :type 'string
   :group 'robby-chat)
 

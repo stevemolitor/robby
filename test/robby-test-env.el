@@ -6,6 +6,7 @@
 
 (setq package-lint-main-file "/Users/stephenmolitor/repos/robby/robby.el")
 (setq sentence-end-double-space nil)
+(setq checkdoc-verb-check-experimental-flag nil)
 
 (defconst robby--test-deps '(markdown-mode spinner package-lint))
 

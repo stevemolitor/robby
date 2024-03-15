@@ -4,6 +4,8 @@
 
 ;; Robby transient menu definitions
 
+;;; Code:
+
 (require 'cl-lib)
 (require 'cus-edit)
 (require 'seq)
@@ -17,10 +19,9 @@
 (require 'robby-utils)
 (require 'robby-validation)
 
-;;; Code:
-
 ;;; Util Functions
 (defun robby--custom-type (symbol)
+  "Get the custom type of the custom variable indicated by SYMBOL."
   (let ((type (get symbol 'custom-type)))
     (if (sequencep type)
         (let ((nested-type (nth 1 type)))
@@ -30,6 +31,7 @@
       type)))
 
 (defun robby--transient-args-to-options (args)
+  "Convert ARGS to a plist of OpenAI API options."
   (seq-reduce
    (lambda (plist arg)
      (let* ((parts (split-string arg "="))
@@ -43,6 +45,7 @@
    '()))
 
 (defun robby--run-transient-command (action &optional arg)
+  "Run ACTION with ARG and transient args."
   (let* ((args (transient-args transient-current-command))
          (simple-prompt (transient-arg-value "prompt=" args))
          (prompt-prefix (transient-arg-value "prompt-prefix=" args))
@@ -68,11 +71,20 @@
   (read-buffer "Select buffer: "))
 
 (defun robby--read-decimal (prompt _initial-input _history)
-  "Read a decimal number."
+  "Read a decimal number from the minibuffer with PROMPT."
   (interactive)
   (format "%s" (read-number prompt)))
 
 (defun robby--read-option-with-validation (option prompt initial-input history)
+  "Read an OpenAI API option with validation.
+
+OPTION is the option to validate against.
+
+PROMPT is the prompt to display in the minibuffer when reading the option value.
+
+INITIAL-INPUT is the initial value to display in the minibuffer.
+
+HISTORY is the history list to use for the minibuffer."
   (save-match-data
     (cl-block nil
       (while t
@@ -85,18 +97,46 @@
             (cl-return str)))))))
 
 (defun robby--read-temperature (prompt initial-input history)
+  "Read temperature API option from the minibuffer.
+
+PROMPT is the prompt to display in the minibuffer when reading the option value.
+
+INITIAL-INPUT is the initial value to display in the minibuffer.
+
+HISTORY is the history list to use for the minibuffer."
   (interactive)
   (robby--read-option-with-validation 'chat-temperature prompt initial-input history))
 
 (defun robby--read-top-p (prompt initial-input history)
+  "Read top-p API Option from the minibuffer.
+
+PROMPT is the prompt to display in the minibuffer when reading the option value.
+
+INITIAL-INPUT is the initial value to display in the minibuffer.
+
+HISTORY is the history list to use for the minibuffer."
   (interactive)
   (robby--read-option-with-validation 'chat-top-p prompt initial-input history))
 
 (defun robby--read-presence-penalty (prompt initial-input history)
+  "Read presence penalty API option from the minibuffer.
+
+PROMPT is the prompt to display in the minibuffer when reading the option value.
+
+INITIAL-INPUT is the initial value to display in the minibuffer.
+
+HISTORY is the history list to use for the minibuffer."
   (interactive)
   (robby--read-option-with-validation 'chat-presence-penalty prompt initial-input history))
 
 (defun robby--read-frequency-penalty (prompt initial-input history)
+  "Read frequency penalty API option from the minibuffer.
+
+PROMPT is the prompt to display in the minibuffer when reading the option value.
+
+INITIAL-INPUT is the initial value to display in the minibuffer.
+
+HISTORY is the history list to use for the minibuffer."
   (interactive)
   (robby--read-option-with-validation 'chat-frequency-penalty prompt initial-input history))
 
@@ -145,6 +185,7 @@
      args)))
 
 (defun robby--init-api-options (obj)
+  "Initialize API options for transient object OBJ."
   (oset obj value `(,@(robby--options-transient-value))))
 
 (transient-define-prefix robby-api-options ()
@@ -207,4 +248,4 @@
 
 (provide 'robby-transients)
 
-;; robby-transients.el ends here
+;;; robby-transients.el ends here

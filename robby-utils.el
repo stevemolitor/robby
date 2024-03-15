@@ -1,17 +1,15 @@
-;;; Code:
-
-;;; robby-utils.el  --- robby utility functions -*- lexical-binding:t -*-
+;;; robby-utils.el  --- robby utility functions  -*- lexical-binding:t -*-
 
 ;;; Commentary:
 
-;; Robby utility functions.
+;; Utility functions used internally by robby.
+
+;;; Code:
 
 (require 'cl-lib)
 (require 'cus-edit)
 (require 'map)
 (require 'seq)
-
-;;; Code:
 
 ;;; string utils
 (defun robby--format-message-text (text)
@@ -34,15 +32,20 @@ For example \"a_b_c\" becomes \"a-b-c\""
   (replace-regexp-in-string "_" "-" string))
 
 (defun robby--string-to-sym (string)
+  "Convert STRING to a symbol."
   (intern (format ":%s" string)))
 
 (defun robby--sym-to-string (sym)
+  "Convert symbol SYM to a string."
   (replace-regexp-in-string "^:" "" (symbol-name sym)))
 
 (defun robby--empty-p (thing)
+  "Return t if THING is nil or an empty string. Otherwise return nil."
   (or (null thing) (string= thing "")))
 
 (defun robby--decimal-p (str)
+  "Return t if string STR is convertable to decimal number.
+Otherwise return nil."
   (string-match-p
    (rx string-start
        (?  (or "+" "-"))
@@ -100,20 +103,17 @@ pass, where the keys are strings."
      'alist
      (seq-filter
       (lambda (elem) (not (null (cdr elem))))
-      (robby--options-from-group 'robby-chat-api "chat"))
+      (robby--options-from-group 'robby-chat-api))
      (seq-map
       (lambda (assoc) (cons (robby--kebab-to-snake-case (replace-regexp-in-string "^:" "" (symbol-name (car assoc)))) (cdr assoc)))
       (robby--plist-to-alist options))))))
 
-(defun robby--options-from-group (group api)
-  "Get list of options from a Robby `robby-chat-api' customization group.
-
-API specifies the customization group, for example \"chat\" or
-\"completions\".  Returns an association list of options."
+(defun robby--options-from-group (group)
+  "Get list of options from a customization group GROUP."
   (seq-map
    (lambda (sym)
      (cons
-      (robby--kebab-to-snake-case (robby--remove-api-prefix api (symbol-name sym)))
+      (robby--kebab-to-snake-case (robby--remove-api-prefix "chat" (symbol-name sym)))
       (symbol-value sym)))
    (seq-map
     #'car
@@ -122,28 +122,11 @@ API specifies the customization group, for example \"chat\" or
        (eq (nth 1 elem) 'custom-variable))
      (custom-group-members group nil)))))
 
-(defun robby--current-options (group api)
-  "Get plist of options from current values in customization group
-GROUP.
-
-API specifies the customization group, for example \"chat\" or
-\"completions\". Returns an association list of options."
-  (let* ((options-alist (seq-filter
-                         (lambda (elem) (not (null (cdr elem))))
-                         (robby--options-from-group group api)))
-         (sorted-options-alist (seq-sort-by #'car #'string< options-alist)))
-    (apply
-     #'append
-     (mapcar (lambda (elem)
-               (list
-                (robby--string-to-sym (robby--snake-to-kebob-case (car elem)))
-                (cdr elem)))
-             sorted-options-alist))))
-
 (defun robby--options-transient-value ()
-  "Get api options values for API from current customization
-values, formatted for use as the initial value of a transient
-prefix."
+  "Get API values from current customization values.
+
+Get API options values from current customization values,
+formatted for use as the initial value of a transient prefix."
   (let* ((custom-variables
           (seq-filter
            (lambda (var) (not (null (symbol-value var))))
@@ -185,11 +168,16 @@ history variable containing the conversation history list."
     `((messages . ,formatted-messages))))
 
 (defun robby--chunk-content (chunk streamp)
-  "Parse message text from chat API response JSON."
+  "Parse message text from chat API response JSON.
+
+CHUNK is the response JSON from the OpenAI chat API.
+
+STREAMP is true if the chunk is part of a streaming response."
   (let ((key (if streamp 'delta 'message)))
     (assoc-default 'content (assoc-default key (seq-first (assoc-default 'choices chunk))))))
 
 (defun robby--gpt-models (all-models)
+  "Return a list of GPT models from ALL-MODELS."
   (seq-filter
    (lambda (name) (string-prefix-p "gpt" name))
    all-models))
@@ -221,8 +209,10 @@ Returns an association list suitable for use with `format-spec'."
     (?n . ,user-full-name)))
 
 (defun robby--format-prompt (prompt &optional spec)
-  "Format PROMPT string using `format-spec', using the format spec
-returned by SPEC-FN."
+  "Format PROMPT string using `format-spec'.
+
+Use the format spec returned by SPEC, or the spec returned by
+`robby-prompt-spec-fn' if SPEC is nil."
   (let* ((file-name (robby--prompt-file-name-base))
          (file-ext (robby--prompt-file-ext))
          (prompt-spec (or
@@ -232,6 +222,7 @@ returned by SPEC-FN."
 
 ;;; grounding
 (defun robby--ground-response (response grounding-fns)
+  "Ground RESPONSE using GROUNDING-FNS."
   (if (seqp grounding-fns)
       (seq-reduce
        (lambda (resp fn) (funcall fn resp))

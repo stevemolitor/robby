@@ -5,12 +5,12 @@
 ;; Provides robby-minor-mode. This mode binds the default robby keybindings,
 ;; and adds a robby spinner lighter.
 
+;;; Code:
+
 (require 'robby-commands)
 (require 'robby-example-commands)
 (require 'robby-process)
 (require 'robby-spinner)
-
-;;; Code:
 
 ;;;###autoload
 (defvar robby-command-map
@@ -50,7 +50,9 @@
     map))
 
 (defun robby--kill-robby-process ()
-  "Silently kill any robby process associated with the current
+  "Kill robby process associated with the current buffer.
+
+Silently kill any robby process associated with the current
 buffer."
   (when (and (boundp 'robby-mode) robby-mode)
     (robby-kill-last-process t)))
@@ -69,4 +71,4 @@ buffer."
 
 (provide 'robby-mode)
 
-;; robby-mode.el ends here
+;;; robby-mode.el ends here

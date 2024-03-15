@@ -4,12 +4,12 @@
 
 ;; Example Robby commands defined using `define-robby-command'.
 
+;;; Code:
+
 (require 'robby-define-command)
 (require 'robby-prompts)
 (require 'robby-actions)
 (require 'robby-grounding-fns)
-
-;;; Code:
 
 ;;;###autoload (autoload 'robby-write-tests "robby-commands" "Write some tests for the code in the region, append to region." t)
 (robby-define-command
@@ -100,6 +100,12 @@ selected region, show description in robby view window."
  :api-options '(:max-tokens 2000))
 
 (cl-defun robby-get-prompt-from-git-diff (&key prompt-prefix &allow-other-keys)
+  "Get a prompt with staged changes in the current git repository.
+
+Return a prompt for a git commit message based on the staged
+changes in the current git repository.
+
+PROMPT-PREFIX is a string to prepend to the prompt."
   (let* ((dir (locate-dominating-file default-directory ".git"))
          (diff (shell-command-to-string (format "cd %s && git diff --staged" dir))))
     (format "%s\n%s" prompt-prefix diff)))
@@ -118,4 +124,4 @@ selected region, show description in robby view window."
 
 (provide 'robby-example-commands)
 
-;; example-commands.el ends here
+;;; robby-example-commands.el ends here

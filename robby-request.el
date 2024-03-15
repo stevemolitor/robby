@@ -1,5 +1,11 @@
 ;;; robby-request.el  --- Make robby requests via curl or url-retrieve  -*- lexical-binding:t -*-
 
+;;; Commentary:
+
+;; Provides the `robby--request' function to make requests to the OpenAI API.
+
+;;; Code:
+
 (require 'cl-lib)
 (require 'files)
 (require 'json)
@@ -15,9 +21,11 @@
 
 ;;; util functions
 (defun robby--request-parse-error-data (data)
+  "Get error from response DATA."
   (cdr (assoc 'message (assoc 'error data))))
 
 (defun robby--request-parse-error-string (err)
+  "Get error from JSON string ERR."
   (condition-case _err
       (robby--request-parse-error-data (json-read-from-string err))
     (error nil)))
@@ -33,7 +41,7 @@
 (defun robby--curl-parse-chunk (remaining data)
   "Parse json documents in current buffer from DATA string.
 
-Prepend REMAINING text incomplete JSON in last chunk Return
+Prepend REMAINING text incomplete JSON in last chunk. Return
 remaining incomplete text in this document.
 
 Ignores \"[DONE]\".
@@ -41,8 +49,7 @@ Ignores \"[DONE]\".
 Returns a plist with remaining un-parsed text (if any) and a list
 of parsed JSON objects:
 
-    (:remaining \"text\" :parsed \\='())
-"
+    (:remaining \"text\" :parsed \\='())"
   (with-temp-buffer
     (let ((new-remaining "")
           (parsed '())
@@ -66,14 +73,25 @@ of parsed JSON objects:
 (defconst robby--curl-unknown-error "Unexpected error making OpenAI request via curl" )
 
 (defun robby--curl-parse-response (string remaining streamp)
+  "Parse JSON curl response from data in STRING and REMAINING unparsed text.
+
+STREAMP is non-nil if the response is a stream."
   (let* ((data (replace-regexp-in-string (rx bol "data:") "" string))
          (json (robby--curl-parse-chunk remaining data))
          (parsed (plist-get json :parsed))
          (text (string-join (seq-filter #'stringp (seq-map (lambda (chunk) (robby--chunk-content chunk streamp)) parsed)))))
-    (setq remaining (plist-get json :remaining))
     `(:text ,text :remaining ,(plist-get json :remaining))))
 
 (cl-defun robby--curl (&key payload on-text on-error streamp)
+  "Make a request to the OpenAI API using curl.
+
+PAYLOAD is the request payload alist.
+
+ON-TEXT is the callback for when a chunk of text is received.
+
+ON-ERROR is the callback for when an error is received.
+
+STREAMP is non-nil if the response is a stream."
   (let* ((input-json (json-encode (append payload (if streamp '((stream . t)) nil))))
          (curl-options (append robby--curl-options
                                `("-H" ,(format "Authorization: Bearer %s" (robby--get-api-key))
@@ -119,6 +137,15 @@ of parsed JSON objects:
 
 ;;; url-retrieve
 (cl-defun robby--url-retrieve (&key payload on-text on-error &allow-other-keys)
+  "Make a request to the OpenAI API using `url-retrieve'.
+
+Does not support streaming responses. Use `robby--curl' for that.
+
+PAYLOAD is the request payload alist.
+
+ON-TEXT is the callback for when a chunk of text is received.
+
+ON-ERROR is the callback for when an error is received."
   (let* ((inhibit-message t)
          (message-log-max nil)
          (url-request-method "POST")
@@ -145,13 +172,25 @@ of parsed JSON objects:
 
 ;;; robby--request
 (defun robby--request-available-p ()
+  "Check if curl is available."
   (executable-find "curl"))
 
 (cl-defun robby--request (&key payload on-text on-error streamp)
+  "Make a request to the OpenAI API.
+
+Use curl if available, otherwise use `url-retrieve'.
+
+PAYLOAD is the request payload alist.
+
+ON-TEXT is the callback for when a chunk of text is received.
+
+ON-ERROR is the callback for when an error is received.
+
+STREAMP is non-nil if the response is a stream."
   (if (and robby-use-curl (robby--request-available-p))
       (robby--curl :payload payload :on-text on-text :on-error on-error :streamp streamp)
     (robby--url-retrieve :payload payload :on-text on-text :on-error on-error)))
 
 (provide 'robby-request)
 
-;; robby-request.el ends here
+;;; robby-request.el ends here

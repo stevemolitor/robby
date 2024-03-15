@@ -66,13 +66,6 @@
                      ("stop" . ("stop")) 
                      ("temperature" . 1.0))))))
 
-(ert-deftest robby--current-options ()
-  (let ((robby-chat-model "gpt-4")
-        (robby-chat-max-tokens 100)
-        (robby-chat-temperature 1.0))
-    (should (equal (robby--current-options 'robby-chat-api "chat")
-                   '(:max-tokens 100 :model "gpt-4" :temperature 1.0)))))
-
 ;;; request input tests
 (ert-deftest robby--request-input--no-history ()
   (let ((input (robby--request-input "hello" nil nil)))

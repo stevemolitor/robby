@@ -4,11 +4,11 @@
 
 ;; Buffer local modeline spinner for robby, robby-spinner-mode
 
+;;; Code:
+
 (require 'spinner)
 
 (require 'robby-customization)
-
-;;; Code:
 
 (defvar-local robby--spinner nil)
 (put 'robby--spinner 'permanent-local t)

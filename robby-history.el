@@ -4,9 +4,9 @@
 
 ;; Robby conversation history
 
-(require 'robby-customization)
-
 ;;; Code:
+
+(require 'robby-customization)
 
 (defvar-local robby--history nil "AI Conversation history.")
 
