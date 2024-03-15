@@ -269,7 +269,7 @@ value overrides the `robby-stream' customization variable."
   (let* ((prompt-args-with-arg (map-merge 'plist prompt-args `(:arg ,arg)))
          (prompt-result (if (functionp prompt) (apply prompt prompt-args-with-arg) (format "%s" prompt)))
          (basic-prompt (robby--format-prompt prompt-result))
-         (request-input (robby--request-input basic-prompt historyp robby--history))
+         (request-input (robby--request-input basic-prompt historyp robby--history robby-chat-system-message))
          (payload (append request-input (robby--options-alist-for-api-request api-options)))
          (response-buffer (get-buffer-create (robby--get-response-buffer action action-args)))
          (response-region (robby--get-response-region response-buffer))

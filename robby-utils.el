@@ -145,12 +145,14 @@ For example, \"robby-chat-temperature\" becomes \"temperature\""
   (let ((regexp (format "^robby-%s-" api)))
     (replace-regexp-in-string regexp "" string)))
 
-(defun robby--request-input (prompt historyp history)
+(defun robby--request-input (prompt historyp history system-message)
   "Return OpenAI chat API input data including PROMPT.
 
 Also include prompt history if HISTORYP is true. HISTORY is the
-history variable containing the conversation history list."
-  (let* ((system-message `((role . "system") (content . ,robby-chat-system-message)))
+history variable containing the conversation history list.
+
+SYSTEM-MESSAGE is the system prompt."
+  (let* ((system-message `((role . "system") (content . ,system-message)))
          (formatted-messages
           (if historyp
               (vconcat

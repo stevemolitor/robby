@@ -68,8 +68,8 @@
 
 ;;; request input tests
 (ert-deftest robby--request-input--no-history ()
-  (let ((input (robby--request-input "hello" nil nil)))
-    (should (equal input `((messages . [((role . "system") (content . ,robby-chat-system-message))
+  (let ((input (robby--request-input "hello" nil nil "I am a helpful assistant.")))
+    (should (equal input `((messages . [((role . "system") (content . "I am a helpful assistant."))
                                         ((role . "user") (content . "hello"))]))))))
 
 (ert-deftest robby--request-input--with-history ()
@@ -77,9 +77,10 @@
            (robby--request-input
             "Where was it played?"
             t
-            '(("Who won the world series in 2020?" . "The Los Angeles Dodgers won the World Series in 2020.")))
+            '(("Who won the world series in 2020?" . "The Los Angeles Dodgers won the World Series in 2020."))
+            "I am a helpful assistant.")
            `((messages .
-                       [((role . "system") (content . ,robby-chat-system-message))
+                       [((role . "system") (content . "I am a helpful assistant."))
                         ((role . "user") (content . "Who won the world series in 2020?"))
                         ((role . "assistant") (content . "The Los Angeles Dodgers won the World Series in 2020."))
                         ((role . "user") (content . "Where was it played?"))
