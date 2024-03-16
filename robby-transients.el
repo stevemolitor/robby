@@ -215,6 +215,7 @@ HISTORY is the history list to use for the minibuffer."
    ("i" "simple prompt" "prompt=" :always-read t :level 3)]
   ["Prompt from Region or Buffer Options"
    ("p" "prompt prefix" "prompt-prefix=" :always-read t :level 3)
+   ("s" "prompt suffix" "prompt-suffix=" :always-read t :level 3)
    ("b" "prompt buffer" "prompt-buffer=" :reader robby--read-buffer :level 6)]
   [["Region Actions"
     ("x" "prefix region with response" robby--prefix-region-with-response-suffix :level 3)
