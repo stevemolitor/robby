@@ -170,8 +170,15 @@ HISTORY is the history list to use for the minibuffer."
   (robby-clear-history))
 
 ;;; API Options Prefixes
+(defvar robby--api-options
+  '(robby-chat-max-tokens robby-chat-temperature robby-chat-top-p robby-chat-n robby-chat-stop robby-chat-presence-penalty robby-chat-frequency-penalty robby-chat-user)
+  "API options available for customization in transient.
+
+Only includes options that cannot be nil.")
+
 (transient-define-suffix robby--apply-api-options ()
   (interactive)
+  (seq-do (lambda (custom-var) (set custom-var nil)) robby--api-options)
   (let ((args (transient-args transient-current-command)))
     (seq-do
      (lambda (arg)
