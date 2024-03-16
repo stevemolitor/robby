@@ -36,7 +36,9 @@
 (require 'robby-customization)
 (require 'robby-example-commands)
 (require 'robby-mode)
+(require 'robby-process)
 (require 'robby-transients)
 
 (provide 'robby)
 ;;; robby.el ends here
+
