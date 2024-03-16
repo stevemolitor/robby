@@ -36,7 +36,9 @@ Robby will use =curl= to make HTTP requests if available, otherwise, it will fal
 To install robby in Emacs 29 versions, first install via ~package-vc-install~ and then turn on ~robby-mode~:
 
 #+begin_src emacs-lisp
-(package-vc-install "https://github.com/stevemolitor/robby")
+(if (not (package-installed-p 'robby))
+    (package-vc-install "https://github.com/stevemolitor/robby"))
+
 (robby-mode)
 
 ;; (optional) bind a prefix key to the robby-command-map, default is "C-c C-r":
@@ -44,10 +46,10 @@ To install robby in Emacs 29 versions, first install via ~package-vc-install~ an
 
 ;; (optional) show robby view window in a side window on the right side:
 (add-to-list 'display-buffer-alist
- '("\\*robby\\*"
-   (display-buffer-in-side-window)
-   (side . right)
-   (window-width . 0.4)))
+	     '("\\*robby\\*"
+	       (display-buffer-in-side-window)
+	       (side . right)
+	       (window-width . 0.4)))
 #+end_src
 ** Emacs 30
 To install robby in Emacs 30, first install via ~use-package~ with the ~:vc~ option,
