@@ -234,7 +234,7 @@ HISTORY is the history list to use for the minibuffer."
   ["API"
    ("A" "API options" robby-api-options :transient transient--do-recurse :level 5)])
 
-;;;###autoload (autoload 'robby-commands "robby-transients" "Display menu of custom robby commands." t)
+;;;###autoload (autoload 'robby-example-commands "robby-transients" "Display menu for executing example robby commands." t)
 (transient-define-prefix robby-example-commands ()
   "Display menu for executing example robby commands."
   ["Robby Example Commands"

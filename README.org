@@ -38,6 +38,16 @@ To install robby in Emacs 29 versions, first install via ~package-vc-install~ an
 #+begin_src emacs-lisp
 (package-vc-install "https://github.com/stevemolitor/robby")
 (robby-mode)
+
+;; (optional) bind a prefix key to the robby-command-map, default is "C-c C-r":
+(global-set-key (kbd "s-r") robby-command-map)
+
+;; (optional) show robby view window in a side window on the right side:
+(add-to-list 'display-buffer-alist
+ '("\\*robby\\*"
+   (display-buffer-in-side-window)
+   (side . right)
+   (window-width . 0.4)))
 #+end_src
 ** Emacs 30
 To install robby in Emacs 30, first install via ~use-package~ with the ~:vc~ option,
@@ -47,8 +57,18 @@ and then turn on ~robby-mode~:
 (use-package robby
   :vc (:url "https://github.com/stevemolitor/robby"
        :branch "main"
-       :rev :newest))
-(robby-mode)
+       :rev :newest)
+  :config
+  ;; (optional) bind a prefix key to the robby-command-map, default is "C-c C-r":
+  ("s-r" . robby-command-map)
+  (robby-mode)
+
+  ;; (optional) show robby view window in a side window on the right side:
+  (add-to-list 'display-buffer-alist
+   '("\\*robby\\*"
+     (display-buffer-in-side-window)
+     (side . right)
+     (window-width . 0.4))))
 #+end_src
 ** Set API Key
 You need an [[https://platform.openai.com/account/api-keys][OpenAI API key]] to use ~robby~. You can set the variable
