@@ -46,10 +46,10 @@ To install robby in Emacs 29 versions, first install via ~package-vc-install~ an
 
 ;; (optional) show robby view window in a side window on the right side:
 (add-to-list 'display-buffer-alist
-	     '("\\*robby\\*"
-	       (display-buffer-in-side-window)
-	       (side . right)
-	       (window-width . 0.4)))
+         '("\\*robby\\*"
+           (display-buffer-in-side-window)
+           (side . right)
+           (window-width . 0.4)))
 #+end_src
 ** Emacs 30
 To install robby in Emacs 30, first install via ~use-package~ with the ~:vc~ option,
@@ -153,7 +153,7 @@ Running ~robby-builder~ (=C-c C-r b=)will bring up a transient menu to build and
 
 [[./images/builder.png]]
 
-To see advanced options run ~transient-toggle-level-limit~ (=C-x a=), or [[https://magit.vc/manual/transient/Enabling-and-Disabling-Suffixes.html][set the transient level]]:
+To see advanced options or [[https://magit.vc/manual/transient/Enabling-and-Disabling-Suffixes.html][set the transient level]] to =6=:
 
 [[./images/advanced-builder-options.png]]
 
