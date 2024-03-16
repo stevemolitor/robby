@@ -83,6 +83,11 @@ It should include a `%s' placeholder for the spinner."
   :type 'string
   :group 'robby)
 
+(defcustom robby-chat-system-message "You are an AI tool embedded within Emacs. Assist users with their tasks and provide information as needed. Do not engage in harmful or malicious behavior. Please provide helpful information. Answer concisely."
+  "System message to use with OpenAI Chat API."
+  :type 'string
+  :group 'robby)
+
 ;;; chat api options
 (defgroup robby-chat-api nil
   "Options to pass to the chat API."
@@ -154,11 +159,6 @@ A unique identifier representing your end-user, which can help
 OpenAI to monitor and detect abuse."
   :type '(choice string (const nil))
   :group 'robby-chat-api)
-
-(defcustom robby-chat-system-message "You are an AI tool embedded within Emacs. Assist users with their tasks and provide information as needed. Do not engage in harmful or malicious behavior. Please provide helpful information. Answer concisely."
-  "System message to use with OpenAI Chat API."
-  :type 'string
-  :group 'robby-chat)
 
 (provide 'robby-customization)
 
