@@ -60,9 +60,10 @@ and then turn on ~robby-mode~:
   :vc (:url "https://github.com/stevemolitor/robby"
        :branch "main"
        :rev :newest)
-  :config
+  :bind-keymap
   ;; (optional) bind a prefix key to the robby-command-map, default is "C-c C-r":
   ("s-r" . robby-command-map)
+  :config
   (robby-mode)
 
   ;; (optional) show robby view window in a side window on the right side:
