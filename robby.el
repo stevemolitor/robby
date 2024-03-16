@@ -31,7 +31,12 @@
   (require 'seq)
   (require 'transient))
 
-;;; 
+;; require files with exported / autoloaded commands or functions
+(require 'robby-commands)
+(require 'robby-customization)
+(require 'robby-example-commands)
+(require 'robby-mode)
+(require 'robby-transients)
 
 (provide 'robby)
 ;;; robby.el ends here
