@@ -16,7 +16,7 @@
    (not (null robby--last-process))
    (process-live-p robby--last-process)))
 
-;;;###autoload (autoload 'robby-kill-last-process "robby-process" "If a robby process is currently running, kill it." t) 
+;;;###autoload (autoload 'robby-kill-last-process "robby-process" "If a robby process is currently running, kill it." t)
 (defun robby-kill-last-process (&optional silentp)
   "If a robby process is currently running, kill it.
 
@@ -24,8 +24,7 @@ Do nothing if no process is currently running. If called from
 Emacs Lisp, do not print messages if SILENTP is t.
 
 Note that you cannot currently kill the last robby process if you
-are using `url-retreive'; you must be using `curl'
-"
+are using `url-retreive'; you must be using `curl'"
   (interactive)
   (if (robby--process-running-p)
       (progn
