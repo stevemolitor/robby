@@ -148,7 +148,7 @@ RESPONSE-REGION is the region to prepend, append, or replace in
 RESPONSE-BUFFER."
   (when completep
     (robby--spinner-stop))
-  (robby--log (format "# robby--handle-text, text:\n%S\ncompletep: %S, chars-processed %d" text completep chars-processed))
+  (robby--log (format "# Received chunk, completep: %S, chars-processed %d, chunk:\n%S\n" completep chars-processed text))
   (let ((beg (car response-region))
         (end (cdr response-region))
         (grounded-text (robby--ground-response text grounding-fns)))
@@ -169,7 +169,7 @@ RESPONSE-BUFFER."
   "Handle an error ERR from OpenAI."
   (robby--spinner-stop)
   (let* ((err-msg (if (stringp err) err (error-message-string err)))
-         (log-msg (format "Error processing robby request: %s" err-msg)))
+         (log-msg (format "Error processing robby request: %s\n" err-msg)))
     (robby--log log-msg)
     (message log-msg))
   (when (process-live-p robby--last-process)
@@ -276,7 +276,7 @@ value overrides the `robby-stream' customization variable."
          (streamp (robby--get-stream-p :never-stream-p never-stream-p :no-op-pattern no-op-pattern :grounding-fns grounding-fns))
          (chars-processed 0))
 
-    (robby--log (format "# Request body:\n%s\n" payload))
+    (robby--log (format "# Request body alist:\n%s\n" payload))
     
     (with-undo-amalgamate
       (with-current-buffer response-buffer

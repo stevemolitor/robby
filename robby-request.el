@@ -108,6 +108,7 @@ STREAMP is non-nil if the response is a stream."
     (let ((remaining "")
           (text "")
           (errored nil))
+      (robby--log (format "# Curl request JSON payload:\n%s\n" input-json))
       (when streamp
         (set-process-filter
          proc
@@ -160,6 +161,7 @@ ON-ERROR is the callback for when an error is received."
             ("Authorization" . ,(concat "Bearer " (robby--get-api-key)))))
          (inhibit-message t)
          (message-log-max nil))
+    (robby--log (format "#url-retrieve request JSON payload:\n%s\n" url-request-data))
     (url-retrieve
      robby--request-url
      (lambda (_status)
