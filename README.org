@@ -104,7 +104,7 @@ Ask for a prompt in the minibuffer, send the prompt to OpenAI, and display the r
 
 [[./images/message-response.png]]
 
-*** robby-view
+*** robby-chat
 Query AI from the region, and respond in a read-only markdown view window.
 Maintain conversational history of previous prompts and responses.
 [[./images/view-prompt.png]]
@@ -117,8 +117,8 @@ You can refine the response by typing =v=:
 
 [[./images/view-response-2.png]]
 
-*** robby-view-from-region
-Like ~robby-view~, but reads prompt from the current region, or the entire buffer if no active region. You can supply an optional prompt prefix from the minibuffer, to provide extra context or instructions.
+*** robby-chat-from-region
+Like ~robby-chat~, but reads prompt from the current region, or the entire buffer if no active region. You can supply an optional prompt prefix from the minibuffer, to provide extra context or instructions.
 *** robby-prepend-region
 Query AI from the region, prefix the selection region with the response or
 insert at point if no selected region. If no selected region read prompt from
@@ -137,8 +137,8 @@ buffer and ask for confirmation before applying.
 ** Conversation History
 Robby passes the conversation history of previous messages to OpenAI.
 Conversation history is local to the output buffer of the command. For most
-commands this is the current buffer, but for ~robby-view~ and
-~robby-view-from-region~ it is the ~*robby*~ robby view output buffer.
+commands this is the current buffer, but for ~robby-chat~ and
+~robby-chat-from-region~ it is the ~*robby*~ robby view output buffer.
 
 You can clear the history for a buffer with the ~robby-clear-history~ command.
 
@@ -302,7 +302,7 @@ You pass custom OpenAI API options in the ~:options~ property list when defining
  :historyp nil
  :prompt #'robby-get-prompt-from-region
  :prompt-args '(:prompt-prefix "Describe the following code: ")
- :action #'robby-respond-with-robby-view
+ :action #'robby-respond-with-robby-chat
  :api-options '(:max-tokens 2000))
 #+end_src
 
@@ -379,8 +379,8 @@ Prepend AI response to region, or insert at point if no selected region.
 Append AI response to region, or insert at point if no selected region.
 *** ~robby-replace-region-with-response~
 Replace region with AI response, or insert at point no selected region.
-*** ~robby-respond-with-robby-view~
-Show TEXT in ~robby-view-mode~ buffer.
+*** ~robby-respond-with-robby-chat~
+Show TEXT in ~robby-chat-mode~ buffer.
 ** Built-in Grounding Functions
 *** ~robby-extract-fenced-text~
 Extract the text between the first pair of fenced code blocks in RESPONSE.
@@ -425,9 +425,9 @@ The ~robby-chat-api~ group species the OpenAI API options. Here are a few import
 - ~robby-chat-model~ :: the model to use with the Chat API, for example, "gpt-4" or "gpt-3.5-turbo". 
 - ~robby-chat-max-tokens~ ::  The maximum number of tokens to return in the response. The Robby default is ~2000~, but you may want to increase this for longer responses or decrease to reduce token usage.
 * Animated Gifs
-Using ~robby-view~ with conversation history:
+Using ~robby-chat~ with conversation history:
 
-[[./images/robby-view-video.gif]]
+[[./images/robby-chat-video.gif]]
 
 Using ~robby-fix-code~ with prefix arg to show diff preview before applying fix:
 

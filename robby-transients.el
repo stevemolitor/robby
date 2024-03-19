@@ -142,9 +142,9 @@ HISTORY is the history list to use for the minibuffer."
 
 ;;; Action Suffixes
 (transient-define-suffix
-  robby--respond-with-robby-view-suffix ()
+  robby--respond-with-robby-chat-suffix ()
   (interactive)
-  (robby--run-transient-command #'robby-respond-with-robby-view))
+  (robby--run-transient-command #'robby-respond-with-robby-chat))
 
 (transient-define-suffix
   robby--prefix-region-with-response-suffix ()
@@ -229,7 +229,7 @@ Only includes options that cannot be nil.")
     ("a" "append response to region" robby--append-response-to-region-suffix :level 3)
     ("g" "replace region with response" robby--replace-region-with-response-suffix :level 3)]
    ["Misc Actions"
-    ("v" "respond in robby view buffer" robby--respond-with-robby-view-suffix :level 3)]]
+    ("v" "respond in robby view buffer" robby--respond-with-robby-chat-suffix :level 3)]]
   ["Region Action Options"
    ("f" "response buffer" "response-buffer=" :reader robby--read-buffer :level 6)
    ("d" "show diff preview before replacing region" "diff-preview" :reader robby--read-buffer :level 5)]

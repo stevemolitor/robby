@@ -96,22 +96,22 @@ ask the user for confirmation before applying."
     (goto-char (+ beg chars-processed))
     (insert text)))
 
-;;; robby-view
+;;; robby-chat
 
-(defvar robby-view-mode-map
+(defvar robby-chat-mode-map
   (let ((map (make-sparse-keymap)))
     (define-key map "q" 'kill-this-buffer)
-    (define-key map "v" 'robby-view)
+    (define-key map "v" 'robby-chat)
     map))
 
-(define-derived-mode robby-view-mode markdown-view-mode "robby"
+(define-derived-mode robby-chat-mode markdown-view-mode "robby"
   "Mode for viewing read-only OpenAI robby responses."
-  (use-local-map robby-view-mode-map))
+  (use-local-map robby-chat-mode-map))
 
 (defconst robby--end-view-message "\n___\n")
 
-(cl-defun robby--show-robby-view (&key show-prompt-p chars-processed prompt text completep response-buffer &allow-other-keys)
-  "Insert PROMPT followed by TEXT in `robby-view-mode' buffer RESPONSE-BUFFER.
+(cl-defun robby--show-robby-chat (&key show-prompt-p chars-processed prompt text completep response-buffer &allow-other-keys)
+  "Insert PROMPT followed by TEXT in `robby-chat-mode' buffer RESPONSE-BUFFER.
 
 When SHOW-PROMPT-P it t also insert PROMPT before TEXT. TEXT may
 be part of a chunked response.
@@ -126,7 +126,7 @@ is the first chunk, and if so display the RESPONSE-BUFFER."
     (when (and (eq chars-processed 0) (not (window-live-p (get-buffer-window))))
       (display-buffer (current-buffer) '(display-buffer-reuse-window . ((dedicated . t) (body-function . select-window)))))
     (when (eq (point-max) 1)
-      (robby-view-mode))
+      (robby-chat-mode))
     (goto-char (point-max))
     (let ((inhibit-read-only t))
       (when (and show-prompt-p (zerop chars-processed))
@@ -134,21 +134,10 @@ is the first chunk, and if so display the RESPONSE-BUFFER."
       (insert text)
       (when (eq completep t)
         (insert robby--end-view-message)
-        (message "%s" (substitute-command-keys "Type \\<robby-view-mode-map>\\[robby-view] to continue the conversation, or \\<robby-view-mode-map>\\[kill-this-buffer] to stop and kill this buffer."))))))
+        (message "%s" (substitute-command-keys "Type \\<robby-chat-mode-map>\\[robby-chat] to continue the conversation, or \\<robby-chat-mode-map>\\[kill-this-buffer] to stop and kill this buffer."))))))
 
-(cl-defun robby-respond-with-robby-view (&key chars-processed prompt text completep response-buffer &allow-other-keys)
-  "Show PROMPT and TEXT in `robby-view-mode' buffer RESPONSE-BUFFER.
-
-When COMPLETEP is t show a message to the user explaining how to
-continue the conversation or quit.
-
-CHARS-PROCESSED indicates the number of characters already
-processed in a chunked response. It is used to determine if this
-is the first chunk, and if so display the RESPONSE-BUFFER."
-  (robby--show-robby-view :show-prompt-p t :chars-processed chars-processed :prompt prompt :text text :completep completep :response-buffer response-buffer))
-
-(cl-defun robby-respond-with-robby-view-without-prompt (&key chars-processed text completep response-buffer &allow-other-keys)
-  "Show TEXT in `robby-view-mode' buffer RESPONSE-BUFFER.
+(cl-defun robby-respond-with-robby-chat (&key chars-processed prompt text completep response-buffer &allow-other-keys)
+  "Show PROMPT and TEXT in `robby-chat-mode' buffer RESPONSE-BUFFER.
 
 When COMPLETEP is t show a message to the user explaining how to
 continue the conversation or quit.
@@ -156,7 +145,18 @@ continue the conversation or quit.
 CHARS-PROCESSED indicates the number of characters already
 processed in a chunked response. It is used to determine if this
 is the first chunk, and if so display the RESPONSE-BUFFER."
-  (robby--show-robby-view :show-prompt-p nil :chars-processed chars-processed :text text :completep completep :response-buffer response-buffer))
+  (robby--show-robby-chat :show-prompt-p t :chars-processed chars-processed :prompt prompt :text text :completep completep :response-buffer response-buffer))
+
+(cl-defun robby-respond-with-robby-chat-without-prompt (&key chars-processed text completep response-buffer &allow-other-keys)
+  "Show TEXT in `robby-chat-mode' buffer RESPONSE-BUFFER.
+
+When COMPLETEP is t show a message to the user explaining how to
+continue the conversation or quit.
+
+CHARS-PROCESSED indicates the number of characters already
+processed in a chunked response. It is used to determine if this
+is the first chunk, and if so display the RESPONSE-BUFFER."
+  (robby--show-robby-chat :show-prompt-p nil :chars-processed chars-processed :text text :completep completep :response-buffer response-buffer))
 
 (provide 'robby-actions)
 

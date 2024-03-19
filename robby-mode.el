@@ -8,7 +8,6 @@
 ;;; Code:
 
 (require 'robby-commands)
-(require 'robby-example-commands)
 (require 'robby-process)
 (require 'robby-spinner)
 
@@ -26,8 +25,8 @@
     (define-key map "p" 'robby-prepend-region)
     (define-key map "r" 'robby-replace-region)
     (define-key map "u" 'robby-run-last-command)
-    (define-key map "v" 'robby-view)
-    (define-key map "w" 'robby-view-from-region)
+    (define-key map "v" 'robby-chat)
+    (define-key map "w" 'robby-chat-from-region)
 
     (define-key map "fd" 'robby-describe-code)
     (define-key map "ff" 'robby-fix-code)

@@ -214,8 +214,8 @@ to the current buffer."
       response-buffer)
 
      ;; make sure robby views use the robby view buffer unless otherwise specified:
-     ((or (eq action 'robby-respond-with-robby-view)
-          (eq action 'robby-respond-with-robby-view-without-prompt))
+     ((or (eq action 'robby-respond-with-robby-chat)
+          (eq action 'robby-respond-with-robby-chat-without-prompt))
       "*robby*")
 
      ;; default to current buffer
