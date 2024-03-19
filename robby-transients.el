@@ -12,6 +12,7 @@
 (require 'transient)
 
 (require 'robby-actions)
+(require 'robby-commands)
 (require 'robby-customization)
 (require 'robby-models)
 (require 'robby-prompts)
@@ -195,6 +196,7 @@ Only includes options that cannot be nil.")
   "Initialize API options for transient object OBJ."
   (oset obj value `(,@(robby--options-transient-value))))
 
+;;; robby-api-options
 (transient-define-prefix robby-api-options ()
   "Chat API option transient."
   :init-value 'robby--init-api-options
@@ -211,7 +213,7 @@ Only includes options that cannot be nil.")
   [[("a" "apply options" robby--apply-api-options :transient transient--do-return)]
    [("x" "exit without applying options" ignore :transient transient--do-return :if (lambda () transient-current-command))]])
 
-;;; Robby transient
+;;; robby
 ;;;###autoload (autoload 'robby-builder "robby-transients" "Build a robby AI command." t)
 (transient-define-prefix robby-builder ()
   "Build a robby AI command."
@@ -242,10 +244,18 @@ Only includes options that cannot be nil.")
   ["API"
    ("A" "API options" robby-api-options :transient transient--do-recurse :level 5)])
 
-;;;###autoload (autoload 'robby-example-commands "robby-transients" "Display menu for executing example robby commands." t)
-(transient-define-prefix robby-example-commands ()
+;;; robby-commands
+;;;###autoload (autoload 'robby-commands "robby-transients" "Display menu for executing robby commands." t)
+(transient-define-prefix robby-commands ()
   "Display menu for executing example robby commands."
-  ["Robby Example Commands"
+  ["Core Commands"
+   ("c" "chat with AI" robby-chat)
+   ("C" "chat with AI with initial prompt from selected region" robby-chat-from-region)
+   ("m" "ask AI and respond with message" robby-message)
+   ("p" "prompt from region and prepend response to region" robby-prepend-region)
+   ("a" "prompt from region and append response to region" robby-append-region)
+   ("r" "prompt from region and replace region with response" robby-replace-region)]
+  ["Commands for Specific Tasks"
    ("d" "describe code" robby-describe-code)
    ("f" "fix code" robby-fix-code)
    ("g" "generate commit message from staged changes" robby-git-commit-message)

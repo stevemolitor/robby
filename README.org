@@ -11,7 +11,9 @@ Robby provides an extensible Emacs interface to OpenAI. It provides basic comman
       - [[#emacs-30][Emacs 30]]
       - [[#set-api-key][Set API Key]]
 - [[#usage][Usage]]
-      - [[#built-in-commands][Built-In Commands]]
+      - [[#core-commands][Core Commands]]
+      - [[#commands-for-specific-tasks][Commands for Specific Tasks]]
+      - [[#commands-transient][Commands Transient]]
       - [[#conversation-history][Conversation History]]
 - [[#building-custom-commands-with-robby-builder][Building Custom Commands with Robby Builder]]
 - [[#defining-custom-commands][Defining Custom Commands]]
@@ -23,7 +25,6 @@ Robby provides an extensible Emacs interface to OpenAI. It provides basic comman
       - [[#built-in-prompt-functions][Built-in Prompt Functions]]
       - [[#built-in-action-functions][Built-in Action Functions]]
       - [[#built-in-grounding-functions][Built-in Grounding Functions]]
-      - [[#example-custom-commands][Example Custom Commands]]
 - [[#customization][Customization]]
 - [[#animated-gifs][Animated Gifs]]
 
@@ -95,8 +96,8 @@ the "Mastering Emacs" article [[https://www.masteringemacs.org/article/keeping-s
 Sources]]. Robby will decrypt and read the API key from the encrypted
 =~/.authinfo.gpg= if you have set that up. This is what I do.
 * Usage
-** Built-In Commands
-Robby comes with the following built-in commands:
+** Core Commands
+Robby comes with the following generic built-in commands:
 *** robby-message
 Ask for a prompt in the minibuffer, send the prompt to OpenAI, and display the response in the minibuffer. Maintain conversational history of previous prompts and responses, up to ~robby-max-history~ prompt/response pairs.
 
@@ -134,6 +135,40 @@ the minibuffer, to provide extra context or instructions.
 
 If a prefix argument is supplied, robby will display the changes in a diff
 buffer and ask for confirmation before applying.
+** Commands for Specific Tasks
+Robby also includes a handful of example commands for specific tasks. You can use these as inspiration when creating your commands.
+
+See [[https://github.com/stevemolitor/robby/blob/main/robby-commands.el][robby-commands.el]] for the definitions of robby's commands. You may want to
+copy and paste and then adjust the prompts to suit your needs or use them as
+inspiration for your commands.
+
+Here is the list of example commands:
+
+*** robby-describe-code
+Describe code in the selected region, show description in robby view window.
+*** robby-fix-code
+Fix code in the selected region.
+
+Preview changes in a diff buffer when invoked with a prefix argument.
+*** robby-git-commit-message
+Generate git commit message title from staged changes.
+*** robby-add-comment
+Add a comment for the code in the selected region or buffer. Preview changes in
+a diff buffer when invoked with a prefix argument.
+*** robby-write-tests
+Write some tests for the code in the region, and append them to the region.
+*** robby-summarize
+Summarize the text in the selected region or entire buffer if no selected
+region, show description in robby view window.
+*** robby-proof-read
+Proof read the text in the selected region.
+
+Preview changes in a diff buffer when invoked with a prefix argument.
+
+** Commands Transient
+~M-x robby-commands~ will display a transient menu for executing the robby core and task specific commands:
+
+[[./images/commands-transient.png]]
 ** Conversation History
 Robby passes the conversation history of previous messages to OpenAI.
 Conversation history is local to the output buffer of the command. For most
@@ -390,33 +425,6 @@ Extract the text between the first pair of fenced code blocks in RESPONSE if in 
 Replace =%= with =%%= in TEXT to avoid format string errors calling ~message~.
 *** ~robby-remove-trailing-end-of-line~
 Remove the end of line character at the very end of a string if present.
-** Example Custom Commands
-Robby includes a handful of example commands you can use as inspiration when creating your commands. ~M-x robby-example-commands~ will display a transient menu for executing these commands:
-
-[[./images/example-commands-transient.png]]
-
-See [[https://github.com/stevemolitor/robby/blob/main/robby-example-commands.el][robby-example-commands.el]] for their definitions. You may want to copy and paste and then adjust the prompts to suit your needs or use them as inspiration for your commands.
-
-Here is the list of example commands:
-*** ~robby-write-tests~
-Write some tests for the code in the region, and append them to the region.
-*** ~robby-add-comment~
-Add a comment for the code in the selected region or buffer. Preview changes in
-a diff buffer when invoked with a prefix argument.
-*** ~robby-fix-code~
-Fix the code in the selected region. Preview changes in a diff buffer when
-invoked with a prefix argument.
-*** ~robby-git-commit-message~
-Generate git commit message title from staged changes.
-*** ~robby-proof-read-text~
-Proofread the text in the selected region. Preview changes in a diff buffer
-when invoked with a prefix argument.
-*** ~robby-describe-code~
-Describe the code in the selected region, and show a description in a robby view
-window.
-*** ~robby-summarize~
-Summarize the text in the selected region or entire buffer if no the selected
-region, show a description in a robby view window.
 * Customization
 Use ~customize-group~ | ~robby~ to see the various customization options.
 
