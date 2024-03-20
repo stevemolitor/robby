@@ -2,7 +2,14 @@
 
 [[./images/robby.png]]
 * About
-Robby provides an extensible Emacs interface to OpenAI. It provides basic commands to use OpenAI with regions, the minibuffer, and help windows. It also provides a mechanism for defining your own interactive AI commands, and to save the last executed command as a reusable custom AI command. 
+Robby provides an extensible Emacs interface to OpenAI. 
+
+Robby provides a set of functions to generate prompts and act on AI
+responses, and a macro and other utilities to assemble these into reusable AI
+commands. Robby uses these facilities to build core commands to operate on
+regions and such, and task-specific commands to do things like fixing code,
+generating comments, summarizing text, etc. Robby also provides an interactive
+builder to create custom commands without having to write code.
 * Table of Contents :TOC:
 - [[#about][About]]
 - [[#requirements][Requirements]]
@@ -15,6 +22,7 @@ Robby provides an extensible Emacs interface to OpenAI. It provides basic comman
       - [[#commands-for-specific-tasks][Commands for Specific Tasks]]
       - [[#commands-transient][Commands Transient]]
       - [[#conversation-history][Conversation History]]
+      - [[#logging][Logging]]
 - [[#building-custom-commands-with-robby-builder][Building Custom Commands with Robby Builder]]
 - [[#defining-custom-commands][Defining Custom Commands]]
       - [[#defining-simple-commands][Defining Simple Commands]]
@@ -183,6 +191,8 @@ The ~robby-max-history~ customization variable specifies the maximum number of
 previous prompt/response pairs to keep in the conversation history. Its default
 is 2. Increasing this value will pass more history context to OpenAI, at the
 cost of using more tokens. Setting it to 0 to turn conversation history off.
+** Logging
+Set ~robby-logging~ to ~t~ to enable logging. Robby will log OpenAI requests and responses in the ~*robby-log*~ buffer.
 * Building Custom Commands with Robby Builder
 Running ~robby-builder~ (=C-c C-r b=)will bring up a transient menu to build and execute robby commands interactively. You can use this to tune your prompt, API options, and such. When you are satisfied with the result you can save the command via ~robby-insert-last-command~:
 
