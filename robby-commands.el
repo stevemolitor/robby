@@ -10,11 +10,13 @@
 (require 'robby-prompts)
 (require 'robby-actions)
 (require 'robby-grounding-fns)
+(require 'robby-spinner)
+
 
 ;;; Core Commands
 
 ;;;; robby-chat
-;;;###autoload (autoload 'robby-chat "robby-commands" "Query AI from minibuffer, respond in robby-chat-mode buffer." t)
+;;;###autoload (autoload 'robby-chat "robby" "Query AI from minibuffer, respond in robby-chat-mode buffer." t)
 (robby-define-command
  robby-chat
  "Query AI from minibuffer, respond in robby-chat-mode buffer."
@@ -23,7 +25,7 @@
  :historyp t)
 
 ;;;; robby-chat-from-region
-;;;###autoload (autoload 'robby-chat-from-region "robby-commands" "Query AI from minibuffer, respond in robby-chat-mode buffer." t)
+;;;###autoload (autoload 'robby-chat-from-region "robby" "Query AI from minibuffer, respond in robby-chat-mode buffer." t)
 (robby-define-command
  robby-chat-from-region
  "Query AI from region, respond in robby-chat-mode buffer."
@@ -32,7 +34,7 @@
  :historyp t)
 
 ;;;; robby-message
-;;;###autoload (autoload 'robby-message "robby-commands" "Query AI from minibuffer, respond with message." t)
+;;;###autoload (autoload 'robby-message "robby" "Query AI from minibuffer, respond with message." t)
 (robby-define-command
  robby-message
  "Query AI from minibuffer, respond with message."
@@ -43,7 +45,7 @@
  :never-stream-p t)
 
 ;;;; robby-prepend-region
-;;;###autoload (autoload 'robby-prepend-region "robby-commands" "Query AI from region or entire buffer if no selected region, prepend results to region or buffer." t)
+;;;###autoload (autoload 'robby-prepend-region "robby" "Query AI from region or entire buffer if no selected region, prepend results to region or buffer." t)
 (robby-define-command
  robby-prepend-region
  "Query AI from region or entire buffer if no selected region,
@@ -54,7 +56,7 @@ prepend results to region or buffer."
  :never-stream-p t)
 
 ;;;; robby-append-region
-;;;###autoload (autoload 'robby-append-region "robby-commands" "Query AI from region or entire buffer if no selected region, append results to region or buffer." t)
+;;;###autoload (autoload 'robby-append-region "robby" "Query AI from region or entire buffer if no selected region, append results to region or buffer." t)
 (robby-define-command
  robby-append-region
  "Query AI from region or entire buffer if no selected region,
@@ -65,7 +67,7 @@ append results to region or buffer."
  :never-stream-p t)
 
 ;;;; robby-replace-region
-;;;###autoload (autoload 'robby-replace-region "robby-commands" "Query AI from region or entire buffer if no selected region, replace region with response." t)
+;;;###autoload (autoload 'robby-replace-region "robby" "Query AI from region or entire buffer if no selected region, replace region with response." t)
 (robby-define-command
  robby-replace-region
  "Query AI from region or entire buffer if no selected region,
@@ -81,7 +83,7 @@ before applying."
 ;;; Example Commands for Specific Tasks
 
 ;;;; robby-write-tests
-;;;###autoload (autoload 'robby-write-tests "robby-commands" "Write some tests for the code in the region, append to region." t)
+;;;###autoload (autoload 'robby-write-tests "robby" "Write some tests for the code in the region, append to region." t)
 (robby-define-command
  robby-write-tests
  "Write some tests for the code in the region, append to region."
@@ -95,7 +97,7 @@ before applying."
  :grounding-fns #'robby-extract-fenced-text)
 
 ;;;; robby-add-comment
-;;;###autoload (autoload 'robby-add-comment "robby-commands" "Add a comment for the code in the selected region or buffer." t)
+;;;###autoload (autoload 'robby-add-comment "robby" "Add a comment for the code in the selected region or buffer." t)
 (robby-define-command
  robby-add-comment
  "Add a comment for the code in the selected region or buffer."
@@ -109,7 +111,7 @@ before applying."
  :grounding-fns #'robby-extract-fenced-text)
 
 ;;;; robby-fix-code
-;;;###autoload (autoload 'robby-fix-code "robby-commands" "Fix code in region." t)
+;;;###autoload (autoload 'robby-fix-code "robby" "Fix code in region." t)
 (robby-define-command
  robby-fix-code
  "Fix code in the selected region.
@@ -130,7 +132,7 @@ However if the code is NOT correct, respond with the fixed code and do NOT use t
  :no-op-pattern (rx (or "the code is correct" "the original code is correct")))
 
 ;;;; robby-proof-read
-;;;###autoload (autoload 'robby-proof-read "robby-commands" "Proof read text." t)
+;;;###autoload (autoload 'robby-proof-read "robby" "Proof read text." t)
 (robby-define-command
  robby-proof-read
  "Proof read the text in the selected region.
@@ -147,7 +149,7 @@ Preview changes in a diff buffer when invoked with a prefix argument."
  :grounding-fns #'robby-extract-fenced-text)
 
 ;;;; robby-describe-code
-;;;###autoload (autoload 'robby-describe-code "robby-commands" "Describe code in the selected region, show description in robby view window." t)
+;;;###autoload (autoload 'robby-describe-code "robby" "Describe code in the selected region, show description in robby view window." t)
 (robby-define-command
  robby-describe-code
  "Describe code in the selected region, show description in robby view window."
@@ -160,7 +162,7 @@ Preview changes in a diff buffer when invoked with a prefix argument."
  :api-options '(:max-tokens 2000))
 
 ;;;; robby-summarize
-;;;###autoload (autoload 'robby-summarize "robby-commands" "Summarize the text in the selected region or entire buffer if no selected region, show description in robby view window." t)
+;;;###autoload (autoload 'robby-summarize "robby" "Summarize the text in the selected region or entire buffer if no selected region, show description in robby view window." t)
 (robby-define-command
  robby-summarize
  "Summarize the text in the selected region or entire buffer if no
@@ -186,7 +188,7 @@ PROMPT-PREFIX is a string to prepend to the prompt."
     (format "%s\n%s" prompt-prefix diff)))
 
 ;;;; robby-git-commit-message
-;;;###autoload (autoload 'robby-git-commit-message "robby-commands" "Generate git commit message title from staged changes." t)
+;;;###autoload (autoload 'robby-git-commit-message "robby" "Generate git commit message title from staged changes." t)
 (robby-define-command
  robby-git-commit-message
  "Generate git commit message title from staged changes."

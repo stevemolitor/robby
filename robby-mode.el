@@ -11,7 +11,7 @@
 (require 'robby-process)
 (require 'robby-spinner)
 
-;;;###autoload
+;;;###autoload (autoload 'robby-command-map "robby")
 (defvar robby-command-map
   (let ((map (make-sparse-keymap)))
     (define-key map "a" 'robby-append-region)
@@ -39,10 +39,10 @@
     map)
   "Robby command map.")
 
-;;;###autoload
+;;;###autoload (autoload 'robby-keymap-prefix "robby")
 (defvar robby-keymap-prefix (kbd "C-c C-r"))
 
-;;;###autoload
+;;;###autoload (autoload 'robby-mode-map "robby")
 (defvar robby-mode-map
   (let ((map (make-sparse-keymap)))
     (define-key map robby-keymap-prefix robby-command-map)
@@ -56,7 +56,7 @@ buffer."
   (when (and (boundp 'robby-mode) robby-mode)
     (robby-kill-last-process t)))
 
-;;;###autoload
+;;;###autoload (autoload 'robby-mode "robby")
 (define-minor-mode robby-mode
   "Minor mode for running robby commands."
   :global t

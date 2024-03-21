@@ -31,8 +31,7 @@
   (require 'seq)
   (require 'transient))
 
-;; require files with exported / autoloaded commands or functions
-(require 'robby-commands)
+;; require files with autoloads, and customization file
 (require 'robby-customization)
 (require 'robby-commands)
 (require 'robby-mode)

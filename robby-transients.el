@@ -214,7 +214,7 @@ Only includes options that cannot be nil.")
    [("x" "exit without applying options" ignore :transient transient--do-return :if (lambda () transient-current-command))]])
 
 ;;; robby
-;;;###autoload (autoload 'robby-builder "robby-transients" "Build a robby AI command." t)
+;;;###autoload (autoload 'robby-builder "robby" "Build a robby AI command." t)
 (transient-define-prefix robby-builder ()
   "Build a robby AI command."
   :incompatible '(("prompt=" "prompt-prefix=")
@@ -245,7 +245,7 @@ Only includes options that cannot be nil.")
    ("A" "API options" robby-api-options :transient transient--do-recurse :level 5)])
 
 ;;; robby-commands
-;;;###autoload (autoload 'robby-commands "robby-transients" "Display menu for executing robby commands." t)
+;;;###autoload (autoload 'robby-commands "robby" "Display menu for executing robby commands." t)
 (transient-define-prefix robby-commands ()
   "Display menu for executing example robby commands."
   ["Core Commands"
