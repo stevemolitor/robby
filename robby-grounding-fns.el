@@ -16,7 +16,9 @@
     (let ((beg (re-search-forward "```.*$" nil t))
           (end (re-search-forward "```" nil t)))
       (if (and beg end)
-          (buffer-substring-no-properties (+ beg 1) (- end 3))
+          ;; remove any trailing newline before the end of the fence
+          (let ((resp (buffer-substring-no-properties (+ beg 1) (- end 3))))
+            (replace-regexp-in-string "\n$" "" resp))
         response))))
 
 (defun robby-extract-fenced-text-in-prog-modes (response)
