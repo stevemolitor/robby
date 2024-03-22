@@ -435,12 +435,15 @@ Replace =%= with =%%= in TEXT to avoid format string errors calling ~message~.
 *** ~robby-remove-trailing-end-of-line~
 Remove the end of line character at the very end of a string if present.
 * Customization
-Use ~customize-group~ | ~robby~ to see the various customization options.
+Use ~customize-group~ | ~robby~ to see the various customization options. Robby will validate values as appropriate, for example ~robby-chat-temperature~ values must be between =0.0= and =2.0=. 
 
-The ~robby-chat-api~ group species the OpenAI API options. Here are a few important ones:
+The ~robby-chat-api~ customization group species the OpenAI API options. Here are
+a few important ones:
 - ~robby-chat-api~ :: customization group with options to pass to the Chat API.
 - ~robby-chat-model~ :: the model to use with the Chat API, for example, "gpt-4" or "gpt-3.5-turbo". 
 - ~robby-chat-max-tokens~ ::  The maximum number of tokens to return in the response. The Robby default is ~2000~, but you may want to increase this for longer responses or decrease to reduce token usage.
+
+  You can also set values in the ~robby-chat-api~ group for the current Emacs session by invoking the ~robby-api-options~ transient. 
 * Animated Gifs
 Using ~robby-chat~ with conversation history:
 
