@@ -213,7 +213,7 @@ Only includes options that cannot be nil.")
   [[("a" "apply options" robby--apply-api-options :transient transient--do-return)]
    [("x" "exit without applying options" ignore :transient transient--do-return :if (lambda () transient-current-command))]])
 
-;;; robby
+;;; robby-builder
 ;;;###autoload (autoload 'robby-builder "robby" "Build a robby AI command." t)
 (transient-define-prefix robby-builder ()
   "Build a robby AI command."
@@ -245,9 +245,23 @@ Only includes options that cannot be nil.")
    ("A" "API options" robby-api-options :transient transient--do-recurse :level 5)])
 
 ;;; robby-commands
+(transient-define-suffix
+  robby--fix-code ()
+  (interactive)
+  (let* ((args (transient-args transient-current-command))
+         (diff-preview (transient-arg-value "diff-preview" args)))
+    (robby-fix-code diff-preview)))
+
+(transient-define-suffix
+  robby--proof-read ()
+  (interactive)
+  (let* ((args (transient-args transient-current-command))
+         (diff-preview (transient-arg-value "diff-preview" args)))
+    (robby-proof-read diff-preview)))
+
 ;;;###autoload (autoload 'robby-commands "robby" "Display menu for executing robby commands." t)
 (transient-define-prefix robby-commands ()
-  "Display menu for executing example robby commands."
+  "Display menu for executing built-in robby commands."
   ["Core Commands"
    ("c" "chat with AI" robby-chat)
    ("C" "chat with AI with initial prompt from selected region" robby-chat-from-region)
@@ -257,12 +271,14 @@ Only includes options that cannot be nil.")
    ("r" "prompt from region and replace region with response" robby-replace-region)]
   ["Commands for Specific Tasks"
    ("d" "describe code" robby-describe-code)
-   ("f" "fix code" robby-fix-code)
+   ("f" "fix code" robby--fix-code)
    ("g" "generate commit message from staged changes" robby-git-commit-message)
    ("o" "add comments" robby-add-comment)
    ("t" "write tests" robby-write-tests)
    ("s" "summarize text" robby-summarize)
-   ("x" "proof read text" robby-proof-read)])
+   ("x" "proof read text" robby--proof-read)]
+  ["Options"
+   ("d" "show diff preview before replacing region" "diff-preview" :reader robby--read-buffer :level 5)])
 
 (provide 'robby-transients)
 

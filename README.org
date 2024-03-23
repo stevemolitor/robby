@@ -176,6 +176,13 @@ Preview changes in a diff buffer when invoked with a prefix argument.
 ~M-x robby-commands~ will display a transient menu for executing the robby core and task-specific commands:
 
 [[./images/commands-transient.png]]
+
+To see command options (currently just one) [[https://magit.vc/manual/transient/Enabling-and-Disabling-Suffixes.html][set the transient level]] to =4=:
+
+[[./images/advanced-commands-options.png]]
+
+With the =d= option selected, before fixing code or proofreading text, robby will
+display the changes in a diff buffer and ask for confirmation before applying.
 ** Conversation History
 Robby passes the conversation history of previous messages to OpenAI.
 Conversation history is local to the output buffer of the command. For most
