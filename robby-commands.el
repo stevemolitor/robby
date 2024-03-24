@@ -12,7 +12,6 @@
 (require 'robby-grounding-fns)
 (require 'robby-spinner)
 
-
 ;;; Core Commands
 
 ;;;; robby-chat
@@ -105,7 +104,7 @@ before applying."
  :never-stream-p t
  :prompt #'robby-get-prompt-from-region
  :prompt-args '(:prompt-prefix
-                "The file extension for this code is \"%e\". First, determine the programming language based on the file extension. Then, write a documentation comment for the code delimted by triple backticks, formatted with the appropriate comment delimeters for the programming language, and based on the type of thing it is - code block, function definition, class definition, etc. Return the entire comment inside a markdown code fence, delimited by triple backticks. Do not return the original code in your response. Here is an example response for a Lisp function definition:
+                "The file extension for this code is \"%e\". First, determine the programming language based on the file extension. If there is no file extension try to determine the language based on the code. Then, write a documentation comment for the code delimted by triple backticks, formatted with the appropriate comment delimeters for the programming language, and based on the type of thing it is - code block, function definition, class definition, etc. Return the entire comment inside a markdown code fence, delimited by triple backticks. Do not return the original code in your response. Here is an example response for a Lisp function definition:
 
 ```
 ;; Adds two numbers, a and b
