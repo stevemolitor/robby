@@ -192,7 +192,7 @@ commands this is the current buffer, but for ~robby-chat~ and
 You can clear the history for a buffer with the ~robby-clear-history~ command.
 
 Note that commands can opt out of conversation history by setting the ~historyp~
-option to ~nil~; See [[*Defining Custom Commands][Defining Custom Commands]] below.
+option to ~nil~.
 
 The ~robby-max-history~ customization variable specifies the maximum number of
 previous prompt/response pairs to keep in the conversation history. Its default
