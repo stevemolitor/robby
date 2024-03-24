@@ -371,6 +371,29 @@ Prompt functions take the following keyword arguments:
 - ~prompt-suffix~ - String to append to the prompt.
 - ~prompt-buffer~ - The buffer to get prompt from. Usually, this is the current buffer, but commands can specify other buffers.
 - ~never-ask-p~ - Prefix functions like ~robby-get-prompt-from-region~ ask the user for a prompt prefix before executing the command. Pass ~never-ask-p t~ to turn that behavior off.
+
+Before sending the prompt to AI robby will format the prompt using ~format-spec~ with the following format specs:
+
+- =e= - current file extension 
+- =f= - current buffer file name 
+- =l= - user login name
+- =n= - user full name
+
+You can use these format specifiers in your own prompts to provide extra context. For example here is a simplified version of ~robby-add-comment~ that passes the file extension by using the ~%e~ format spec:
+
+#+begin_src emacs-lisp
+(robby-define-command
+ add-comment
+ "Add a comment for the code in the selected region or buffer."
+ :historyp nil
+ :never-stream-p t
+ :prompt #'robby-get-prompt-from-region
+ :prompt-args '(:prompt-prefix
+                "The file extension for this code is \"%e\". First, determine the programming language based on the file extension. Then, write a documentation comment for the code with the appropriate comment delimeters for the programming language. Here is the code:
+")
+ :action #'robby-prepend-response-to-region)
+#+end_src
+
 *** action
 - Type: Function.
 - Description: The function to invoke when the request is complete. The function is passed the response text and the selected region. Must be of the form ‘(TEXT BEG END)’.
