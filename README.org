@@ -34,6 +34,8 @@ builder to create custom commands without having to write code.
       - [[#built-in-action-functions][Built-in Action Functions]]
       - [[#built-in-grounding-functions][Built-in Grounding Functions]]
 - [[#customization][Customization]]
+      - [[#openai-url][OpenAI URL]]
+      - [[#api-options][API Options]]
 - [[#animated-gifs][Animated Gifs]]
 
 * Requirements
@@ -468,7 +470,12 @@ Replace =%= with =%%= in TEXT to avoid format string errors calling ~message~.
 *** ~robby-remove-trailing-end-of-line~
 Remove the end of line character at the very end of a string if present.
 * Customization
-Use ~customize-group~ | ~robby~ to see the various customization options. Robby will validate values as appropriate, for example ~robby-chat-temperature~ values must be between =0.0= and =2.0=. 
+Use ~customize-group~ | ~robby~ to see the various customization options. Robby will validate values as appropriate, for example ~robby-chat-temperature~ values must be between =0.0= and =2.0=.
+
+** OpenAI URL
+Customize the ~robby-chat-api~ variable to use a different OpenAI compatible provider. By default it is set to =https://api.openai.com/v1/chat/completions=. 
+
+** API Options
 
 The ~robby-chat-api~ customization group species the OpenAI API options. Here are
 a few important ones:

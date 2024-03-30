@@ -88,6 +88,11 @@ It should include a `%s' placeholder for the spinner."
   :type 'string
   :group 'robby)
 
+(defcustom robby-api-url "https://api.openai.com/v1/chat/completions"
+  "URL to use for OpenAI API requests."
+  :type 'string
+  :group 'robby)
+
 ;;; chat api options
 (defgroup robby-chat-api nil
   "Options to pass to the chat API."

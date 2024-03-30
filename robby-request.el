@@ -13,11 +13,9 @@
 (require 'url-vars)
 
 (require 'robby-api-key)
+(require 'robby-customization)
 (require 'robby-logging)
 (require 'robby-utils)
-
-;;; constants
-(defconst robby--request-url "https://api.openai.com/v1/chat/completions")
 
 ;;; util functions
 (defun robby--request-parse-error-data (data)
@@ -102,7 +100,7 @@ STREAMP is non-nil if the response is a stream."
                           "curl"
                           proc-buffer
                           "curl"
-                          robby--request-url
+                          robby-api-url
                           curl-options)
                  (error (funcall on-error err)))))
     (let ((remaining "")
@@ -163,7 +161,7 @@ ON-ERROR is the callback for when an error is received."
          (message-log-max nil))
     (robby--log (format "#url-retrieve request JSON payload:\n%s\n" url-request-data))
     (url-retrieve
-     robby--request-url
+     robby-api-url
      (lambda (_status)
        (goto-char (point-min))
        (re-search-forward "^{")
