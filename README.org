@@ -319,7 +319,10 @@ The ~:grounding-fns~ option takes either a list of grounding functions that will
 be executed in order, or a single grounding function as shown above.
 
 ** A More Involved Example
-The prompt or action options can do more than just operate on the selected region. For example, the ~robby-git-commit-message~ function invokes a shell command to get the list of staged changes in a git repository and generates a one-line git commit message:
+The prompt or action options can do more than just operate on the
+selected region. For example, the ~robby-git-commit-message~ function
+invokes a shell command to get the list of staged changes in a git
+repository and generates a one-line git commit message:
 
 #+begin_src emacs-lisp
 (cl-defun robby-get-prompt-from-git-diff (&key prompt-prefix &allow-other-keys)
