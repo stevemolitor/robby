@@ -111,6 +111,7 @@ STREAMP is non-nil if the response is a stream."
         (set-process-filter
          proc
          (lambda (proc string)
+           (robby--log (format "# Raw curl response chunk:\n%s\n" string))
            (condition-case err
                (let ((error-msg (robby--request-parse-error-string string)))
                  (if error-msg
