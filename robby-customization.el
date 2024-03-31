@@ -30,6 +30,15 @@ Return an error message if the value is invalid, or nil if it is valid."
   :group 'tools
   :tag "robby")
 
+(defcustom robby-openai-api-key #'robby--get-api-key-from-auth-source
+  "OpenAI API key.
+
+A string, or a function that returns the API key."
+  :group 'robby
+  :type '(choice
+          (string :tag "OpenAI API key")
+          (function :tag "Function that returns the OpenAI API key")))
+
 (defcustom robby-logging nil
   "Log to *robby-log* buffer if t."
   :type 'boolean
