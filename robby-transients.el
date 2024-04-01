@@ -197,11 +197,12 @@ Only includes options that cannot be nil.")
   (oset obj value `(,@(robby--options-transient-value))))
 
 ;;; robby-api-options
+;;;###autoload (autoload 'robby-api-options "robby" "Chat API options transient." t)
 (transient-define-prefix robby-api-options ()
-  "Chat API option transient."
+  "Chat API options transient."
   :init-value 'robby--init-api-options
   ["Chat API Options"
-   ("m" "model" "model=" :always-read t :choices ,(robby--get-models))
+   ("m" "model" "model=" :always-read t :choices (lambda () (robby--get-models)))
    ("t" "max tokens" "max-tokens=" :reader transient-read-number-N+ :always-read t)
    ("e" "temperature" "temperature=" :reader robby--read-temperature :always-read t)
    ("p" "top p" "top-p=" :reader robby--read-top-p :always-read t)
