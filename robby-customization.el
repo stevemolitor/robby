@@ -97,8 +97,10 @@ It should include a `%s' placeholder for the spinner."
   :type 'string
   :group 'robby)
 
-(defcustom robby-api-url "https://api.openai.com/v1/chat/completions"
-  "URL to use for OpenAI API requests."
+(defcustom robby-api-url "https://api.openai.com/v1"
+  "Base URL to use for OpenAI API requests.
+
+It should not end with a trailing slash. Robby will append paths to the URL like `/chat/models'"
   :type 'string
   :group 'robby)
 
