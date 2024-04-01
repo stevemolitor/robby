@@ -20,7 +20,7 @@ Make  request to OpenAI API to get the list of available models."
       robby-models
     (let* ((inhibit-message t)
            (message-log-max nil)
-           (url robby-api-url)
+           (url (concat robby-api-url "/models"))
            (url-request-method "GET")
            (url-request-extra-headers
             `(("Content-Type" . "application/json")
