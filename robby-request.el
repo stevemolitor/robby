@@ -68,8 +68,6 @@ of parsed JSON objects:
            (setq new-remaining (buffer-substring pos (point-max))))))
       `(:remaining ,new-remaining :parsed ,(nreverse parsed)))))
 
-(defconst robby--curl-unknown-error "Unexpected error making OpenAI request via curl" )
-
 (defun robby--curl-parse-response (string remaining streamp)
   "Parse JSON curl response from data in STRING and REMAINING unparsed text.
 
@@ -79,6 +77,10 @@ STREAMP is non-nil if the response is a stream."
          (parsed (plist-get json :parsed))
          (text (string-join (seq-filter #'stringp (seq-map (lambda (chunk) (robby--chunk-content chunk streamp)) parsed)))))
     `(:text ,text :remaining ,(plist-get json :remaining))))
+
+(defun robby--chat-url ()
+  "Get the chat API URL."
+  (concat robby-api-url "/chat/completions"))
 
 (cl-defun robby--curl (&key payload on-text on-error streamp)
   "Make a request to the OpenAI API using curl.
@@ -100,9 +102,10 @@ STREAMP is non-nil if the response is a stream."
                           "curl"
                           proc-buffer
                           "curl"
-                          robby-api-url
+                          (robby--chat-url)
                           curl-options)
                  (error (funcall on-error err)))))
+    (robby--log (format "# Curl request command:\ncurl %s %s\n" (robby--chat-url) (string-join curl-options " ")))
     (let ((remaining "")
           (text "")
           (errored nil))
@@ -122,8 +125,8 @@ STREAMP is non-nil if the response is a stream."
                      (setq remaining (plist-get resp :remaining))
                      (funcall on-text :text (plist-get resp :text) :completep nil))))
              (error
-              (kill-process proc)
-              (error "Robby: unexpected error processing curl response: %S" err))))))
+              (error "Robby: unexpected error processing curl response: %S" err)
+              (kill-process proc))))))
       (set-process-sentinel
        proc
        (lambda (_proc _status)
@@ -160,9 +163,8 @@ ON-ERROR is the callback for when an error is received."
             ("Authorization" . ,(concat "Bearer " (robby--get-api-key)))))
          (inhibit-message t)
          (message-log-max nil))
-    (robby--log (format "#url-retrieve request JSON payload:\n%s\n" url-request-data))
     (url-retrieve
-     robby-api-url
+     (robby--chat-url)
      (lambda (_status)
        (goto-char (point-min))
        (re-search-forward "^{")
