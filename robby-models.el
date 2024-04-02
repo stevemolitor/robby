@@ -9,18 +9,23 @@
 (require 'robby-api-key)
 (require 'robby-request)
 (require 'robby-customization)
+(require 'robby-providers)
 
-(defvar robby-models nil)
+(defvar robby--models nil)
+
+(defun robby--models-url ()
+  "Get the URL for the models endpoint."
+  (concat "https://" (robby--providers-host) (robby--providers-api-base-path) "/models"))
 
 (defun robby--get-models ()
   "Get the list of available models from OpenAI.
 
 Make  request to OpenAI API to get the list of available models."
-  (if robby-models
-      robby-models
+  (if robby--models
+      robby--models
     (let* ((inhibit-message t)
            (message-log-max nil)
-           (url (concat robby-api-url "/models"))
+           (url (robby--models-url))
            (url-request-method "GET")
            (url-request-extra-headers
             `(("Content-Type" . "application/json")
@@ -37,8 +42,10 @@ Make  request to OpenAI API to get the list of available models."
           (if err
               (error "Error fetching models: %S" err)
             (let* ((all-models (seq-map (lambda (obj) (cdr (assoc 'id obj))) (cdr (assoc 'data resp))))
-                   (gpt-models (seq-filter (lambda (name) (string-prefix-p "gpt" name)) all-models)))
-              (setq robby-models gpt-models))))))))
+                   (filtered-models (if (robby--providers-models-filter-re)
+                                        (seq-filter (lambda (name) (string-prefix-p (robby--providers-models-filter-re) name)) all-models)
+                                      all-models)))
+              (setq robby--models filtered-models))))))))
 
 (provide 'robby-models)
 

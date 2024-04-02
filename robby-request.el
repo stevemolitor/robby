@@ -15,9 +15,10 @@
 (require 'robby-api-key)
 (require 'robby-customization)
 (require 'robby-logging)
+(require 'robby-providers)
 (require 'robby-utils)
 
-;;; util functions
+;;; request util functions
 (defun robby--request-parse-error-data (data)
   "Get error from response DATA."
   (cdr (assoc 'message (assoc 'error data))))
@@ -27,6 +28,10 @@
   (condition-case _err
       (robby--request-parse-error-data (json-read-from-string err))
     (error nil)))
+
+(defun robby--chat-url ()
+  "Get the chat API URL."
+  (concat "https://" (robby--providers-host) (robby--providers-api-base-path) "/chat/completions"))
 
 ;;; curl
 (defvar robby--curl-options
@@ -77,10 +82,6 @@ STREAMP is non-nil if the response is a stream."
          (parsed (plist-get json :parsed))
          (text (string-join (seq-filter #'stringp (seq-map (lambda (chunk) (robby--chunk-content chunk streamp)) parsed)))))
     `(:text ,text :remaining ,(plist-get json :remaining))))
-
-(defun robby--chat-url ()
-  "Get the chat API URL."
-  (concat robby-api-url "/chat/completions"))
 
 (cl-defun robby--curl (&key payload on-text on-error streamp)
   "Make a request to the OpenAI API using curl.
@@ -160,12 +161,13 @@ ON-ERROR is the callback for when an error is received."
           (encode-coding-string (json-encode payload) 'utf-8))
          (url-request-extra-headers
           `(("Content-Type" . "application/json")
-            ("Authorization" . ,(concat "Bearer " (robby--get-api-key)))))
+            ("Authorization:" . ,(concat "Bearer " (robby--get-api-key)))))
          (inhibit-message t)
          (message-log-max nil))
     (url-retrieve
      (robby--chat-url)
      (lambda (_status)
+       (robby--log (format "# URL retrieve response buffer contents: %s" (buffer-substring-no-properties (point-min) (point-max))))
        (goto-char (point-min))
        (re-search-forward "^{")
        (backward-char 1)

@@ -6,6 +6,7 @@
 
 ;;; Code:
 
+(require 'map)
 (require 'spinner)
 
 (require 'robby-api-key)
@@ -92,15 +93,9 @@ It should include a `%s' placeholder for the spinner."
   :type 'string
   :group 'robby)
 
-(defcustom robby-chat-system-message "You are an AI tool embedded within Emacs. Assist users with their tasks and provide information as needed. Do not engage in harmful or malicious behavior. Please provide helpful information. Answer concisely."
+(defcustom robby-chat-system-message
+  "You are an AI tool embedded within Emacs. Assist users with their tasks and provide information as needed. Do not engage in harmful or malicious behavior. Please provide helpful information. Answer concisely."
   "System message to use with OpenAI Chat API."
-  :type 'string
-  :group 'robby)
-
-(defcustom robby-api-url "https://api.openai.com/v1"
-  "Base URL to use for OpenAI API requests.
-
-It should not end with a trailing slash. Robby will append paths to the URL like `/chat/models'"
   :type 'string
   :group 'robby)
 
@@ -109,9 +104,60 @@ It should not end with a trailing slash. Robby will append paths to the URL like
   "Options to pass to the chat API."
   :group 'robby)
 
-(defcustom robby-chat-model "gpt-3.5-turbo"
-  "The model to use with the completions API."
-  :type 'string
+(defcustom robby-providers-settings
+  '((openai
+     . (:host "api.openai.com"
+        :default-model "gpt-3.5-turbo"
+        :api-base-path "/v1"
+        :models-filter-re "\\`gpt"))
+    (mistral
+     . (:host "api.mistral.ai"
+        :default-model "mistral-small-latest"
+        :api-base-path "/v1"))
+    (togetherai
+     . (:host "api.together.xyz"
+        :default-model "mistral-small-latest"
+        :api-base-path "/v1")))
+  "Alist of AI providers and their settings."
+  :type 'sexp
+  :group 'robby)
+
+(defcustom robby-provider 'mistral
+  "The AI provider to use."
+  :type '(choice (const :tag "Mistral" mistral)
+                 (const :tag "TogetherAI" togetherai)
+                 (const :tag "OpenAI" openai))
+  :group 'robby)
+
+(defun robby--provider-name (provider)
+  "Format AI provider name from PROVIDER symbol.
+
+For example `'openai' becomes \"OpenAI\"."
+  (string-replace "ai" "AI" (capitalize (symbol-name provider))))
+
+(defun robby--providers-type ()
+  "Get the `robby-provider' custom type.
+
+Get the customizatoin type from `robby-providers-settings',
+including a choice for each provider."
+  `(choice
+    ,@(seq-map
+       (lambda (provider)
+         `(const :tag ,(robby--provider-name provider) ,provider))
+       (map-keys robby-providers-settings))))
+
+(defcustom robby-provider 'openai
+  "The AI provider to use."
+  :type '(choice (const :tag "Mistral" mistral)
+                 (const :tag "TogetherAI" togetherai)
+                 (const :tag "OpenAI" openai))
+  :group 'robby)
+
+(defcustom robby-chat-model nil
+  "The model to use with the chat completions API.
+
+Nil means use the default model for the provider."
+  :type '(choice string (const nil))
   :group 'robby-chat-api)
 
 (defcustom robby-chat-max-tokens 2000
