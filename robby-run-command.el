@@ -116,6 +116,7 @@ of the entire buffer."
                               no-op-pattern
                               no-op-message
                               text
+                              text-processed
                               response-buffer
                               response-region)
   "Process a cunk of text received from OpenAI.
@@ -142,6 +143,8 @@ matches.
 TEXT is the response from OpenAI. It may be one chunk of the
 response if streaming is on.
 
+TEXT-PROCESSED is the text processed so far, not including the new TEXT.
+
 RESPONSE-BUFFER is the buffer where the response is written to.
 
 RESPONSE-REGION is the region to prepend, append, or replace in
@@ -153,7 +156,7 @@ RESPONSE-BUFFER."
         (end (cdr response-region))
         (grounded-text (robby--ground-response text grounding-fns)))
     (when completep
-      (robby--history-push basic-prompt text))
+      (robby--history-push basic-prompt (concat text text-processed)))
     (if (and no-op-pattern (string-match-p no-op-pattern text))
         (message (or no-op-message) "no action to perform")
       (when (or completep (> (length grounded-text) 0))
@@ -274,7 +277,7 @@ value overrides the `robby-stream' customization variable."
          (response-buffer (get-buffer-create (robby--get-response-buffer action action-args)))
          (response-region (robby--get-response-region response-buffer))
          (streamp (robby--get-stream-p :never-stream-p never-stream-p :no-op-pattern no-op-pattern :grounding-fns grounding-fns))
-         (chars-processed 0))
+         (text-processed ""))
 
     (robby--log (format "# Request body alist:\n%s\n" payload))
     
@@ -298,16 +301,17 @@ value overrides the `robby-stream' customization variable."
                                :action-args action-args
                                :arg arg
                                :basic-prompt basic-prompt
-                               :chars-processed chars-processed
+                               :chars-processed (length text-processed)
                                :completep completep
                                :grounding-fns grounding-fns
                                :no-op-pattern no-op-pattern
                                :no-op-message no-op-message
                                :response-buffer response-buffer
                                :response-region response-region
-                               :text text))
+                               :text text
+                               :text-processed text-processed))
                           (error (robby--handle-error err))))
-                      (setq chars-processed (+ chars-processed (length text)))))
+                      (setq text-processed (concat text text-processed))))
                    :on-error
                    (lambda (err)
                      (with-current-buffer response-buffer
