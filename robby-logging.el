@@ -14,9 +14,9 @@
   "Insert MSG in `robby--log' buffer."
   (if robby-logging
       (with-current-buffer (get-buffer-create robby--log-buffer)
-        (insert msg))))
-
-(provide 'robby-logging)
+        (setq buffer-read-only nil)
+        (insert msg)
+        (setq buffer-read-only t))))
 
 (provide 'robby-logging)
 
