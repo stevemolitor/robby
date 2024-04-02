@@ -86,6 +86,23 @@
                         ((role . "user") (content . "Where was it played?"))
                         ])))))
 
+(ert-deftest robby--request-input--with-two-itemhistory ()
+  (should (equal
+           (robby--request-input
+            "Bonjour!"
+            t
+            '(("hi" . "Hello!") ("answer in french" . "Bien sûr!"))
+            "I am a helpful assistant.")
+
+           `((messages .
+                       [((role . "system") (content . "I am a helpful assistant."))
+                        ((role . "user") (content . "hi"))
+                        ((role . "assistant") (content . "Hello!"))
+                        ((role . "user") (content . "answer in french"))
+                        ((role . "assistant") (content . "Bien sûr!"))
+                        ((role . "user") (content . "Bonjour!"))
+                        ])))))
+
 ;;; chunk content tests
 (ert-deftest robby--chunk-content--no-streaming ()
   (let ((resp '((choices . [((index . 0)
