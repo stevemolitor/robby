@@ -116,7 +116,7 @@ It should include a `%s' placeholder for the spinner."
         :api-base-path "/v1"))
     (togetherai
      . (:host "api.together.xyz"
-        :default-model "mistral-small-latest"
+        :default-model "togethercomputer/StripedHyena-Nous-7B"
         :api-base-path "/v1")))
   "Alist of AI providers and their settings."
   :type 'sexp
@@ -138,7 +138,7 @@ For example `'openai' becomes \"OpenAI\"."
 (defun robby--providers-type ()
   "Get the `robby-provider' custom type.
 
-Get the customizatoin type from `robby-providers-settings',
+Get the customization type from `robby-providers-settings',
 including a choice for each provider."
   `(choice
     ,@(seq-map
