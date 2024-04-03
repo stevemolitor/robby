@@ -11,6 +11,8 @@
 (require 'map)
 (require 'seq)
 
+(require 'robby-providers)
+
 ;;; string utils
 (defun robby--format-message-text (text)
   "Replace % with %% in TEXT to avoid format string errors calling `message."
@@ -100,7 +102,9 @@ pass, where the keys are strings."
    #'car #'string<
    (robby--to-stop-array-vals
     (map-merge
+     ;; add default model if no model specified, since mistral will return an error if no model is specified
      'alist
+     `(("model" . ,(robby--providers-default-model)))
      (seq-filter
       (lambda (elem) (not (null (cdr elem))))
       (robby--options-from-group 'robby-chat-api))

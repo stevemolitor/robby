@@ -21,7 +21,14 @@
 ;;; request util functions
 (defun robby--request-parse-error-data (data)
   "Get error from response DATA."
-  (cdr (assoc 'message (assoc 'error data))))
+  (or
+   ;; openai, together:
+   (cdr (assoc 'message (assoc 'error data)))
+   ;; mistral:
+   (let ((object (cdr (assoc 'object data))))
+     (if (string= object "error")
+         (cdr (assoc 'message data))
+       nil))))
 
 (defun robby--request-parse-error-string (err)
   "Get error from JSON string ERR."
@@ -116,6 +123,7 @@ STREAMP is non-nil if the response is a stream."
          proc
          (lambda (proc string)
            (robby--log (format "# Raw curl response chunk:\n%s\n" string))
+           (robby--log (format "# proc %S" proc))
            (condition-case err
                (let ((error-msg (robby--request-parse-error-string string)))
                  (if error-msg
