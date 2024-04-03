@@ -55,17 +55,6 @@
                      ("model" . "gpt-4")
                      ("temperature" . 1.0))))))
 
-(ert-deftest robby--options-alist-for-api-request-default-model-for-provider ()
-  (let ((robby-provider 'openai)
-        (robby-chat-model nil)
-        (robby-chat-max-tokens 100)
-        (robby-chat-temperature 1.0))
-    (message "provider: %S, default model %S" robby-provider (robby--providers-default-model))
-    (should (equal (robby--options-alist-for-api-request '(:max-tokens 2))
-                   '(("max_tokens" . 2)
-                     ("model" . "gpt-3.5-turbo")
-                     ("temperature" . 1.0))))))
-
 (ert-deftest robby--options-alist-for-api-request-returns-stop-array ()
   ;; we only support a single "stop" string, but the API expects an array
   (let ((robby-chat-model "gpt-4")
@@ -167,4 +156,3 @@
 (provide 'robby-utils-test)
 
 ;;; robby-utils-test.el ends here
-

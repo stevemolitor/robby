@@ -104,29 +104,11 @@ It should include a `%s' placeholder for the spinner."
   "Options to pass to the chat API."
   :group 'robby)
 
-(defcustom robby-providers-settings
-  '((openai
-     . (:host "api.openai.com"
-        :default-model "gpt-3.5-turbo"
-        :api-base-path "/v1"
-        :models-filter-re "\\`gpt"))
-    (mistral
-     . (:host "api.mistral.ai"
-        :default-model "mistral-small-latest"
-        :api-base-path "/v1"))
-    (togetherai
-     . (:host "api.together.xyz"
-        :default-model "togethercomputer/StripedHyena-Nous-7B"
-        :api-base-path "/v1")))
-  "Alist of AI providers and their settings."
-  :type 'sexp
-  :group 'robby)
-
-(defcustom robby-provider 'mistral
+(defcustom robby-provider 'openai
   "The AI provider to use."
   :type '(choice (const :tag "Mistral" mistral)
-                 (const :tag "TogetherAI" togetherai)
-                 (const :tag "OpenAI" openai))
+                 (const :tag "OpenAI" openai)
+                 (const :tag "TogetherAI" togetherai))
   :group 'robby)
 
 (defun robby--provider-name (provider)
@@ -144,14 +126,7 @@ including a choice for each provider."
     ,@(seq-map
        (lambda (provider)
          `(const :tag ,(robby--provider-name provider) ,provider))
-       (map-keys robby-providers-settings))))
-
-(defcustom robby-provider 'openai
-  "The AI provider to use."
-  :type '(choice (const :tag "Mistral" mistral)
-                 (const :tag "TogetherAI" togetherai)
-                 (const :tag "OpenAI" openai))
-  :group 'robby)
+       (map-keys '(mistral openai togetherai)))))
 
 (defcustom robby-chat-model nil
   "The model to use with the chat completions API.

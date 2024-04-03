@@ -19,21 +19,10 @@
 (require 'robby-utils)
 
 ;;; request util functions
-(defun robby--request-parse-error-data (data)
-  "Get error from response DATA."
-  (or
-   ;; openai, together:
-   (cdr (assoc 'message (assoc 'error data)))
-   ;; mistral:
-   (let ((object (cdr (assoc 'object data))))
-     (if (string= object "error")
-         (cdr (assoc 'message data))
-       nil))))
-
 (defun robby--request-parse-error-string (err)
   "Get error from JSON string ERR."
   (condition-case _err
-      (robby--request-parse-error-data (json-read-from-string err))
+      (robby--providers-parse-error (json-read-from-string err))
     (error nil)))
 
 (defun robby--chat-url ()
@@ -181,7 +170,7 @@ ON-ERROR is the callback for when an error is received."
        (backward-char 1)
        (let* ((json-object-type 'alist)
               (resp (json-read))
-              (err (robby--request-parse-error-data resp)))
+              (err (robby--providers-parse-error resp)))
          (if err
              (funcall on-error err)
            (let ((text (robby--chunk-content resp nil)))

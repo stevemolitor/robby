@@ -15,7 +15,8 @@
 
 (defun robby--models-url ()
   "Get the URL for the models endpoint."
-  (concat "https://" (robby--providers-host) (robby--providers-api-base-path) "/models"))
+  ;; (concat "https://" (robby--providers-host) (robby--providers-api-base-path) "/models")
+  (concat "https://" (robby--providers-host) "/models/info?="))
 
 (defun robby--get-models ()
   "Get the list of available models from OpenAI.
@@ -33,12 +34,14 @@ Make  request to OpenAI API to get the list of available models."
            (inhibit-message t)
            (message-log-max nil))
       (with-current-buffer (url-retrieve-synchronously url)
+        (robby--log (format "Models response: %s\n" (buffer-string)))
         (goto-char (point-min))
-        (re-search-forward "^{")
+        ;; (re-search-forward "^{")
+        (re-search-forward "^[[{]")
         (backward-char 1)
         (let* ((json-object-type 'alist)
                (resp (json-read))
-               (err (robby--request-parse-error-data resp)))
+               (err (robby--providers-parse-error resp)))
           (if err
               (error "Error fetching models: %S" err)
             (let* ((all-models (seq-map (lambda (obj) (cdr (assoc 'id obj))) (cdr (assoc 'data resp))))

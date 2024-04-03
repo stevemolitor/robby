@@ -13,6 +13,7 @@
 (require 'robby-customization)
 (require 'robby-history)
 (require 'robby-logging)
+(require 'robby-providers)
 (require 'robby-process)
 (require 'robby-spinner)
 
@@ -94,7 +95,17 @@ DOCSTRING is the command's docstring."
       (setq quoted-options (plist-put quoted-options :historyp t)))
     (robby--pp-cmd `(robby-define-command ,name ,docstring ,@quoted-options))))
 
-;;; run command
+;;; robby-run-command and helper functions
+(defun robby--get-request-input (api-options)
+  "Get the request input from API-OPTIONS.
+
+If no model is specified, use the default model for the provider"
+  (map-merge
+   ;; add default model if no model specified, since mistral will return an error if no model is specified
+   'alist
+   `(("model" . ,(robby--providers-default-model)))
+   (robby--options-alist-for-api-request api-options)))
+
 (defun robby--get-response-region (response-buffer)
   "Return the region to replace in RESPONSE-BUFFER.
 
@@ -273,7 +284,7 @@ value overrides the `robby-stream' customization variable."
          (prompt-result (if (functionp prompt) (apply prompt prompt-args-with-arg) (format "%s" prompt)))
          (basic-prompt (robby--format-prompt prompt-result robby-prompt-spec-fn))
          (request-input (robby--request-input basic-prompt historyp robby--history robby-chat-system-message))
-         (payload (append request-input (robby--options-alist-for-api-request api-options)))
+         (payload (append request-input (robby--get-request-input api-options)))
          (response-buffer (get-buffer-create (robby--get-response-buffer action action-args)))
          (response-region (robby--get-response-region response-buffer))
          (streamp (robby--get-stream-p :never-stream-p never-stream-p :no-op-pattern no-op-pattern :grounding-fns grounding-fns))
