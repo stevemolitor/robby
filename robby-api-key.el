@@ -11,12 +11,12 @@
 (defvar robby-openai-api-key)
 
 ;; declared in robby-providers.el
-(declare-function robby--providers-host ())
+(declare-function robby--provider-host ())
 
 (defun robby--get-api-key-from-auth-source ()
   "Get api key from auth source."
   (if-let ((secret (plist-get (car (auth-source-search
-                                    :host (robby--providers-host)
+                                    :host (robby--provider-host)
                                     :user "apikey"
                                     :require '(:secret)))
                               :secret)))

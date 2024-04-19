@@ -15,19 +15,20 @@
 (require 'robby-api-key)
 (require 'robby-customization)
 (require 'robby-logging)
-(require 'robby-providers)
+(require 'robby-provider)
 (require 'robby-utils)
 
 ;;; request util functions
 (defun robby--request-parse-error-string (err)
   "Get error from JSON string ERR."
   (condition-case _err
-      (robby--providers-parse-error (json-read-from-string err))
+      (robby-provider-parse-error (json-read-from-string err))
     (error nil)))
 
+;; TODO consider passing url to robby--request
 (defun robby--chat-url ()
   "Get the chat API URL."
-  (concat "https://" (robby--providers-host) (robby--providers-api-base-path) "/chat/completions"))
+  (concat "https://" (robby--provider-host) (robby--provider-api-base-path)))
 
 ;;; curl
 (defvar robby--curl-options
@@ -170,7 +171,7 @@ ON-ERROR is the callback for when an error is received."
        (backward-char 1)
        (let* ((json-object-type 'alist)
               (resp (json-read))
-              (err (robby--providers-parse-error resp)))
+              (err (robby-provider-parse-error resp)))
          (if err
              (funcall on-error err)
            (let ((text (robby--chunk-content resp nil)))

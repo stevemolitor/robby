@@ -104,29 +104,27 @@ It should include a `%s' placeholder for the spinner."
   "Options to pass to the chat API."
   :group 'robby)
 
-(defcustom robby-provider 'openai
-  "The AI provider to use."
-  :type '(choice (const :tag "Mistral" mistral)
-                 (const :tag "OpenAI" openai)
-                 (const :tag "TogetherAI" togetherai))
-  :group 'robby)
-
 (defun robby--provider-name (provider)
   "Format AI provider name from PROVIDER symbol.
 
 For example `'openai' becomes \"OpenAI\"."
   (string-replace "ai" "AI" (capitalize (symbol-name provider))))
 
-(defun robby--providers-type ()
+(defun robby--provider-type ()
   "Get the `robby-provider' custom type.
 
-Get the customization type from `robby-providers-settings',
-including a choice for each provider."
+Includes a choice for each provider added via
+`robby-add-provider'."
   `(choice
     ,@(seq-map
-       (lambda (provider)
-         `(const :tag ,(robby--provider-name provider) ,provider))
-       (map-keys '(mistral openai togetherai)))))
+       (lambda (provider-settings)
+         `(const :tag ,(plist-get (cdr robby--provider-settings) :name) ,(car provider-settings)))
+       robby--provider-settings)))
+
+(defcustom robby-provider 'openai
+  "The AI provider to use."
+  :type (robby--provider-type)
+  :group 'robby)
 
 (defcustom robby-chat-model nil
   "The model to use with the chat completions API.
