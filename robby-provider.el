@@ -11,16 +11,6 @@
 (defvar robby--provider-settings nil
   "alist of provider settings.")
 
-;; TODO use this function for each provider upon initialization
-(defun robby--add-provider-choice (symbol name)
-  "Add a provider SYMBOL and NAME to the choices for the
-`robby-provider' custom type."
-  (let* ((new-choice `(const :tag ,name ,symbol))
-         (old-choices (cdr (get 'provider 'custom-type)))
-         (new-choices (cons new-choice old-choices))
-         (new-type (cons 'choice new-choices)))
-    (put 'provider 'custom-type new-type)))
-
 (defun robby--get-provider-settings ()
   "Return the settings of the current provider."
   (alist-get robby-provider robby--provider-settings))
@@ -48,7 +38,7 @@
                            :default-model ,default-model
                            :api-base-path ,(or api-base-path "/v1/chat/completions")
                            :models-path ,(or models-path "/v1/models"))))
-    (push (cons symbol settings) robby--provider-settings)))
+    (add-to-list 'robby--provider-settings (cons symbol settings))))
 
 (cl-defmethod robby-provider-parse-error (data)
   "Get error from response DATA.

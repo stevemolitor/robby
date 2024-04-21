@@ -118,7 +118,7 @@ Includes a choice for each provider added via
   `(choice
     ,@(seq-map
        (lambda (provider-settings)
-         `(const :tag ,(plist-get (cdr robby--provider-settings) :name) ,(car provider-settings)))
+         `(const :tag ,(plist-get (cdr provider-settings) :name) ,(car provider-settings)))
        robby--provider-settings)))
 
 (defcustom robby-provider 'openai
