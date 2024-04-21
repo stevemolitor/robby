@@ -21,9 +21,8 @@
 ;;; request util functions
 (defun robby--request-parse-error-string (err)
   "Get error from JSON string ERR."
-  (condition-case _err
-      (robby-provider-parse-error (json-read-from-string err))
-    (error nil)))
+  (ignore-errors
+    (robby-provider-parse-error (json-read-from-string err))))
 
 ;; TODO consider passing url to robby--request
 (defun robby--chat-url ()
