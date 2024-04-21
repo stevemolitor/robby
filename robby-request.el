@@ -12,10 +12,11 @@
 (require 'seq)
 (require 'url-vars)
 
+(require 'robby-provider)               ; require first to make sure robby--provider-settings is defined
+
 (require 'robby-api-key)
 (require 'robby-customization)
 (require 'robby-logging)
-(require 'robby-provider)
 (require 'robby-utils)
 
 ;;; request util functions
