@@ -9,7 +9,7 @@
 (defvar robby-provider)
 
 (defvar robby--provider-settings nil
-  "alist of provider settings.")
+  "Global alist of provider settings.")
 
 (defun robby--get-provider-settings ()
   "Return the settings of the current provider."
@@ -40,7 +40,7 @@
                            :models-path ,(or models-path "/v1/models"))))
     (add-to-list 'robby--provider-settings (cons symbol settings))))
 
-(cl-defmethod robby-provider-parse-error (data)
+(cl-defmethod robby-provider-parse-error (_data)
   "Get error from response DATA.
 
 DATA is an alist of the JSON parsed response from the provider."

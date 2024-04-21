@@ -8,7 +8,6 @@
 
 (require 'robby-run-command)
 
-
 (cl-defmacro robby-define-command (name
                                    docstring
                                    &key

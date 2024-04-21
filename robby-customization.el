@@ -10,8 +10,8 @@
 (require 'spinner)
 
 (require 'robby-api-key)
-(require 'robby-validation)
 (require 'robby-utils)
+(require 'robby-validation)
 
 ;;; function to validate custom api options
 (defun robby--validate-custom-api-option (name)
