@@ -13,7 +13,6 @@
 (require 'robby-customization)
 (require 'robby-history)
 (require 'robby-logging)
-(require 'robby-provider)
 (require 'robby-process)
 (require 'robby-spinner)
 
@@ -236,98 +235,6 @@ to the current buffer."
      (t
       (current-buffer)))))
 
-(cl-defun robby-run-command (&key arg prompt prompt-args action action-args api-options grounding-fns no-op-pattern no-op-message historyp never-stream-p)
-  "Run a command using OpenAI.
-
-ARG is the interactive prefix arg, if any. It is passed to the
-PROMPT and ACTION functions.
-
-PROMPT is a string or a function. If a string it used as is as
-the prompt to send to OpenAI. If PROMPT is a function it is
-called with PROMPT-ARGS to produce the prompt. PROMPT-ARGS is a
-key / value style property list.
-
-When the response text is received from OpenAI, ACTION is called
-with the property list ACTION-ARGS and `:text', where text
-is the text response from OpenAI.
-
-API-OPTIONS is an optional property list of options to pass to
-the OpenAI API. Kebab case keys are converted to snake case JSON
-keys. For example `max-tokens' becomes \"max_tokens\". The
-values in API-OPTIONS are merged with and overwrite equivalent
-values in the customization options specified in for example
-`robby-chat-options' or `robby-completion-options'.
-
-GROUNDING-FNS - Format the response from OpenAI before returning
-it. Only used if `NEVER-STREAM-P' is t.
-
-NO-OP-PATTERN - If the response matches this regular expression,
-do not perform the action. Useful with a prompt that tells OpenAI
-to respond with a certain response if there is nothing to do. For
-example with a prompt of \"Fix this code. Respond with \\='the code
-is correct\\=' if the code is correct\", then a NO-OP-PATTERN of
-\"code is correct\" will tell robby to not replace the region
-when the pattern matches. Only use NO-OP-PATTERN when
-NEVER-STREAM-P is t.
-
-NO-OP-MESSAGE - Message to display when NO-OP-PATTERN matches. Optional.
-
-HISTORYP indicates whether or not to use conversation history.
-
-NEVER-STREAM-P - Never stream response if t. If present this
-value overrides the `robby-stream' customization variable."
-  ;; save command history
-  (robby--save-last-command-options
-   :prompt prompt :prompt-args prompt-args :action action :action-args action-args :historyp historyp :api-options api-options :never-stream-p never-stream-p)
-
-  (let* ((prompt-args-with-arg (map-merge 'plist prompt-args `(:arg ,arg)))
-         (prompt-result (if (functionp prompt) (apply prompt prompt-args-with-arg) (format "%s" prompt)))
-         (basic-prompt (robby--format-prompt prompt-result robby-prompt-spec-fn))
-         (request-input (robby--request-input basic-prompt historyp robby--history robby-chat-system-message))
-         (payload (append request-input (robby--get-request-input api-options)))
-         (response-buffer (get-buffer-create (robby--get-response-buffer action action-args)))
-         (response-region (robby--get-response-region response-buffer))
-         (streamp (robby--get-stream-p :never-stream-p never-stream-p :no-op-pattern no-op-pattern :grounding-fns grounding-fns))
-         (text-processed ""))
-
-    (robby--log (format "# Request body alist:\n%s\n" payload))
-    
-    (with-undo-amalgamate
-      (with-current-buffer response-buffer
-        (robby-kill-last-process t)
-        (robby--spinner-start)
-        (setq robby--last-process
-              (condition-case curl-err
-                  (robby--request
-                   :payload payload
-                   :streamp streamp
-                   :on-text
-                   (cl-function
-                    (lambda (&key text completep)
-                      (when (buffer-live-p response-buffer)
-                        (condition-case err
-                            (with-current-buffer response-buffer
-                              (robby--handle-text
-                               :action action
-                               :action-args action-args
-                               :arg arg
-                               :basic-prompt basic-prompt
-                               :chars-processed (length text-processed)
-                               :completep completep
-                               :grounding-fns grounding-fns
-                               :no-op-pattern no-op-pattern
-                               :no-op-message no-op-message
-                               :response-buffer response-buffer
-                               :response-region response-region
-                               :text text
-                               :text-processed text-processed))
-                          (error (robby--handle-error err))))
-                      (setq text-processed (concat text text-processed))))
-                   :on-error
-                   (lambda (err)
-                     (with-current-buffer response-buffer
-                       (robby--handle-error err))))
-                (error (robby--handle-error curl-err))))))))
 (cl-defun robby-run-command (&key arg prompt prompt-args action action-args api-options grounding-fns no-op-pattern no-op-message historyp never-stream-p)
   "Run a command using OpenAI.
 
