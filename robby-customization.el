@@ -13,6 +13,9 @@
 (require 'robby-utils)
 (require 'robby-validation)
 
+;;; Variable declarations
+(defvar robby--provider-settings)                 ; defined in robby-provider.el
+
 ;;; function to validate custom api options
 (defun robby--validate-custom-api-option (name)
   "Validate that option NAME is within its allowed range of values.

@@ -2,6 +2,8 @@
 
 (require 'ert)
 
+(require 'robby-provider)
+
 ;;; Code:
 
 (setq package-lint-main-file "/Users/stephenmolitor/repos/robby/robby.el")

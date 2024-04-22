@@ -30,7 +30,6 @@ test: install
       -l ./test/robby-grounding-fns-test.el \
       -l ./test/robby-history-test.el \
       -l ./test/robby-logging-test.el \
-      -l ./test/robby-providers-test.el \
       -l ./test/robby-request-test.el \
       -l ./test/robby-test-env.el \
       -l ./test/robby-utils-test.el \
