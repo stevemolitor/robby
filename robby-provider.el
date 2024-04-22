@@ -15,6 +15,10 @@
   "Return the settings of the current provider."
   (alist-get robby-provider robby--provider-settings))
 
+(defun robby--provider-name ()
+  "Return the name of the current provider."
+  (plist-get (robby--get-provider-settings) :name))
+
 (defun robby--provider-host ()
   "Return the host of the current provider."
   (plist-get (robby--get-provider-settings) :host))
@@ -40,18 +44,14 @@
                            :models-path ,(or models-path "/v1/models"))))
     (add-to-list 'robby--provider-settings (cons symbol settings))))
 
-(cl-defmethod robby-provider-parse-error (_data)
+(cl-defmethod robby-provider-parse-error (data)
   "Get error from response DATA.
 
 DATA is an alist of the JSON parsed response from the provider."
-  ;; TODO
-  nil
-  ;; (cdr (assoc 'message (assoc 'error data)))
-  )
+  (cdr (assoc 'message (assoc 'error data))))
 
 (cl-defmethod robby-provider-parse-models (data)
   "Get models from response DATA."
-  (message "base method data: %S" data)
   (seq-map (lambda (obj) (cdr (assoc 'id obj))) (cdr (assoc 'data data))))
 
 (provide 'robby-provider)

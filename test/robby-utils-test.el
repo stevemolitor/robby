@@ -153,6 +153,30 @@
     (should (equal (robby--ground-response "response" #'upcase)
                    "RESPONSE"))))
 
+;;; request utils
+(ert-deftest robby--parse-http-status ()
+  (let ((resp "logprobs\":null,\"finish_reason\":\"stop\"}]}
+
+data: [DONE]
+
+ HTTP STATUS: 200
+
+"))
+    (should (equal
+             (robby--parse-http-status resp)
+             200))))
+
+(ert-deftest robby--parse-http-status-no-status ()
+  (let ((chunk "data: {\"id\":\"chatcmpl-9GR46WElbBCZQwFD2WoGeYKnd8I5z\",\"object\":\"chat.completion.chunk\",\"created\":1713704314,\"model\":\"gpt-3.5-turbo-0125\",\"system_fingerprint\":\"fp_c2295e73ad\",\"choices\":[{\"index\":0,\"delta\":{\"role\":\"assistant\",\"content\":\"\"},\"logprobs\":null,\"finish_reason\":null}]}
+
+data: {\"id\":\"chatcmpl-9GR46WElbBCZQwFD2WoGeYKnd8I5z\",\"object\":\"chat.completion.chunk\",\"created\":1713704314,\"model\":\"gpt-3.5-turbo-0125\",\"system_fingerprint\":\"fp_c2295e73ad\",\"choices\":[{\"index\":0,\"delta\":{\"content\":\"Hello\"},\"logprobs\":null,\"finish_reason\":null}]}
+
+data: {\"id\":\"chatcmpl-9GR46WElbBCZQwFD2WoGeYKnd8I5z\",\"object\":\"chat.completion.chunk\",\"created\":1713704314,\"model\":\"gpt-3.5-turbo-0125\",\"system_fingerprint\":\"fp_c2295e73ad\",\"choices\":[{\"index\":0,\"delta\":{\"content\":\"!\"},\"logprobs\":null,\"finish_reason\":null}]}
+
+
+"))
+    (should (null (robby--parse-http-status chunk)))))
+
 (provide 'robby-utils-test)
 
 ;;; robby-utils-test.el ends here

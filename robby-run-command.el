@@ -182,7 +182,7 @@ RESPONSE-BUFFER."
   "Handle an error ERR from OpenAI."
   (robby--spinner-stop)
   (let* ((err-msg (if (stringp err) err (error-message-string err)))
-         (log-msg (format "Error processing robby request: %s\n" err-msg)))
+         (log-msg (format "Error running robby command: %s" err-msg)))
     (robby--log log-msg)
     (message log-msg))
   (when (process-live-p robby--last-process)

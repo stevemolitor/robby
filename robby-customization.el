@@ -104,12 +104,6 @@ It should include a `%s' placeholder for the spinner."
   "Options to pass to the chat API."
   :group 'robby)
 
-(defun robby--provider-name (provider)
-  "Format AI provider name from PROVIDER symbol.
-
-For example `'openai' becomes \"OpenAI\"."
-  (string-replace "ai" "AI" (capitalize (symbol-name provider))))
-
 (defun robby--provider-type ()
   "Get the `robby-provider' custom type.
 

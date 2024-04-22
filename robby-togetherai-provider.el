@@ -10,7 +10,7 @@
  :symbol 'togetherai
  :name "Together AI"
  :host "api.together.xyz"
- :default-model "togethercomputer/StripedHyena-Nous-7B"
+ ;; :default-model "togethercomputer/StripedHyena-Nous-7B"
  :models-path "/models/info?=")
 
 (cl-defmethod robby-providers-parse-models (data &context (robby-provider (eql 'togetherai)))

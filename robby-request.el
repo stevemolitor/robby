@@ -1,18 +1,11 @@
 ;;; robby-request.el  --- Make robby requests via curl or url-retrieve  -*- lexical-binding:t -*-
 
-;;; Commentary:
-
-;; Provides the `robby--request' function to make requests to the OpenAI API.
-
-;;; Code:
-
-(require 'cl-lib)
 (require 'files)
 (require 'json)
 (require 'seq)
 (require 'url-vars)
 
-(require 'robby-provider)               ; require first to make sure robby--provider-settings is defined
+(require 'robby-provider) ; require first to make sure robby--provider-settings is defined
 
 (require 'robby-api-key)
 (require 'robby-customization)
@@ -20,10 +13,26 @@
 (require 'robby-utils)
 
 ;;; request util functions
-(defun robby--request-parse-error-string (err)
+(defun robby--request-parse-error-string (string)
   "Get error from JSON string ERR."
   (ignore-errors
-    (robby-provider-parse-error (json-read-from-string err))))
+    (robby-provider-parse-error (json-read-from-string string))))
+
+(defun robby--request-get-error (string)
+  "Get error from response STRING, or nil if no error.
+
+If there is a response status and it is not 200, try to parse the
+error message from the response and return that, otherwise return
+a generic error message. Otherwise return nil (no error)."
+  (let ((provider (robby--provider-name))
+        (status (robby--parse-http-status string)))
+    (if (and (numberp status) (not (eq status 200)))
+        (let ((error-msg (robby--request-parse-error-string string)))
+          (if error-msg
+              (format "%s API returned error - '%s'" provider error-msg)
+            (if (numberp status)
+                (format "Unexpected response status %S from %s API request" status provider)
+              (format "Unexpected response from %S API request: %S" provider string)))))))
 
 ;; TODO consider passing url to robby--request
 (defun robby--chat-url ()
@@ -36,6 +45,7 @@
     "--disable"
     "--silent"
     "-m 600"
+    "-w HTTP STATUS: %{http_code}\n"
     "-H" "Content-Type: application/json"))
 
 (defun robby--curl-parse-chunk (remaining data)
@@ -103,7 +113,6 @@ STREAMP is non-nil if the response is a stream."
                           (robby--chat-url)
                           curl-options)
                  (error (funcall on-error err)))))
-    (robby--log (format "# Curl request command:\ncurl %s %s\n" (robby--chat-url) (string-join curl-options " ")))
     (let ((remaining "")
           (text "")
           (errored nil))
@@ -113,9 +122,8 @@ STREAMP is non-nil if the response is a stream."
          proc
          (lambda (proc string)
            (robby--log (format "# Raw curl response chunk:\n%s\n" string))
-           (robby--log (format "# proc %S" proc))
            (condition-case err
-               (let ((error-msg (robby--request-parse-error-string string)))
+               (let ((error-msg (robby--request-get-error string)))
                  (if error-msg
                      (progn
                        (setq errored t)
@@ -134,7 +142,7 @@ STREAMP is non-nil if the response is a stream."
                  (funcall on-text :text text :completep t))
            (with-current-buffer proc-buffer
              (let* ((string (buffer-string))
-                    (error-msg (robby--request-parse-error-string string)))
+                    (error-msg (robby--request-get-error string)))
                (if error-msg
                    (funcall on-error error-msg)
                  (let ((resp (robby--curl-parse-response string "" nil)))
