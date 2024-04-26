@@ -32,6 +32,7 @@
   (require 'transient))
 
 ;; require providers
+(require 'robby-mistralai-provider)
 (require 'robby-openai-provider)
 (require 'robby-togetherai-provider)
 
