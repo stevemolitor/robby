@@ -13,10 +13,6 @@
 
 (defvar robby--models nil)
 
-(defun robby--models-url ()
-  "Get the URL for the models endpoint."
-  (concat "https://" (robby--provider-host) (robby--provider-models-path)))
-
 (defun robby--get-models ()
   "Get the list of available models from OpenAI.
 
