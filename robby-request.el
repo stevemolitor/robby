@@ -21,15 +21,15 @@
 (defun robby--request-get-error (string)
   "Get error from response STRING, or nil if no error.
 
-If there is a response status and it is not 200, try to parse the
+If there is a status code and it is not 200, try to parse the
 error message from the response and return that, otherwise return
-a generic error message. Otherwise return nil (no error)."
+a generic error message. If status is 200 return nil (no error)."
   (let ((provider (robby--provider-name))
         (status (robby--parse-http-status string)))
     (if (and (numberp status) (not (eq status 200)))
         (let ((error-msg (robby--request-parse-error-string string)))
           (if error-msg
-              (format "%s API returned error - '%s'" provider error-msg)
+              (format "%s API error - '%s'" provider error-msg)
             (if (numberp status)
                 (format "Unexpected response status %S from %s API request" status provider)
               (format "Unexpected response from %S API request: %S" provider string)))))))
