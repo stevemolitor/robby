@@ -31,6 +31,11 @@
   (require 'seq)
   (require 'transient))
 
+;; require providers
+(require 'robby-mistralai-provider)
+(require 'robby-openai-provider)
+(require 'robby-togetherai-provider)
+
 ;; require files with autoloads, and customization file
 (require 'robby-customization)
 (require 'robby-commands)

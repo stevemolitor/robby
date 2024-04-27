@@ -94,7 +94,17 @@ DOCSTRING is the command's docstring."
       (setq quoted-options (plist-put quoted-options :historyp t)))
     (robby--pp-cmd `(robby-define-command ,name ,docstring ,@quoted-options))))
 
-;;; run command
+;;; robby-run-command and helper functions
+(defun robby--get-request-input (api-options)
+  "Get the request input from API-OPTIONS.
+
+If no model is specified, use the default model for the provider"
+  (map-merge
+   ;; add default model if no model specified, since mistral will return an error if no model is specified
+   'alist
+   `(("model" . ,(robby--provider-default-model)))
+   (robby--options-alist-for-api-request api-options)))
+
 (defun robby--get-response-region (response-buffer)
   "Return the region to replace in RESPONSE-BUFFER.
 
@@ -116,6 +126,7 @@ of the entire buffer."
                               no-op-pattern
                               no-op-message
                               text
+                              text-processed
                               response-buffer
                               response-region)
   "Process a cunk of text received from OpenAI.
@@ -142,6 +153,8 @@ matches.
 TEXT is the response from OpenAI. It may be one chunk of the
 response if streaming is on.
 
+TEXT-PROCESSED is the text processed so far, not including the new TEXT.
+
 RESPONSE-BUFFER is the buffer where the response is written to.
 
 RESPONSE-REGION is the region to prepend, append, or replace in
@@ -153,7 +166,7 @@ RESPONSE-BUFFER."
         (end (cdr response-region))
         (grounded-text (robby--ground-response text grounding-fns)))
     (when completep
-      (robby--history-push basic-prompt text))
+      (robby--history-push basic-prompt (concat text text-processed)))
     (if (and no-op-pattern (string-match-p no-op-pattern text))
         (message (or no-op-message) "no action to perform")
       (when (or completep (> (length grounded-text) 0))
@@ -169,7 +182,7 @@ RESPONSE-BUFFER."
   "Handle an error ERR from OpenAI."
   (robby--spinner-stop)
   (let* ((err-msg (if (stringp err) err (error-message-string err)))
-         (log-msg (format "Error processing robby request: %s\n" err-msg)))
+         (log-msg (format "Error running robby command: %s" err-msg)))
     (robby--log log-msg)
     (message log-msg))
   (when (process-live-p robby--last-process)
@@ -270,11 +283,11 @@ value overrides the `robby-stream' customization variable."
          (prompt-result (if (functionp prompt) (apply prompt prompt-args-with-arg) (format "%s" prompt)))
          (basic-prompt (robby--format-prompt prompt-result robby-prompt-spec-fn))
          (request-input (robby--request-input basic-prompt historyp robby--history robby-chat-system-message))
-         (payload (append request-input (robby--options-alist-for-api-request api-options)))
+         (payload (append request-input (robby--get-request-input api-options)))
          (response-buffer (get-buffer-create (robby--get-response-buffer action action-args)))
          (response-region (robby--get-response-region response-buffer))
          (streamp (robby--get-stream-p :never-stream-p never-stream-p :no-op-pattern no-op-pattern :grounding-fns grounding-fns))
-         (chars-processed 0))
+         (text-processed ""))
 
     (robby--log (format "# Request body alist:\n%s\n" payload))
     
@@ -298,16 +311,17 @@ value overrides the `robby-stream' customization variable."
                                :action-args action-args
                                :arg arg
                                :basic-prompt basic-prompt
-                               :chars-processed chars-processed
+                               :chars-processed (length text-processed)
                                :completep completep
                                :grounding-fns grounding-fns
                                :no-op-pattern no-op-pattern
                                :no-op-message no-op-message
                                :response-buffer response-buffer
                                :response-region response-region
-                               :text text))
+                               :text text
+                               :text-processed text-processed))
                           (error (robby--handle-error err))))
-                      (setq chars-processed (+ chars-processed (length text)))))
+                      (setq text-processed (concat text text-processed))))
                    :on-error
                    (lambda (err)
                      (with-current-buffer response-buffer

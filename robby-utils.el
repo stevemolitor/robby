@@ -233,6 +233,18 @@ details."
        response)
     (funcall grounding-fns response)))
 
+;;; request utils
+(defun robby--parse-http-status (resp)
+  "Parse http status code from response text.
+
+Use with the curl option --write-out 'HTTP STATUS: %{http_code}\n'.
+Returns the status code as a number, or nil if no status code found."
+  (if (string-match "HTTP STATUS: \\([0-9]+\\)" resp)
+      (when-let ((m (match-string 1 resp))
+                 (n (string-to-number m)))
+        (if (eq n 0) nil n))
+    nil))
+
 (provide 'robby-utils)
 
 ;;; robby-utils.el ends here

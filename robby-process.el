@@ -26,9 +26,9 @@ Emacs Lisp, do not print messages if SILENTP is t.
 Note that you cannot currently kill the last robby process if you
 are using `url-retreive'; you must be using `curl'"
   (interactive)
+  (robby--spinner-stop)
   (if (robby--process-running-p)
       (progn
-        (robby--spinner-stop)
         (kill-process robby--last-process)
         (when (not silentp)
           (message "robby process killed")))

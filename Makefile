@@ -33,6 +33,7 @@ test: install
       -l ./test/robby-request-test.el \
       -l ./test/robby-test-env.el \
       -l ./test/robby-utils-test.el \
+      -l ./test/robby-validation-test.el \
       -eval '(ert-run-tests-batch-and-exit "$(MATCH)")'
 
 EL_FILES := $(wildcard *.el)
@@ -41,7 +42,7 @@ EL_FILES := $(wildcard *.el)
 checkdoc:
 	for FILE in ${EL_FILES}; do $(EMACS) --batch -L . -l ./test/robby-test-env.el -eval "(checkdoc-file \"$$FILE\")" ; done
 
-compile: install
+compile: install clean-compiled
 	$(EMACS) --batch -L . -l ./test/robby-test-env.el -f batch-byte-compile robby-*.el
 
 lint: install

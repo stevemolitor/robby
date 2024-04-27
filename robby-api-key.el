@@ -7,10 +7,16 @@
 ;;; Code:
 (require 'auth-source)
 
+;; declared in robby-customization.el
+(defvar robby-openai-api-key)
+
+;; declared in robby-providers.el
+(declare-function robby--provider-host ())
+
 (defun robby--get-api-key-from-auth-source ()
   "Get api key from auth source."
   (if-let ((secret (plist-get (car (auth-source-search
-                                    :host "api.openai.com"
+                                    :host (robby--provider-host)
                                     :user "apikey"
                                     :require '(:secret)))
                               :secret)))
@@ -18,15 +24,6 @@
           (encode-coding-string (funcall secret) 'utf-8)
         secret)
     (user-error "No `robby-api-key' found in auth source")))
-
-(defcustom robby-openai-api-key #'robby--get-api-key-from-auth-source
-  "OpenAI API key.
-
-A string, or a function that returns the API key."
-  :group 'robby
-  :type '(choice
-          (string :tag "OpenAI API key")
-          (function :tag "Function that returns the OpenAI API key")))
 
 (defun robby--get-api-key ()
   "Get api key from `robby-api-key'."

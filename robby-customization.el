@@ -6,11 +6,15 @@
 
 ;;; Code:
 
+(require 'map)
 (require 'spinner)
 
 (require 'robby-api-key)
-(require 'robby-validation)
 (require 'robby-utils)
+(require 'robby-validation)
+
+;;; Variable declarations
+(defvar robby--provider-settings)                 ; defined in robby-provider.el
 
 ;;; function to validate custom api options
 (defun robby--validate-custom-api-option (name)
@@ -29,6 +33,15 @@ Return an error message if the value is invalid, or nil if it is valid."
   "Simple AI Integration for Emacs."
   :group 'tools
   :tag "robby")
+
+(defcustom robby-openai-api-key #'robby--get-api-key-from-auth-source
+  "OpenAI API key.
+
+A string, or a function that returns the API key."
+  :group 'robby
+  :type '(choice
+          (string :tag "OpenAI API key")
+          (function :tag "Function that returns the OpenAI API key")))
 
 (defcustom robby-logging nil
   "Log to *robby-log* buffer if t."
@@ -83,13 +96,9 @@ It should include a `%s' placeholder for the spinner."
   :type 'string
   :group 'robby)
 
-(defcustom robby-chat-system-message "You are an AI tool embedded within Emacs. Assist users with their tasks and provide information as needed. Do not engage in harmful or malicious behavior. Please provide helpful information. Answer concisely."
+(defcustom robby-chat-system-message
+  "You are an AI tool embedded within Emacs. Assist users with their tasks and provide information as needed. Do not engage in harmful or malicious behavior. Please provide helpful information. Answer concisely."
   "System message to use with OpenAI Chat API."
-  :type 'string
-  :group 'robby)
-
-(defcustom robby-api-url "https://api.openai.com/v1/chat/completions"
-  "URL to use for OpenAI API requests."
   :type 'string
   :group 'robby)
 
@@ -98,9 +107,27 @@ It should include a `%s' placeholder for the spinner."
   "Options to pass to the chat API."
   :group 'robby)
 
-(defcustom robby-chat-model "gpt-3.5-turbo"
-  "The model to use with the completions API."
-  :type 'string
+(defun robby--provider-type ()
+  "Get the `robby-provider' custom type.
+
+Includes a choice for each provider added via
+`robby-add-provider'."
+  `(choice
+    ,@(seq-map
+       (lambda (provider-settings)
+         `(const :tag ,(plist-get (cdr provider-settings) :name) ,(car provider-settings)))
+       robby--provider-settings)))
+
+(defcustom robby-provider 'openai
+  "The AI provider to use."
+  :type (robby--provider-type)
+  :group 'robby)
+
+(defcustom robby-chat-model nil
+  "The model to use with the chat completions API.
+
+Nil means use the default model for the provider."
+  :type '(choice string (const nil))
   :group 'robby-chat-api)
 
 (defcustom robby-chat-max-tokens 2000

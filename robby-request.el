@@ -1,32 +1,43 @@
 ;;; robby-request.el  --- Make robby requests via curl or url-retrieve  -*- lexical-binding:t -*-
 
-;;; Commentary:
-
-;; Provides the `robby--request' function to make requests to the OpenAI API.
-
-;;; Code:
-
-(require 'cl-lib)
 (require 'files)
 (require 'json)
 (require 'seq)
 (require 'url-vars)
+
+(require 'robby-provider) ; require first to make sure robby--provider-settings is defined
 
 (require 'robby-api-key)
 (require 'robby-customization)
 (require 'robby-logging)
 (require 'robby-utils)
 
-;;; util functions
-(defun robby--request-parse-error-data (data)
-  "Get error from response DATA."
-  (cdr (assoc 'message (assoc 'error data))))
-
-(defun robby--request-parse-error-string (err)
+;;; request util functions
+(defun robby--request-parse-error-string (string)
   "Get error from JSON string ERR."
-  (condition-case _err
-      (robby--request-parse-error-data (json-read-from-string err))
-    (error nil)))
+  (ignore-errors
+    (robby-provider-parse-error (json-read-from-string string))))
+
+(defun robby--request-get-error (string)
+  "Get error from response STRING, or nil if no error.
+
+If there is a status code and it is not 200, try to parse the
+error message from the response and return that, otherwise return
+a generic error message. If status is 200 return nil (no error)."
+  (let ((provider (robby--provider-name))
+        (status (robby--parse-http-status string)))
+    (if (and (numberp status) (not (eq status 200)))
+        (let ((error-msg (robby--request-parse-error-string string)))
+          (if error-msg
+              (format "%s API error - '%s'" provider error-msg)
+            (if (numberp status)
+                (format "Unexpected response status %S from %s API request" status provider)
+              (format "Unexpected response from %S API request: %S" provider string)))))))
+
+;; TODO consider passing url to robby--request
+(defun robby--chat-url ()
+  "Get the chat API URL."
+  (concat "https://" (robby--provider-host) (robby--provider-api-base-path)))
 
 ;;; curl
 (defvar robby--curl-options
@@ -34,6 +45,7 @@
     "--disable"
     "--silent"
     "-m 600"
+    "-w HTTP STATUS: %{http_code}\n"
     "-H" "Content-Type: application/json"))
 
 (defun robby--curl-parse-chunk (remaining data)
@@ -68,8 +80,6 @@ of parsed JSON objects:
            (setq new-remaining (buffer-substring pos (point-max))))))
       `(:remaining ,new-remaining :parsed ,(nreverse parsed)))))
 
-(defconst robby--curl-unknown-error "Unexpected error making OpenAI request via curl" )
-
 (defun robby--curl-parse-response (string remaining streamp)
   "Parse JSON curl response from data in STRING and REMAINING unparsed text.
 
@@ -100,7 +110,7 @@ STREAMP is non-nil if the response is a stream."
                           "curl"
                           proc-buffer
                           "curl"
-                          robby-api-url
+                          (robby--chat-url)
                           curl-options)
                  (error (funcall on-error err)))))
     (let ((remaining "")
@@ -111,8 +121,9 @@ STREAMP is non-nil if the response is a stream."
         (set-process-filter
          proc
          (lambda (proc string)
+           (robby--log (format "# Raw curl response chunk:\n%s\n" string))
            (condition-case err
-               (let ((error-msg (robby--request-parse-error-string string)))
+               (let ((error-msg (robby--request-get-error string)))
                  (if error-msg
                      (progn
                        (setq errored t)
@@ -121,8 +132,8 @@ STREAMP is non-nil if the response is a stream."
                      (setq remaining (plist-get resp :remaining))
                      (funcall on-text :text (plist-get resp :text) :completep nil))))
              (error
-              (kill-process proc)
-              (error "Robby: unexpected error processing curl response: %S" err))))))
+              (error "Robby: unexpected error processing curl response: %S" err)
+              (kill-process proc))))))
       (set-process-sentinel
        proc
        (lambda (_proc _status)
@@ -131,7 +142,7 @@ STREAMP is non-nil if the response is a stream."
                  (funcall on-text :text text :completep t))
            (with-current-buffer proc-buffer
              (let* ((string (buffer-string))
-                    (error-msg (robby--request-parse-error-string string)))
+                    (error-msg (robby--request-get-error string)))
                (if error-msg
                    (funcall on-error error-msg)
                  (let ((resp (robby--curl-parse-response string "" nil)))
@@ -156,19 +167,19 @@ ON-ERROR is the callback for when an error is received."
           (encode-coding-string (json-encode payload) 'utf-8))
          (url-request-extra-headers
           `(("Content-Type" . "application/json")
-            ("Authorization" . ,(concat "Bearer " (robby--get-api-key)))))
+            ("Authorization:" . ,(concat "Bearer " (robby--get-api-key)))))
          (inhibit-message t)
          (message-log-max nil))
-    (robby--log (format "#url-retrieve request JSON payload:\n%s\n" url-request-data))
     (url-retrieve
-     robby-api-url
+     (robby--chat-url)
      (lambda (_status)
+       (robby--log (format "# URL retrieve response buffer contents: %s" (buffer-substring-no-properties (point-min) (point-max))))
        (goto-char (point-min))
        (re-search-forward "^{")
        (backward-char 1)
        (let* ((json-object-type 'alist)
               (resp (json-read))
-              (err (robby--request-parse-error-data resp)))
+              (err (robby-provider-parse-error resp)))
          (if err
              (funcall on-error err)
            (let ((text (robby--chunk-content resp nil)))
