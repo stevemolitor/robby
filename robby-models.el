@@ -16,12 +16,12 @@
 (defun robby--get-models ()
   "Get the list of available models from OpenAI.
 
-Make  request to OpenAI API to get the list of available models."
+Make request to OpenAI API to get the list of available models."
   (if robby--models
       robby--models
     (let* ((inhibit-message t)
            (message-log-max nil)
-           (url (robby--models-url))
+           (url (concat "https://" (robby--provider-host) (robby--provider-models-path)))
            (url-request-method "GET")
            (url-request-extra-headers
             `(("Content-Type" . "application/json")

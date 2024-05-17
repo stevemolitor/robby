@@ -13,7 +13,7 @@
  ;; :default-model "togethercomputer/StripedHyena-Nous-7B"
  :models-path "/models/info?=")
 
-(cl-defmethod robby-providers-parse-models (data &context (robby-provider (eql 'togetherai)))
+(cl-defmethod robby-provider-parse-models (data &context (robby-provider (eql 'togetherai)))
   "Get models from response DATA for togetherai."
   (seq-map (lambda (elem) (alist-get 'name elem)) data))
 
